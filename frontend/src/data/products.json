@@ -1,0 +1,232 @@
+[
+    {
+        "id": "1",
+        "name": "AC Milan Retro Black Jersey",
+        "price": 799,
+        "originalPrice": 1299,
+        "description": "Premium quality AC Milan retro jersey in classic black. Perfect for true fans who appreciate the legendary style of the Rossoneri. Made with breathable fabric for maximum comfort.",
+        "category": "Retro",
+        "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL",
+            "XXL"
+        ],
+        "images": [
+            "/images/ac_milan_black.jpg"
+        ],
+        "inStock": true,
+        "featured": true
+    },
+    {
+        "id": "2",
+        "name": "Brazil Classic Yellow Jersey",
+        "price": 899,
+        "originalPrice": 1499,
+        "description": "The iconic Brazil national team jersey in stunning yellow. Relive the glory of Brazilian football with this classic design. Perfect for World Cup celebrations.",
+        "category": "Classic",
+        "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL"
+        ],
+        "images": [
+            "/images/184D107C-6266-4F93-91D8-F2FD5565CCAA.jpg"
+        ],
+        "inStock": true,
+        "featured": true
+    },
+    {
+        "id": "3",
+        "name": "Argentina World Cup Jersey",
+        "price": 999,
+        "originalPrice": 1599,
+        "description": "Celebrate Argentina's World Cup glory with this stunning jersey. Featuring the iconic blue and white stripes that represent the passion of La Albiceleste.",
+        "category": "Classic",
+        "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL",
+            "XXL"
+        ],
+        "images": [
+            "/images/31E0DD0A-67BA-4CCF-A580-021C6F15A0F6.jpg"
+        ],
+        "inStock": true,
+        "featured": true
+    },
+    {
+        "id": "4",
+        "name": "Manchester United Retro Jersey",
+        "price": 849,
+        "originalPrice": 1399,
+        "description": "Classic Manchester United retro jersey. Feel the spirit of Old Trafford with this iconic design worn by legends of the beautiful game.",
+        "category": "Retro",
+        "sizes": [
+            "M",
+            "L",
+            "XL"
+        ],
+        "images": [
+            "/images/4193B363-B0FA-4D48-A816-6F95C55DD719.jpg"
+        ],
+        "inStock": true,
+        "featured": false
+    },
+    {
+        "id": "5",
+        "name": "Real Madrid Classic White Jersey",
+        "price": 899,
+        "originalPrice": 1499,
+        "description": "The legendary all-white Real Madrid jersey. Experience the elegance of Los Blancos with this timeless classic design.",
+        "category": "Classic",
+        "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL"
+        ],
+        "images": [
+            "/images/49CE5FF1-1BFD-45BA-A296-5345B20BB0AA.jpg"
+        ],
+        "inStock": true,
+        "featured": true
+    },
+    {
+        "id": "6",
+        "name": "Barcelona Retro Away Jersey",
+        "price": 799,
+        "originalPrice": 1299,
+        "description": "Barcelona's iconic away jersey from the golden era. Features the classic design that witnessed some of the greatest football moments.",
+        "category": "Retro",
+        "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL",
+            "XXL"
+        ],
+        "images": [
+            "/images/4D23414F-8174-4552-84A0-4E46875111DF.jpg"
+        ],
+        "inStock": true,
+        "featured": false
+    },
+    {
+        "id": "7",
+        "name": "Italy World Cup Blue Jersey",
+        "price": 949,
+        "originalPrice": 1499,
+        "description": "The beautiful Azzurri blue jersey. Celebrate Italian football glory with this stunning national team classic.",
+        "category": "Classic",
+        "sizes": [
+            "M",
+            "L",
+            "XL"
+        ],
+        "images": [
+            "/images/50BA9FB9-8465-4F51-9DDA-0EC9E3F99FCF.jpg"
+        ],
+        "inStock": true,
+        "featured": false
+    },
+    {
+        "id": "8",
+        "name": "Liverpool Retro Red Jersey",
+        "price": 849,
+        "originalPrice": 1399,
+        "description": "The famous Liverpool FC red jersey. Feel the spirit of Anfield and YNWA with this iconic Reds classic.",
+        "category": "Retro",
+        "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL"
+        ],
+        "images": [
+            "/images/53D9EFFC-79AC-41C4-89AE-B5D4E715F26B.jpg"
+        ],
+        "inStock": true,
+        "featured": true
+    },
+    {
+        "id": "9",
+        "name": "Germany Classic Jersey",
+        "price": 899,
+        "originalPrice": 1399,
+        "description": "The German national team classic jersey. Experience the precision and excellence of Die Mannschaft.",
+        "category": "Classic",
+        "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL",
+            "XXL"
+        ],
+        "images": [
+            "/images/5ADA3694-975C-4A07-82EF-69A9B62321BD.jpg"
+        ],
+        "inStock": true,
+        "featured": false
+    },
+    {
+        "id": "10",
+        "name": "Chelsea Retro Blue Jersey",
+        "price": 799,
+        "originalPrice": 1299,
+        "description": "Chelsea FC's iconic blue jersey. Represent the Blues with this classic Stamford Bridge favorite.",
+        "category": "Retro",
+        "sizes": [
+            "M",
+            "L",
+            "XL"
+        ],
+        "images": [
+            "/images/62ABF83C-9F0B-4E17-A70C-D84167132220.jpg"
+        ],
+        "inStock": true,
+        "featured": false
+    },
+    {
+        "id": "11",
+        "name": "Portugal Red Jersey",
+        "price": 949,
+        "originalPrice": 1499,
+        "description": "The passionate red of Portugal. Celebrate the glory of Seleção das Quinas with this stunning jersey.",
+        "category": "Classic",
+        "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL"
+        ],
+        "images": [
+            "/images/6D7DB310-A1A7-437E-AF9B-CC7BCA34C576.jpg"
+        ],
+        "inStock": true,
+        "featured": true
+    },
+    {
+        "id": "12",
+        "name": "France World Cup Jersey",
+        "price": 999,
+        "originalPrice": 1599,
+        "description": "Les Bleus iconic blue jersey. Celebrate French football excellence with this World Cup classic.",
+        "category": "Classic",
+        "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL",
+            "XXL"
+        ],
+        "images": [
+            "/images/7161ECF3-FAF4-4819-83EB-C87FE0511E87.jpg"
+        ],
+        "inStock": true,
+        "featured": false
+    }
+]
