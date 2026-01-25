@@ -9,6 +9,7 @@ const app = express();
 const corsOptions = {
     origin: [
         process.env.FRONTEND_URL,
+        'https://harlon-1.vercel.app/',
         'http://localhost:5173',
         'http://127.0.0.1:5173'
     ].filter(Boolean),
