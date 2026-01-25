@@ -203,7 +203,11 @@ function CategoriesManager() {
                                         images={formData.image ? [formData.image] : []}
                                         onImagesChange={(images) => setFormData({ ...formData, image: images[0] || '' })}
                                         maxImages={1}
+                                        aspectRatio={1}
                                     />
+                                    <p style={{ fontSize: '12px', color: 'var(--primary-color)', marginTop: '8px' }}>
+                                        Image will be cropped to square format
+                                    </p>
                                 </div>
                             </div>
 

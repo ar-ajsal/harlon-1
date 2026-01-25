@@ -1932,3 +1932,214 @@ h4 {
     padding: 15px 20px;
   }
 }
+
+/* ===== Image Cropper Styles ===== */
+.image-cropper-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cropper-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.cropper-container {
+  position: relative;
+  background: var(--color-white);
+  border-radius: 16px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+  animation: slideUp 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cropper-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.cropper-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.4rem;
+  color: var(--heading-color);
+  margin-bottom: 4px;
+}
+
+.cropper-header h3 svg {
+  color: var(--color-black);
+}
+
+.cropper-hint {
+  font-size: 13px;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.cropper-content {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  min-height: 300px;
+  max-height: 60vh;
+  overflow: auto;
+}
+
+.react-crop-wrapper {
+  max-width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* React Image Crop customizations */
+.ReactCrop {
+  max-height: 60vh;
+}
+
+.ReactCrop__crop-selection {
+  border: 2px solid #fff !important;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5) !important;
+}
+
+.ReactCrop__drag-handle {
+  width: 12px !important;
+  height: 12px !important;
+  background: #fff !important;
+  border: 2px solid var(--color-black) !important;
+  border-radius: 50% !important;
+}
+
+.ReactCrop__drag-handle::after {
+  display: none !important;
+}
+
+.cropper-actions {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid var(--border-color);
+  background: var(--color-white);
+}
+
+.cropper-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.cropper-btn.btn-secondary {
+  background: #f1f3f5;
+  color: var(--base-color);
+  border: 1px solid var(--border-color);
+}
+
+.cropper-btn.btn-secondary:hover {
+  background: #e9ecef;
+}
+
+.cropper-btn.btn-primary {
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  color: white;
+  border: none;
+}
+
+.cropper-btn.btn-primary:hover {
+  background: linear-gradient(135deg, #20bd5a, #0f7a6b);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+.crop-progress {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Mobile responsiveness for cropper */
+@media (max-width: 768px) {
+  .cropper-container {
+    max-width: 95vw;
+    max-height: 85vh;
+    border-radius: 12px;
+  }
+
+  .cropper-header {
+    padding: 16px 20px;
+  }
+
+  .cropper-header h3 {
+    font-size: 1.2rem;
+  }
+
+  .cropper-content {
+    padding: 16px;
+    max-height: 50vh;
+  }
+
+  .cropper-actions {
+    padding: 12px 16px;
+    flex-direction: column;
+  }
+
+  .cropper-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .crop-progress {
+    bottom: 80px;
+    font-size: 12px;
+    padding: 8px 16px;
+  }
+}

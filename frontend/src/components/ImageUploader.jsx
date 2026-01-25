@@ -1,10 +1,14 @@
 import { useState, useRef } from 'react'
-import { FiUpload, FiX, FiImage } from 'react-icons/fi'
+import { FiUpload, FiX, FiImage, FiCrop } from 'react-icons/fi'
 import { uploadApi } from '../services/api'
+import ImageCropper from './ImageCropper'
 
-function ImageUploader({ images, onImagesChange, maxImages = 5 }) {
+function ImageUploader({ images, onImagesChange, maxImages = 5, aspectRatio = null }) {
     const [uploading, setUploading] = useState(false)
     const [error, setError] = useState('')
+    const [cropperImage, setCropperImage] = useState(null)
+    const [pendingFiles, setPendingFiles] = useState([])
+    const [currentCropIndex, setCurrentCropIndex] = useState(0)
     const fileInputRef = useRef(null)
 
     const handleFileSelect = async (e) => {
@@ -26,26 +30,80 @@ function ImageUploader({ images, onImagesChange, maxImages = 5 }) {
         }
 
         setError('')
+
+        // Store files for cropping
+        setPendingFiles(files)
+        setCurrentCropIndex(0)
+
+        // Start cropping the first image
+        const firstFile = files[0]
+        const reader = new FileReader()
+        reader.onload = () => {
+            setCropperImage(reader.result)
+        }
+        reader.readAsDataURL(firstFile)
+
+        // Reset input
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ''
+        }
+    }
+
+    const handleCropComplete = async (croppedFile) => {
         setUploading(true)
+        setCropperImage(null)
 
         try {
-            // Upload each file
-            const uploadPromises = files.map(async (file) => {
-                const result = await uploadApi.uploadSingle(file)
-                return result.url
-            })
+            // Upload the cropped file
+            const result = await uploadApi.uploadSingle(croppedFile)
+            const newImage = result.url
 
-            const uploadedUrls = await Promise.all(uploadPromises)
-            onImagesChange([...images, ...uploadedUrls])
+            // Add to images
+            onImagesChange([...images, newImage])
+
+            // Check if there are more files to crop
+            const nextIndex = currentCropIndex + 1
+            if (nextIndex < pendingFiles.length) {
+                setCurrentCropIndex(nextIndex)
+                const nextFile = pendingFiles[nextIndex]
+                const reader = new FileReader()
+                reader.onload = () => {
+                    setCropperImage(reader.result)
+                    setUploading(false)
+                }
+                reader.readAsDataURL(nextFile)
+            } else {
+                // All done
+                setPendingFiles([])
+                setCurrentCropIndex(0)
+                setUploading(false)
+            }
         } catch (err) {
             setError('Upload failed. Please try again.')
             console.error('Upload error:', err)
-        } finally {
             setUploading(false)
-            // Reset input
-            if (fileInputRef.current) {
-                fileInputRef.current.value = ''
+            setPendingFiles([])
+            setCurrentCropIndex(0)
+        }
+    }
+
+    const handleCropCancel = () => {
+        setCropperImage(null)
+
+        // Check if there are more files to crop
+        const nextIndex = currentCropIndex + 1
+        if (nextIndex < pendingFiles.length) {
+            setCurrentCropIndex(nextIndex)
+            const nextFile = pendingFiles[nextIndex]
+            const reader = new FileReader()
+            reader.onload = () => {
+                setCropperImage(reader.result)
             }
+            reader.readAsDataURL(nextFile)
+        } else {
+            // All done
+            setPendingFiles([])
+            setCurrentCropIndex(0)
         }
     }
 
@@ -60,7 +118,7 @@ function ImageUploader({ images, onImagesChange, maxImages = 5 }) {
                 ref={fileInputRef}
                 type="file"
                 accept="image/*"
-                multiple
+                multiple={maxImages > 1}
                 onChange={handleFileSelect}
                 style={{ display: 'none' }}
                 id="image-upload-input"
@@ -79,6 +137,10 @@ function ImageUploader({ images, onImagesChange, maxImages = 5 }) {
                     <>
                         <FiUpload className="upload-icon" />
                         <p><strong>Tap to upload</strong></p>
+                        <p className="upload-hint">
+                            <FiCrop style={{ marginRight: '4px' }} />
+                            Crop before upload
+                        </p>
                         <p className="upload-hint">JPG, PNG, WebP up to 5MB</p>
                     </>
                 )}
@@ -106,6 +168,23 @@ function ImageUploader({ images, onImagesChange, maxImages = 5 }) {
                             <span>Add More</span>
                         </label>
                     )}
+                </div>
+            )}
+
+            {/* Image Cropper Modal */}
+            {cropperImage && (
+                <ImageCropper
+                    imageSrc={cropperImage}
+                    onCropComplete={handleCropComplete}
+                    onCancel={handleCropCancel}
+                    aspectRatio={aspectRatio}
+                />
+            )}
+
+            {/* Progress indicator for multiple images */}
+            {pendingFiles.length > 1 && cropperImage && (
+                <div className="crop-progress">
+                    Cropping image {currentCropIndex + 1} of {pendingFiles.length}
                 </div>
             )}
         </div>
