@@ -253,16 +253,14 @@ function ProductsManager() {
                                             <div className="mobile-card-title">{product.name}</div>
                                             <div className="mobile-card-subtitle">{product.category}</div>
                                             <div className="mobile-card-price">₹{product.price}</div>
-                                            <button
-                                                className={`mobile-card-status ${product.isVisible !== false ? 'visible' : 'hidden'}`}
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    handleVisibilityToggle(product)
-                                                }}
-                                                style={{ border: 'none', cursor: 'pointer' }}
-                                            >
-                                                {product.isVisible !== false ? 'Visible' : 'Hidden'}
-                                            </button>
+                                            <label onClick={e => e.stopPropagation()} className="toggle-switch">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={product.isVisible !== false}
+                                                    onChange={() => handleVisibilityToggle(product)}
+                                                />
+                                                <span className="toggle-slider"></span>
+                                            </label>
                                         </div>
                                     </div>
                                 ))}
@@ -303,13 +301,14 @@ function ProductsManager() {
                                                 <td>{product.category}</td>
                                                 <td>₹{product.price}</td>
                                                 <td>
-                                                    <button
-                                                        className={`btn-icon ${product.isVisible !== false ? 'text-success' : 'text-danger'}`}
-                                                        onClick={() => handleVisibilityToggle(product)}
-                                                        title="Toggle Visibility"
-                                                    >
-                                                        {product.isVisible !== false ? 'Visible' : 'Hidden'}
-                                                    </button>
+                                                    <label onClick={e => e.stopPropagation()} className="toggle-switch">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={product.isVisible !== false}
+                                                            onChange={() => handleVisibilityToggle(product)}
+                                                        />
+                                                        <span className="toggle-slider"></span>
+                                                    </label>
                                                 </td>
                                                 <td>
                                                     <div className="action-buttons">
