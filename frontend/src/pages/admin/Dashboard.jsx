@@ -1,7 +1,10 @@
+import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { FiHome, FiPackage, FiGrid, FiLogOut, FiShoppingBag, FiLayers } from 'react-icons/fi'
+import { FiHome, FiPackage, FiGrid, FiLogOut, FiShoppingBag, FiLayers, FiTrendingUp, FiDollarSign, FiFileText, FiPlus, FiClipboard, FiMenu, FiFilter } from 'react-icons/fi'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useAuth } from '../../context/AuthContext'
 import { useProducts } from '../../context/ProductContext'
+import { ordersAPI } from '../../api/orders.api'
 
 function Dashboard() {
     const navigate = useNavigate()
@@ -13,140 +16,195 @@ function Dashboard() {
         navigate('/admin')
     }
 
+    const [dashboardStats, setDashboardStats] = useState({
+        todayRevenue: 0,
+        monthRevenue: 0,
+        pendingOrders: 0,
+        monthProfit: 0
+    })
+    const [sidebarOpen, setSidebarOpen] = useState(false)
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const res = await ordersAPI.getTodayStats()
+                setDashboardStats(res.data)
+            } catch (err) {
+                console.error('Error fetching dashboard stats:', err)
+            }
+        }
+        fetchStats()
+    }, [])
+
+    const formatCurrency = (val) => `₹${(val || 0).toLocaleString('en-IN')}`
+
     const stats = [
         {
+            icon: <FiDollarSign />,
+            value: formatCurrency(dashboardStats.todayRevenue),
+            label: "Today's Sales",
+            color: 'var(--gold)'
+        },
+        {
+            icon: <FiTrendingUp />,
+            value: formatCurrency(dashboardStats.monthRevenue),
+            label: "Month Sales",
+            color: 'var(--success)'
+        },
+        {
             icon: <FiPackage />,
-            value: products.length,
-            label: 'Total Products',
-            color: 'var(--primary-color)'
+            value: dashboardStats.pendingOrders,
+            label: 'Pending Orders',
+            color: 'var(--warning)'
         },
         {
-            icon: <FiLayers />,
-            value: categories.length,
-            label: 'Categories',
-            color: 'var(--success-color)'
-        },
-        {
-            icon: <FiShoppingBag />,
-            value: products.filter(p => p.inStock).length,
-            label: 'In Stock',
-            color: 'var(--warning-color)'
-        },
-        {
-            icon: <FiGrid />,
-            value: products.filter(p => p.featured).length,
-            label: 'Featured',
-            color: 'var(--accent-color)'
+            icon: <FiDollarSign />,
+            value: formatCurrency(dashboardStats.monthProfit),
+            label: 'Month Profit',
+            color: 'var(--noir-100)'
         }
     ]
 
     return (
         <div className="admin-layout">
-            <aside className="admin-sidebar">
+            <button
+                className="sidebar-toggle"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                aria-label="Toggle Sidebar"
+            >
+                <FiMenu size={24} />
+            </button>
+
+            {/* Mobile Sidebar Overlay */}
+            <div
+                className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`}
+                onClick={() => setSidebarOpen(false)}
+            />
+
+            <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
                 <div className="admin-logo">harlon</div>
-                <nav className="admin-nav">
-                    <NavLink
-                        to="/admin/dashboard"
-                        className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                    >
-                        <FiHome />
-                        Dashboard
-                    </NavLink>
-                    <NavLink
-                        to="/admin/products"
-                        className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                    >
-                        <FiPackage />
-                        Products
-                    </NavLink>
-                    <NavLink
-                        to="/admin/categories"
-                        className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                    >
-                        <FiLayers />
-                        Categories
-                    </NavLink>
-                    <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '20px 0' }} />
-                    <Link to="/" className="admin-nav-link" target="_blank">
-                        <FiShoppingBag />
-                        View Store
-                    </Link>
-                    <button onClick={handleLogout} className="admin-nav-link" style={{ width: '100%', textAlign: 'left' }}>
-                        <FiLogOut />
-                        Logout
-                    </button>
-                </nav>
+                <div className="sidebar-scroll">
+                    <nav className="admin-nav">
+                        <NavLink
+                            to="/admin/dashboard"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiHome /> Dashboard
+                        </NavLink>
+                        <NavLink
+                            to="/admin/products"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiPackage /> Products
+                        </NavLink>
+                        <NavLink
+                            to="/admin/categories"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiLayers /> Categories
+                        </NavLink>
+                        <NavLink
+                            to="/admin/orders"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiFileText /> Invoices
+                        </NavLink>
+                        <NavLink
+                            to="/admin/reports"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiTrendingUp /> Reports
+                        </NavLink>
+
+                        <div className="nav-divider" />
+
+                        <Link to="/" className="admin-nav-link" target="_blank">
+                            <FiShoppingBag /> View Store
+                        </Link>
+                        <button onClick={handleLogout} className="admin-nav-link logout-btn">
+                            <FiLogOut /> Logout
+                        </button>
+                    </nav>
+                </div>
             </aside>
 
             <main className="admin-content">
-                <div className="admin-header">
-                    <h1 className="admin-title">Dashboard</h1>
-                </div>
+                <header className="dashboard-header">
+                    <div>
+                        <h1 className="admin-title">Overview</h1>
+                        <p className="admin-subtitle">Welcome back, Admin</p>
+                    </div>
+                    <div className="date-badge">
+                        {new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
+                    </div>
+                </header>
 
+                {/* Stats Grid */}
                 <div className="stats-grid">
                     {stats.map((stat, index) => (
                         <div key={index} className="stat-card">
-                            <div className="stat-icon" style={{ color: stat.color }}>
+                            <div className="stat-icon-wrapper" style={{ color: stat.color, background: `${stat.color}15` }}>
                                 {stat.icon}
                             </div>
-                            <div className="stat-value">{stat.value}</div>
-                            <div className="stat-label">{stat.label}</div>
+                            <div className="stat-info">
+                                <div className="stat-value">{stat.value}</div>
+                                <div className="stat-label">{stat.label}</div>
+                            </div>
                         </div>
                     ))}
                 </div>
 
-                <div style={{
-                    background: 'var(--surface-color)',
-                    borderRadius: 'var(--border-radius-md)',
-                    padding: '30px',
-                    border: '1px solid var(--border-color)'
-                }}>
-                    <h3 style={{ marginBottom: '20px' }}>Quick Actions</h3>
-                    <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-                        <Link to="/admin/products" className="btn btn-primary">
-                            <FiPackage />
-                            Manage Products
-                        </Link>
-                        <Link to="/admin/categories" className="btn btn-secondary">
-                            <FiLayers />
-                            Manage Categories
-                        </Link>
+                <div className="dashboard-grid-2">
+                    {/* Quick Actions */}
+                    <div className="dashboard-card">
+                        <h3>Quick Actions</h3>
+                        <div className="quick-actions">
+                            <Link to="/admin/orders/new" className="action-tile">
+                                <span className="icon"><FiPlus /></span>
+                                <span>Create Order</span>
+                            </Link>
+                            <Link to="/admin/orders" className="action-tile">
+                                <span className="icon"><FiClipboard /></span>
+                                <span>View Invoices</span>
+                            </Link>
+                            <Link to="/admin/products" className="action-tile">
+                                <span className="icon"><FiPackage /></span>
+                                <span>Add Product</span>
+                            </Link>
+                            <Link to="/admin/categories" className="action-tile">
+                                <span className="icon"><FiLayers /></span>
+                                <span>Categories</span>
+                            </Link>
+                        </div>
                     </div>
-                </div>
 
-                <div style={{
-                    marginTop: '30px',
-                    background: 'var(--surface-color)',
-                    borderRadius: 'var(--border-radius-md)',
-                    padding: '30px',
-                    border: '1px solid var(--border-color)'
-                }}>
-                    <h3 style={{ marginBottom: '20px' }}>Recent Products</h3>
-                    {products.slice(0, 5).map(product => (
-                        <div
-                            key={product._id}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '15px',
-                                padding: '15px 0',
-                                borderBottom: '1px solid var(--border-color)'
-                            }}
-                        >
-                            <img
-                                src={product.images?.[0] || '/images/placeholder.jpg'}
-                                alt={product.name}
-                                style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px' }}
-                            />
-                            <div style={{ flex: 1 }}>
-                                <div style={{ fontWeight: '500' }}>{product.name}</div>
-                                <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{product.category}</div>
-                            </div>
-                            <div style={{ color: 'var(--success-color)', fontWeight: '600' }}>
-                                ₹{product.price}
-                            </div>
+                    {/* Recent Products */}
+                    <div className="dashboard-card">
+                        <div className="card-header-flex">
+                            <h3>Recent Products</h3>
+                            <Link to="/admin/products" className="view-all">View All</Link>
                         </div>
-                    ))}
+                        <div className="recent-list">
+                            {products.slice(0, 4).map(product => (
+                                <div key={product._id} className="recent-item">
+                                    <img
+                                        src={product.images?.[0] || '/images/placeholder.jpg'}
+                                        alt={product.name}
+                                    />
+                                    <div className="recent-info">
+                                        <h4>{product.name}</h4>
+                                        <span>{product.category}</span>
+                                    </div>
+                                    <span className="recent-price">₹{product.price}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>

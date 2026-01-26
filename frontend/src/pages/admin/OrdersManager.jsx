@@ -1,0 +1,229 @@
+import { useState, useEffect } from 'react'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag, FiFileText, FiSearch, FiPlus, FiEye, FiDownload, FiMenu } from 'react-icons/fi'
+import { useAuth } from '../../context/AuthContext'
+import { ordersAPI } from '../../api/orders.api'
+
+function OrdersManager() {
+    const navigate = useNavigate()
+    const { logout } = useAuth()
+    const [orders, setOrders] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [search, setSearch] = useState('')
+    const [statusFilter, setStatusFilter] = useState('all')
+    const [sidebarOpen, setSidebarOpen] = useState(false)
+
+    const handleLogout = () => {
+        logout()
+        navigate('/admin')
+    }
+
+    useEffect(() => {
+        fetchOrders()
+    }, [search])
+
+    const fetchOrders = async () => {
+        try {
+            setLoading(true)
+            const response = await ordersAPI.getAll(search)
+            setOrders(response.data || [])
+        } catch (error) {
+            console.error('Error fetching orders:', error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleStatusChange = async (orderId, newStatus) => {
+        try {
+            await ordersAPI.updateStatus(orderId, newStatus)
+            fetchOrders()
+        } catch (error) {
+            console.error('Error updating status:', error)
+        }
+    }
+
+    const filteredOrders = statusFilter === 'all'
+        ? orders
+        : orders.filter(order => order.status === statusFilter)
+
+    const getStatusClass = (status) => {
+        switch (status) {
+            case 'Paid': return 'status-paid'
+            case 'Pending': return 'status-pending'
+            case 'Cancelled': return 'status-cancelled'
+            default: return ''
+        }
+    }
+
+    const formatDate = (date) => {
+        return new Date(date).toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        })
+    }
+
+    const formatCurrency = (amount) => {
+        return `₹${amount?.toLocaleString('en-IN') || 0}`
+    }
+
+    return (
+        <div className="admin-layout">
+            <button
+                className="sidebar-toggle"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                aria-label="Toggle Sidebar"
+            >
+                <FiMenu size={24} />
+            </button>
+
+            {/* Mobile Sidebar Overlay */}
+            <div
+                className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`}
+                onClick={() => setSidebarOpen(false)}
+            />
+
+            <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
+                <div className="admin-logo">harlon</div>
+                <div className="sidebar-scroll">
+                    <nav className="admin-nav">
+                        <NavLink to="/admin/dashboard" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}>
+                            <FiHome /> Dashboard
+                        </NavLink>
+                        <NavLink to="/admin/products" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}>
+                            <FiPackage /> Products
+                        </NavLink>
+                        <NavLink to="/admin/categories" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}>
+                            <FiLayers /> Categories
+                        </NavLink>
+                        <NavLink to="/admin/orders" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}>
+                            <FiFileText /> Invoices
+                        </NavLink>
+
+                        <div className="nav-divider" />
+
+                        <Link to="/" className="admin-nav-link" target="_blank">
+                            <FiShoppingBag /> View Store
+                        </Link>
+                        <button onClick={handleLogout} className="admin-nav-link logout-btn">
+                            <FiLogOut /> Logout
+                        </button>
+                    </nav>
+                </div>
+            </aside>
+
+            <main className="admin-content">
+                <header className="dashboard-header">
+                    <div>
+                        <h1 className="admin-title">Invoices</h1>
+                        <p className="admin-subtitle">Manage orders and invoices</p>
+                    </div>
+                    <Link to="/admin/orders/new" className="btn btn-primary">
+                        <FiPlus /> Create Order
+                    </Link>
+                </header>
+
+                {/* Filters */}
+                <div className="orders-filters">
+                    <div className="search-box">
+                        <FiSearch className="search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Search by invoice number or phone..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="search-input"
+                        />
+                    </div>
+                    <div className="status-filters">
+                        {['all', 'Pending', 'Paid', 'Cancelled'].map(status => (
+                            <button
+                                key={status}
+                                className={`filter-btn ${statusFilter === status ? 'active' : ''}`}
+                                onClick={() => setStatusFilter(status)}
+                            >
+                                {status === 'all' ? 'All' : status}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Orders Table */}
+                <div className="orders-table-container">
+                    {loading ? (
+                        <div className="loading-state">Loading orders...</div>
+                    ) : filteredOrders.length === 0 ? (
+                        <div className="empty-state">
+                            <FiFileText className="empty-icon" />
+                            <h3>No orders found</h3>
+                            <p>Create your first order to generate an invoice</p>
+                            <Link to="/admin/orders/new" className="btn btn-primary">
+                                <FiPlus /> Create Order
+                            </Link>
+                        </div>
+                    ) : (
+                        <table className="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Payment</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredOrders.map(order => (
+                                    <tr key={order._id}>
+                                        <td className="invoice-number">{order.invoiceNumber}</td>
+                                        <td>
+                                            <div className="customer-info">
+                                                <span className="customer-name">{order.customer?.name}</span>
+                                                <span className="customer-phone">{order.customer?.phone}</span>
+                                            </div>
+                                        </td>
+                                        <td>{formatDate(order.date)}</td>
+                                        <td className="amount">{formatCurrency(order.finalTotal)}</td>
+                                        <td>{order.paymentMethod}</td>
+                                        <td>
+                                            <select
+                                                value={order.status}
+                                                onChange={(e) => handleStatusChange(order._id, e.target.value)}
+                                                className={`status-select ${getStatusClass(order.status)}`}
+                                            >
+                                                <option value="Pending">Pending</option>
+                                                <option value="Paid">Paid</option>
+                                                <option value="Cancelled">Cancelled</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div className="action-buttons">
+                                                <Link to={`/admin/orders/${order._id}`} className="action-btn" title="View">
+                                                    <FiEye />
+                                                </Link>
+                                                <a
+                                                    href={ordersAPI.getPdfUrl(order._id)}
+                                                    className="action-btn"
+                                                    title="Download PDF"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    <FiDownload />
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+            </main>
+        </div>
+    )
+}
+
+export default OrdersManager

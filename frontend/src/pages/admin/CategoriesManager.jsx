@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers } from 'react-icons/fi'
+import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiMenu } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import { useProducts } from '../../context/ProductContext'
 import ImageUploader from '../../components/ImageUploader'
@@ -13,6 +13,7 @@ function CategoriesManager() {
     const [showModal, setShowModal] = useState(false)
     const [editingCategory, setEditingCategory] = useState(null)
     const [formData, setFormData] = useState({ name: '', image: '' })
+    const [sidebarOpen, setSidebarOpen] = useState(false)
 
     const handleLogout = () => {
         logout()
@@ -64,12 +65,27 @@ function CategoriesManager() {
 
     return (
         <div className="admin-layout">
-            <aside className="admin-sidebar">
+            <button
+                className="sidebar-toggle"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                aria-label="Toggle Sidebar"
+            >
+                <FiMenu size={24} />
+            </button>
+
+            {/* Mobile Sidebar Overlay */}
+            <div
+                className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`}
+                onClick={() => setSidebarOpen(false)}
+            />
+
+            <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
                 <div className="admin-logo">harlon</div>
                 <nav className="admin-nav">
                     <NavLink
                         to="/admin/dashboard"
                         className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                        onClick={() => setSidebarOpen(false)}
                     >
                         <FiHome />
                         Dashboard
@@ -77,6 +93,7 @@ function CategoriesManager() {
                     <NavLink
                         to="/admin/products"
                         className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                        onClick={() => setSidebarOpen(false)}
                     >
                         <FiPackage />
                         Products
@@ -84,6 +101,7 @@ function CategoriesManager() {
                     <NavLink
                         to="/admin/categories"
                         className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                        onClick={() => setSidebarOpen(false)}
                     >
                         <FiLayers />
                         Categories

@@ -32,6 +32,11 @@ const productSchema = new mongoose.Schema({
     images: [{
         type: String
     }],
+    stock: {
+        type: Number,
+        default: 0,
+        min: [0, 'Stock cannot be negative']
+    },
     inStock: {
         type: Boolean,
         default: true
@@ -43,6 +48,10 @@ const productSchema = new mongoose.Schema({
     bestSeller: {
         type: Boolean,
         default: false
+    },
+    isVisible: {
+        type: Boolean,
+        default: true
     }
 }, {
     timestamps: true

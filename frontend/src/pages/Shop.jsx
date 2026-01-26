@@ -1,47 +1,46 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { useProducts } from '../context/ProductContext'
 import ProductCard from '../components/ProductCard'
 
 function Shop() {
+    const [searchParams] = useSearchParams()
     const { products, categories, loading } = useProducts()
-    const [searchParams, setSearchParams] = useSearchParams()
-    // Initial category from URL or 'all'
-    const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all')
-    const [searchQuery, setSearchQuery] = useState('')
+    const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all')
+    const [filteredProducts, setFilteredProducts] = useState([])
 
-    // Update URL when category changes
-    const handleCategoryChange = (categorySlug) => {
-        setActiveCategory(categorySlug)
-        if (categorySlug === 'all') {
-            searchParams.delete('category')
+    // Debug logging
+    console.log('[Shop] products:', products)
+    console.log('[Shop] products.length:', products.length)
+    console.log('[Shop] selectedCategory:', selectedCategory)
+    console.log('[Shop] filteredProducts:', filteredProducts)
+    console.log('[Shop] loading:', loading)
+
+    useEffect(() => {
+        console.log('[Shop useEffect] Running filter logic')
+        console.log('[Shop useEffect] selectedCategory:', selectedCategory)
+        console.log('[Shop useEffect] products:', products)
+
+        const visibleProducts = products.filter(p => p.isVisible !== false)
+
+        if (selectedCategory === 'all') {
+            setFilteredProducts(visibleProducts)
         } else {
-            searchParams.set('category', categorySlug)
+            setFilteredProducts(
+                visibleProducts.filter(p =>
+                    p.category.toLowerCase() === selectedCategory.toLowerCase()
+                )
+            )
         }
-        setSearchParams(searchParams)
-    }
+    }, [selectedCategory, products])
 
-    // Update active category if URL changes externally
     useEffect(() => {
         const categoryParam = searchParams.get('category')
-        if (categoryParam && categoryParam !== activeCategory) {
-            setActiveCategory(categoryParam)
-        } else if (!categoryParam && activeCategory !== 'all') {
-            setActiveCategory('all')
+        if (categoryParam) {
+            setSelectedCategory(categoryParam)
         }
     }, [searchParams])
-
-    const activeCategoryName = activeCategory === 'all'
-        ? 'all'
-        : categories.find(c => c.slug === activeCategory)?.name || activeCategory;
-
-    const filteredProducts = products.filter(product => {
-        const matchesCategory = activeCategory === 'all' ||
-            product.category.toLowerCase() === activeCategoryName.toLowerCase()
-        const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            product.category.toLowerCase().includes(searchQuery.toLowerCase())
-        return matchesCategory && matchesSearch
-    })
 
     if (loading) {
         return (
@@ -53,66 +52,77 @@ function Shop() {
 
     return (
         <div className="shop-page">
-            <div className="container">
-                <div className="shop-header">
-                    <h1 className="section-title">Shop All Jerseys</h1>
-
-                    {/* Search */}
-                    <div style={{ maxWidth: '400px', margin: '0 auto 30px' }}>
-                        <input
-                            type="text"
-                            placeholder="Search jerseys..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="form-input"
-                            style={{ textAlign: 'center' }}
-                        />
-                    </div>
+            <section className="section">
+                <div className="container">
+                    {/* Page Header */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        className="shop-header"
+                    >
+                        <h1 className="shop-title">Premium Jersey Collection</h1>
+                        <p className="shop-subtitle">
+                            Authentic retro football jerseys crafted with quality and passion
+                        </p>
+                    </motion.div>
 
                     {/* Category Filters */}
-                    <div className="category-filters">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.2, duration: 0.5 }}
+                        className="category-filters"
+                    >
                         <button
-                            className={`category-btn ${activeCategory === 'all' ? 'active' : ''}`}
-                            onClick={() => handleCategoryChange('all')}
+                            className={`filter-pill ${selectedCategory === 'all' ? 'active' : ''}`}
+                            onClick={() => setSelectedCategory('all')}
                         >
-                            All
+                            All Products
                         </button>
-                        {categories.map(category => (
+                        {categories.map((category) => (
                             <button
-                                key={category.id}
-                                className={`category-btn ${activeCategory === category.slug ? 'active' : ''}`}
-                                onClick={() => handleCategoryChange(category.slug)}
+                                key={category._id}
+                                className={`filter-pill ${selectedCategory === category.slug ||
+                                    selectedCategory === category.name.toLowerCase()
+                                    ? 'active'
+                                    : ''
+                                    }`}
+                                onClick={() => setSelectedCategory(category.name.toLowerCase())}
                             >
                                 {category.name}
                             </button>
                         ))}
-                    </div>
-                </div>
+                    </motion.div>
 
-                {/* Products Grid */}
-                {filteredProducts.length > 0 ? (
-                    <div className="products-grid">
-                        {filteredProducts.map(product => (
-                            <ProductCard key={product._id} product={product} />
-                        ))}
+                    {/* Product Count */}
+                    <div className="product-count">
+                        <span>{filteredProducts.length} {filteredProducts.length === 1 ? 'Product' : 'Products'}</span>
                     </div>
-                ) : (
-                    <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-                        <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem' }}>
-                            No products found. Try a different search or category.
-                        </p>
-                    </div>
-                )}
 
-                {/* Results Count */}
-                <div style={{
-                    textAlign: 'center',
-                    marginTop: '40px',
-                    color: 'var(--text-muted)'
-                }}>
-                    Showing {filteredProducts.length} of {products.length} products
+                    {/* Products Grid */}
+                    {filteredProducts.length > 0 ? (
+                        <div className="products-grid">
+                            {filteredProducts.map((product, index) => (
+                                <div key={product._id}>
+                                    <ProductCard product={product} />
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="no-products"
+                        >
+                            <p>No products found in this category.</p>
+                            <Link to="/shop" onClick={() => setSelectedCategory('all')} className="btn btn-primary">
+                                View All Products
+                            </Link>
+                        </motion.div>
+                    )}
                 </div>
-            </div>
+            </section>
         </div>
     )
 }

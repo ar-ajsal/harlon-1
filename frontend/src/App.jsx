@@ -9,6 +9,10 @@ import AdminLogin from './pages/admin/AdminLogin'
 import Dashboard from './pages/admin/Dashboard'
 import ProductsManager from './pages/admin/ProductsManager'
 import CategoriesManager from './pages/admin/CategoriesManager'
+import OrdersManager from './pages/admin/OrdersManager'
+import CreateOrder from './pages/admin/CreateOrder'
+import OrderDetail from './pages/admin/OrderDetail'
+import Reports from './pages/admin/Reports'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -30,6 +34,26 @@ function App() {
                 <Route path="/admin/categories" element={
                     <ProtectedRoute>
                         <CategoriesManager />
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin/orders" element={
+                    <ProtectedRoute>
+                        <OrdersManager />
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin/orders/new" element={
+                    <ProtectedRoute>
+                        <CreateOrder />
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin/orders/:id" element={
+                    <ProtectedRoute>
+                        <OrderDetail />
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin/reports" element={
+                    <ProtectedRoute>
+                        <Reports />
                     </ProtectedRoute>
                 } />
 
@@ -54,3 +78,4 @@ function App() {
 }
 
 export default App
+

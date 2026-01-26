@@ -5,8 +5,13 @@ function ProductCard({ product }) {
         ? Math.round((1 - product.price / product.originalPrice) * 100)
         : 0
 
+    const isOutOfStock = product.stock !== undefined && product.stock === 0
+
     return (
-        <Link to={`/product/${product._id}`} className="product-card">
+        <Link
+            to={`/product/${product._id}`}
+            className={`product-card ${isOutOfStock ? 'sold-out' : ''}`}
+        >
             <div className="product-image-wrapper">
                 <img
                     src={product.images?.[0] || '/images/placeholder.jpg'}
@@ -14,12 +19,13 @@ function ProductCard({ product }) {
                     className="product-image"
                     loading="lazy"
                 />
-                {product.bestSeller && (
+                {isOutOfStock ? (
+                    <span className="product-badge">SOLD OUT</span>
+                ) : product.bestSeller ? (
                     <span className="product-badge bestseller">Best Seller</span>
-                )}
-                {!product.bestSeller && discount > 0 && (
+                ) : discount > 0 ? (
                     <span className="product-badge">{discount}% OFF</span>
-                )}
+                ) : null}
             </div>
             <div className="product-info">
                 <span className="product-category">{product.category}</span>

@@ -1,0 +1,29 @@
+import api from './axios';
+
+export const ordersAPI = {
+    // Get all orders with optional search
+    getAll: (search = '') => api.get('/orders', { params: { search } }),
+
+    // Get single order by ID
+    getById: (id) => api.get(`/orders/${id}`),
+
+    // Create new order
+    create: (data) => api.post('/orders', data),
+
+    // Update order status
+    updateStatus: (id, status) => api.put(`/orders/${id}/status`, { status }),
+
+    // Get order statistics
+    getStats: () => api.get('/orders/stats/summary'),
+
+    // Get Today's Stats for Dashboard
+    getTodayStats: () => api.get('/orders/stats/today'),
+
+    // Get Monthly Report
+    getMonthlyReport: (year, month) => api.get(`/orders/reports/${year}/${month}`),
+
+    // Get PDF download URL
+    getPdfUrl: (id) => `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/orders/${id}/pdf`
+};
+
+export default ordersAPI;

@@ -1,0 +1,231 @@
+/* ===== Admin Responsive Layout ===== */
+
+/* Admin Layout Container */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--noir-10);
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Sidebar Styles */
+.admin-sidebar {
+    width: 260px;
+    background: var(--white);
+    /* Changed to white for cleaner look */
+    color: var(--noir-100);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    border-right: 1px solid var(--noir-20);
+    transition: transform var(--duration-normal) var(--ease-smooth);
+}
+
+.admin-logo {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    padding: 0 var(--space-6);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+    border-bottom: 1px solid var(--noir-10);
+}
+
+.sidebar-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-6) 0;
+}
+
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: 0 var(--space-4);
+}
+
+.admin-nav-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    color: var(--noir-60);
+    font-weight: var(--weight-medium);
+    border-radius: var(--border-radius);
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.admin-nav-link:hover {
+    background-color: var(--noir-10);
+    color: var(--noir-100);
+}
+
+.admin-nav-link.active {
+    background-color: var(--noir-100);
+    color: var(--white);
+}
+
+.nav-divider {
+    height: 1px;
+    background-color: var(--noir-20);
+    margin: var(--space-4) var(--space-4);
+}
+
+/* Admin Content Area */
+.admin-content {
+    flex: 1;
+    margin-left: 260px;
+    /* Make space for sidebar */
+    padding: var(--space-8);
+    transition: margin-left var(--duration-normal) var(--ease-smooth);
+    width: 100%;
+    /* Ensure full width */
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-8);
+    flex-wrap: wrap;
+    /* Allow wrapping on mobile */
+    gap: var(--space-4);
+}
+
+.admin-title {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-1);
+}
+
+.admin-subtitle {
+    color: var(--noir-60);
+}
+
+/* Responsive Sidebar Toggle Button */
+.sidebar-toggle {
+    display: none;
+    /* Hidden on desktop */
+    position: fixed;
+    top: var(--space-4);
+    right: var(--space-4);
+    /* Position on right for ease */
+    z-index: 1001;
+    /* Above sidebar */
+    background: var(--noir-100);
+    /* Contrast background */
+    color: var(--white);
+    border: none;
+    border-radius: var(--border-radius);
+    padding: var(--space-2);
+    cursor: pointer;
+    box-shadow: var(--shadow-elevated);
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 90;
+    backdrop-filter: blur(2px);
+}
+
+/* Admin Responsive Mobile Styles */
+@media (max-width: 968px) {
+    .admin-sidebar {
+        transform: translateX(-100%);
+        /* Hide sidebar by default */
+    }
+
+    .admin-sidebar.open {
+        transform: translateX(0);
+    }
+
+    .admin-content {
+        margin-left: 0;
+        /* Remove margin */
+        padding: var(--space-4);
+        padding-top: 80px;
+        /* Space for toggle/header if needed */
+    }
+
+    .sidebar-toggle {
+        display: flex;
+        /* Show toggle button */
+        align-items: center;
+        justify-content: center;
+    }
+
+    .sidebar-overlay.visible {
+        display: block;
+    }
+
+    .admin-table th,
+    .admin-table td {
+        white-space: nowrap;
+        /* Prevent wrapping in table cells */
+    }
+}
+
+/* Card Styles needed for Admin */
+.content-card {
+    background: var(--white);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--noir-20);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    /* Contain children */
+}
+
+/* Responsive Table Wrapper */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -24px;
+    /* compensate for card padding on mobile */
+    padding: 0 24px;
+}
+
+@media (max-width: 768px) {
+    .content-card {
+        padding: var(--space-4);
+    }
+
+    .table-responsive {
+        margin: 0 -16px;
+        padding: 0 16px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .page-header>div {
+        width: 100%;
+    }
+
+    .page-header .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: var(--space-4);
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-body-grid {
+        grid-template-columns: 1fr;
+        /* Stack modal inputs */
+    }
+}

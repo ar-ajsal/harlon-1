@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers } from 'react-icons/fi'
+import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiSearch, FiFilter, FiMenu, FiFileText, FiTrendingUp } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import { useProducts } from '../../context/ProductContext'
 import ImageUploader from '../../components/ImageUploader'
+import AdminBottomNav from '../../components/AdminBottomNav'
+import '../../styles/admin-responsive.css'
 
 function ProductsManager() {
     const navigate = useNavigate()
@@ -12,6 +14,8 @@ function ProductsManager() {
 
     const [showModal, setShowModal] = useState(false)
     const [editingProduct, setEditingProduct] = useState(null)
+    const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [searchTerm, setSearchTerm] = useState('')
     const [formData, setFormData] = useState({
         name: '',
         price: '',
@@ -20,9 +24,11 @@ function ProductsManager() {
         category: '',
         sizes: [],
         images: [],
+        stock: 0,
         inStock: true,
         featured: false,
-        bestSeller: false
+        bestSeller: false,
+        isVisible: true
     })
 
     const handleLogout = () => {
@@ -40,9 +46,11 @@ function ProductsManager() {
             category: categories[0]?.name || '',
             sizes: ['S', 'M', 'L', 'XL'],
             images: [],
+            stock: 0,
             inStock: true,
             featured: false,
-            bestSeller: false
+            bestSeller: false,
+            isVisible: true
         })
         setShowModal(true)
     }
@@ -57,9 +65,11 @@ function ProductsManager() {
             category: product.category,
             sizes: product.sizes || [],
             images: product.images || [],
+            stock: product.stock || 0,
             inStock: product.inStock,
             featured: product.featured,
-            bestSeller: product.bestSeller || false
+            bestSeller: product.bestSeller || false,
+            isVisible: product.isVisible !== false // Default to true if undefined
         })
         setShowModal(true)
     }
@@ -70,7 +80,8 @@ function ProductsManager() {
         const productData = {
             ...formData,
             price: parseFloat(formData.price),
-            originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null
+            originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
+            stock: parseInt(formData.stock) || 0
         }
 
         if (editingProduct) {
@@ -92,8 +103,6 @@ function ProductsManager() {
         setFormData({ ...formData, images: newImages })
     }
 
-
-
     const toggleSize = (size) => {
         if (formData.sizes.includes(size)) {
             setFormData({ ...formData, sizes: formData.sizes.filter(s => s !== size) })
@@ -102,273 +111,470 @@ function ProductsManager() {
         }
     }
 
+    const handleVisibilityToggle = async (product) => {
+        try {
+            await updateProduct(product._id, { isVisible: !product.isVisible })
+        } catch (error) {
+            console.error('Error toggling visibility:', error)
+            alert('Failed to update visibility')
+        }
+    }
+
     const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+
+    const filteredProducts = products.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.category.toLowerCase().includes(searchTerm.toLowerCase())
+    )
 
     return (
         <div className="admin-layout">
-            <aside className="admin-sidebar">
+            <button
+                className="sidebar-toggle"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                aria-label="Toggle Sidebar"
+            >
+                <FiMenu size={24} />
+            </button>
+
+            {/* Mobile Sidebar Overlay */}
+            <div
+                className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`}
+                onClick={() => setSidebarOpen(false)}
+            />
+
+            <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
                 <div className="admin-logo">harlon</div>
-                <nav className="admin-nav">
-                    <NavLink
-                        to="/admin/dashboard"
-                        className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                    >
-                        <FiHome />
-                        Dashboard
-                    </NavLink>
-                    <NavLink
-                        to="/admin/products"
-                        className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                    >
-                        <FiPackage />
-                        Products
-                    </NavLink>
-                    <NavLink
-                        to="/admin/categories"
-                        className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                    >
-                        <FiLayers />
-                        Categories
-                    </NavLink>
-                    <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '20px 0' }} />
-                    <Link to="/" className="admin-nav-link" target="_blank">
-                        <FiShoppingBag />
-                        View Store
-                    </Link>
-                    <button onClick={handleLogout} className="admin-nav-link" style={{ width: '100%', textAlign: 'left' }}>
-                        <FiLogOut />
-                        Logout
-                    </button>
-                </nav>
+                <div className="sidebar-scroll">
+                    <nav className="admin-nav">
+                        <NavLink
+                            to="/admin/dashboard"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiHome /> Dashboard
+                        </NavLink>
+                        <NavLink
+                            to="/admin/products"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiPackage /> Products
+                        </NavLink>
+                        <NavLink
+                            to="/admin/categories"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiLayers /> Categories
+                        </NavLink>
+                        <NavLink
+                            to="/admin/orders"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiFileText /> Invoices
+                        </NavLink>
+                        <NavLink
+                            to="/admin/reports"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiTrendingUp /> Reports
+                        </NavLink>
+
+                        <div className="nav-divider" />
+
+                        <Link to="/" className="admin-nav-link" target="_blank">
+                            <FiShoppingBag /> View Store
+                        </Link>
+                        <button onClick={handleLogout} className="admin-nav-link logout-btn">
+                            <FiLogOut /> Logout
+                        </button>
+                    </nav>
+                </div>
             </aside>
 
             <main className="admin-content">
-                <div className="admin-header">
-                    <h1 className="admin-title">Products</h1>
-                    <button className="btn btn-primary" onClick={openAddModal}>
-                        <FiPlus />
-                        Add Product
-                    </button>
-                </div>
-
-                <table className="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Image</th>
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Stock</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {products.map(product => (
-                            <tr key={product._id}>
-                                <td>
-                                    <img
-                                        src={product.images?.[0] || '/images/placeholder.jpg'}
-                                        alt={product.name}
-                                        className="table-image"
-                                    />
-                                </td>
-                                <td style={{ fontWeight: '500', color: 'var(--text-primary)' }}>
-                                    {product.name}
-                                    {product.featured && (
-                                        <span style={{
-                                            marginLeft: '8px',
-                                            fontSize: '0.7rem',
-                                            background: 'var(--accent-color)',
-                                            color: 'white',
-                                            padding: '2px 8px',
-                                            borderRadius: '10px'
-                                        }}>
-                                            Featured
-                                        </span>
-                                    )}
-                                </td>
-                                <td>{product.category}</td>
-                                <td>
-                                    <span style={{ color: 'var(--success-color)', fontWeight: '600' }}>
-                                        ₹{product.price}
-                                    </span>
-                                    {product.originalPrice && (
-                                        <span style={{
-                                            marginLeft: '8px',
-                                            textDecoration: 'line-through',
-                                            color: 'var(--text-muted)'
-                                        }}>
-                                            ₹{product.originalPrice}
-                                        </span>
-                                    )}
-                                </td>
-                                <td>
-                                    <span style={{
-                                        color: product.inStock ? 'var(--success-color)' : 'var(--error-color)'
-                                    }}>
-                                        {product.inStock ? 'In Stock' : 'Out of Stock'}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button
-                                        className="action-btn edit"
-                                        onClick={() => openEditModal(product)}
-                                    >
-                                        <FiEdit2 />
-                                    </button>
-                                    <button
-                                        className="action-btn delete"
-                                        onClick={() => handleDelete(product._id)}
-                                    >
-                                        <FiTrash2 />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-
-                {products.length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-secondary)' }}>
-                        No products found. Click "Add Product" to create one.
+                <header className="page-header">
+                    <div>
+                        <h1 className="admin-title">Products</h1>
+                        <p className="admin-subtitle">Manage your inventory and catalog</p>
                     </div>
-                )}
+                    <button className="btn btn-primary" onClick={openAddModal}>
+                        <FiPlus /> Add New Product
+                    </button>
+                </header>
+
+                <div className="content-card">
+                    <div className="table-actions">
+                        <div className="search-bar">
+                            <FiSearch />
+                            <input
+                                type="text"
+                                placeholder="Search products..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <button className="btn btn-outline" style={{ display: 'none' }}>
+                            <FiFilter /> Filter
+                        </button>
+                    </div>
+
+                    {/* Mobile Search Bar */}
+                    <div className="mobile-search-container">
+                        <FiSearch className="mobile-search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Search products..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="mobile-search-input"
+                        />
+                    </div>
+
+                    {/* Mobile Floating Action Button */}
+                    <button className="fab-btn" onClick={openAddModal} aria-label="Add Product">
+                        <FiPlus />
+                    </button>
+
+                    {filteredProducts.length === 0 ? (
+                        <div className="empty-state">
+                            <FiPackage />
+                            <h3>No products found</h3>
+                            <p>Try adjusting your search or add a new product.</p>
+                        </div>
+                    ) : (
+                        <div className="products-list-container">
+                            {/* Mobile Card View */}
+                            <div className="mobile-card-list">
+                                {filteredProducts.map(product => (
+                                    <div key={product._id} className="mobile-card" onClick={() => openEditModal(product)}>
+                                        <img
+                                            src={product.images?.[0] || '/images/placeholder.jpg'}
+                                            alt={product.name}
+                                            className="mobile-card-image"
+                                        />
+                                        <div className="mobile-card-content">
+                                            <div className="mobile-card-title">{product.name}</div>
+                                            <div className="mobile-card-subtitle">{product.category} • {product.stock} units</div>
+                                            <div className="mobile-card-price">₹{product.price}</div>
+                                            <div className={`mobile-card-status ${product.isVisible !== false ? 'visible' : 'hidden'}`}>
+                                                {product.isVisible !== false ? 'Visible' : 'Hidden'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Desktop Table View */}
+                            <div className="table-responsive desktop-only">
+                                <table className="admin-table desktop-only">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Category</th>
+                                            <th>Price</th>
+                                            <th>Status</th>
+                                            <th>Stock</th>
+                                            <th>Visibility</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {filteredProducts.map(product => (
+                                            <tr key={product._id}>
+                                                <td>
+                                                    <div className="product-cell">
+                                                        <img
+                                                            src={product.images?.[0] || '/images/placeholder.jpg'}
+                                                            alt={product.name}
+                                                            className="table-image"
+                                                        />
+                                                        <div className="product-cell-info">
+                                                            <span className="product-cell-name">
+                                                                {product.name}
+                                                                {product.isVisible === false && <span style={{ fontSize: '10px', color: 'var(--error)', marginLeft: '6px', border: '1px solid var(--error)', padding: '1px 4px', borderRadius: '4px' }}>Hidden</span>}
+                                                            </span>
+                                                            {product.featured && <span className="badge badge-accent">Featured</span>}
+                                                            {product.bestSeller && <span className="badge badge-gold">Best Seller</span>}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td><span className="category-pill">{product.category}</span></td>
+                                                <td>
+                                                    <div className="price-cell">
+                                                        <span className="price-current">₹{product.price}</span>
+                                                        {product.originalPrice && (
+                                                            <span className="price-original">₹{product.originalPrice}</span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span className={`status-dot ${product.stock > 0 ? 'active' : 'inactive'}`}>
+                                                        {product.stock > 0 ? 'Active' : 'Sold Out'}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span style={{
+                                                        color: product.stock === 0 ? 'var(--error)' : product.stock < 5 ? 'var(--warning)' : 'var(--success)',
+                                                        fontWeight: '600'
+                                                    }}>
+                                                        {product.stock} units
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); handleVisibilityToggle(product); }}
+                                                        style={{
+                                                            background: 'none',
+                                                            border: 'none',
+                                                            cursor: 'pointer',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: '8px'
+                                                        }}
+                                                        title={product.isVisible !== false ? 'Click to Hide' : 'Click to Show'}
+                                                    >
+                                                        <div style={{
+                                                            width: '36px',
+                                                            height: '20px',
+                                                            background: product.isVisible !== false ? '#10b981' : '#e5e7eb',
+                                                            borderRadius: '20px',
+                                                            position: 'relative',
+                                                            transition: 'all 0.2s'
+                                                        }}>
+                                                            <div style={{
+                                                                width: '16px',
+                                                                height: '16px',
+                                                                background: 'white',
+                                                                borderRadius: '50%',
+                                                                position: 'absolute',
+                                                                top: '2px',
+                                                                left: product.isVisible !== false ? '18px' : '2px',
+                                                                transition: 'all 0.2s',
+                                                                boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                                                            }} />
+                                                        </div>
+                                                        <span style={{ fontSize: '13px', color: '#666' }}>
+                                                            {product.isVisible !== false ? 'Visible' : 'Hidden'}
+                                                        </span>
+                                                    </button>
+                                                </td>
+                                                <td>
+                                                    <div className="actions-cell">
+                                                        <button className="action-btn edit" onClick={() => openEditModal(product)} title="Edit">
+                                                            <FiEdit2 />
+                                                        </button>
+                                                        <button className="action-btn delete" onClick={() => handleDelete(product._id)} title="Delete">
+                                                            <FiTrash2 />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </main>
 
-            {/* Modal */}
+            <AdminBottomNav />
+
+            {/* Premium Modal */}
             {showModal && (
                 <div className="modal-overlay" onClick={() => setShowModal(false)}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()}>
+                    <div className="modal-content modal-lg" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h2 className="modal-title">
-                                {editingProduct ? 'Edit Product' : 'Add New Product'}
-                            </h2>
+                            <div>
+                                <h2 className="modal-title">
+                                    {editingProduct ? 'Edit Product' : 'Add New Product'}
+                                </h2>
+                                <p className="modal-subtitle">Fill in the details below to update your catalog</p>
+                            </div>
                             <button className="modal-close" onClick={() => setShowModal(false)}>
                                 <FiX />
                             </button>
                         </div>
 
                         <form onSubmit={handleSubmit}>
-                            <div className="modal-body">
-                                <div className="form-group">
-                                    <label className="form-label">Product Name *</label>
-                                    <input
-                                        type="text"
-                                        className="form-input"
-                                        value={formData.name}
-                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                        placeholder="e.g., AC Milan Retro Jersey"
-                                        required
-                                    />
-                                </div>
+                            <div className="modal-body-grid">
+                                {/* Left Column: Basic Info */}
+                                <div className="form-section">
+                                    <h3 className="form-section-title">Basic Information</h3>
 
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                                     <div className="form-group">
-                                        <label className="form-label">Price (₹) *</label>
+                                        <label className="form-label">Product Name *</label>
                                         <input
-                                            type="number"
+                                            type="text"
                                             className="form-input"
-                                            value={formData.price}
-                                            onChange={e => setFormData({ ...formData, price: e.target.value })}
-                                            placeholder="799"
+                                            value={formData.name}
+                                            onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                            placeholder="e.g., AC Milan Retro Jersey 2007"
                                             required
                                         />
                                     </div>
+
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label className="form-label">Price (₹) *</label>
+                                            <input
+                                                type="number"
+                                                className="form-input"
+                                                value={formData.price}
+                                                onChange={e => setFormData({ ...formData, price: e.target.value })}
+                                                placeholder="0.00"
+                                                required
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label className="form-label">Original Price (₹)</label>
+                                            <input
+                                                type="number"
+                                                className="form-input"
+                                                value={formData.originalPrice}
+                                                onChange={e => setFormData({ ...formData, originalPrice: e.target.value })}
+                                                placeholder="0.00"
+                                            />
+                                        </div>
+                                    </div>
+
                                     <div className="form-group">
-                                        <label className="form-label">Original Price (₹)</label>
+                                        <label className="form-label">Description</label>
+                                        <textarea
+                                            className="form-textarea"
+                                            rows="4"
+                                            value={formData.description}
+                                            onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                            placeholder="Enter product description..."
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Category *</label>
+                                        <select
+                                            className="form-select"
+                                            value={formData.category}
+                                            onChange={e => setFormData({ ...formData, category: e.target.value })}
+                                            required
+                                        >
+                                            <option value="" disabled>Select Category</option>
+                                            {categories.map(cat => (
+                                                <option key={cat._id} value={cat.name}>{cat.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {/* Right Column: Inventory & Stats */}
+                                <div className="form-section">
+                                    <h3 className="form-section-title">Inventory & Media</h3>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Stock Quantity *</label>
                                         <input
                                             type="number"
                                             className="form-input"
-                                            value={formData.originalPrice}
-                                            onChange={e => setFormData({ ...formData, originalPrice: e.target.value })}
-                                            placeholder="1299"
+                                            value={formData.stock}
+                                            onChange={e => setFormData({ ...formData, stock: e.target.value })}
+                                            placeholder="0"
+                                            min="0"
+                                            required
                                         />
                                     </div>
-                                </div>
 
-                                <div className="form-group">
-                                    <label className="form-label">Category *</label>
-                                    <select
-                                        className="form-input"
-                                        value={formData.category}
-                                        onChange={e => setFormData({ ...formData, category: e.target.value })}
-                                        required
-                                    >
-                                        <option value="" disabled>Select Category</option>
-                                        {categories.map(cat => (
-                                            <option key={cat._id} value={cat.name}>{cat.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div className="form-group">
-                                    <label className="form-label">Description</label>
-                                    <textarea
-                                        className="form-input"
-                                        rows="3"
-                                        value={formData.description}
-                                        onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                        placeholder="Product description..."
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label className="form-label">Available Sizes</label>
-                                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                                        {availableSizes.map(size => (
-                                            <button
-                                                key={size}
-                                                type="button"
-                                                onClick={() => toggleSize(size)}
-                                                style={{
-                                                    padding: '8px 16px',
-                                                    borderRadius: '8px',
-                                                    border: '1px solid var(--border-color)',
-                                                    background: formData.sizes.includes(size) ? 'var(--primary-color)' : 'var(--surface-light)',
-                                                    color: 'var(--text-primary)',
-                                                    cursor: 'pointer'
-                                                }}
-                                            >
-                                                {size}
-                                            </button>
-                                        ))}
+                                    <div className="form-group">
+                                        <label className="form-label">Available Sizes</label>
+                                        <div className="size-selector">
+                                            {availableSizes.map(size => (
+                                                <button
+                                                    key={size}
+                                                    type="button"
+                                                    className={`size-chip ${formData.sizes.includes(size) ? 'active' : ''}`}
+                                                    onClick={() => toggleSize(size)}
+                                                >
+                                                    {size}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="form-group">
-                                    <label className="form-label">Images</label>
-                                    <ImageUploader
-                                        images={formData.images}
-                                        onImagesChange={handleImagesChange}
-                                        maxImages={5}
-                                    />
-                                </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Product Images</label>
+                                        <div className="image-uploader-wrapper">
+                                            <ImageUploader
+                                                images={formData.images}
+                                                onImagesChange={handleImagesChange}
+                                                maxImages={5}
+                                            />
+                                        </div>
+                                    </div>
 
-                                <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                                        <input
-                                            type="checkbox"
-                                            checked={formData.inStock}
-                                            onChange={e => setFormData({ ...formData, inStock: e.target.checked })}
-                                        />
-                                        In Stock
-                                    </label>
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                                        <input
-                                            type="checkbox"
-                                            checked={formData.featured}
-                                            onChange={e => setFormData({ ...formData, featured: e.target.checked })}
-                                        />
-                                        Featured
-                                    </label>
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                                        <input
-                                            type="checkbox"
-                                            checked={formData.bestSeller}
-                                            onChange={e => setFormData({ ...formData, bestSeller: e.target.checked })}
-                                        />
-                                        Best Seller
-                                    </label>
+                                    <div className="switches-container" style={{
+                                        display: 'grid',
+                                        gap: '16px',
+                                        background: '#f8f9fa',
+                                        padding: '20px',
+                                        borderRadius: '12px',
+                                        marginTop: '24px'
+                                    }}>
+                                        <label className="switch-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.inStock}
+                                                onChange={e => setFormData({ ...formData, inStock: e.target.checked })}
+                                                style={{ marginTop: '4px', width: '18px', height: '18px', cursor: 'pointer' }}
+                                            />
+                                            <span className="switch-text">
+                                                <span className="switch-title" style={{ display: 'block', fontWeight: '600', color: '#1a1a1a' }}>In Stock</span>
+                                                <span className="switch-desc" style={{ display: 'block', fontSize: '13px', color: '#666', marginTop: '2px' }}>Product is available for purchase</span>
+                                            </span>
+                                        </label>
+
+                                        <label className="switch-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.featured}
+                                                onChange={e => setFormData({ ...formData, featured: e.target.checked })}
+                                                style={{ marginTop: '4px', width: '18px', height: '18px', cursor: 'pointer' }}
+                                            />
+                                            <span className="switch-text">
+                                                <span className="switch-title" style={{ display: 'block', fontWeight: '600', color: '#1a1a1a' }}>Featured</span>
+                                                <span className="switch-desc" style={{ display: 'block', fontSize: '13px', color: '#666', marginTop: '2px' }}>Show on homepage hero/featured</span>
+                                            </span>
+                                        </label>
+
+                                        <label className="switch-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.bestSeller}
+                                                onChange={e => setFormData({ ...formData, bestSeller: e.target.checked })}
+                                                style={{ marginTop: '4px', width: '18px', height: '18px', cursor: 'pointer' }}
+                                            />
+                                            <span className="switch-text">
+                                                <span className="switch-title" style={{ display: 'block', fontWeight: '600', color: '#1a1a1a' }}>Best Seller</span>
+                                                <span className="switch-desc" style={{ display: 'block', fontSize: '13px', color: '#666', marginTop: '2px' }}>Mark with gold badge</span>
+                                            </span>
+                                        </label>
+
+                                        <div style={{ borderTop: '1px solid #e1e1e1', margin: '8px 0' }}></div>
+
+                                        <label className="switch-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.isVisible}
+                                                onChange={e => setFormData({ ...formData, isVisible: e.target.checked })}
+                                                style={{ marginTop: '4px', width: '18px', height: '18px', cursor: 'pointer', accentColor: '#2563eb' }}
+                                            />
+                                            <span className="switch-text">
+                                                <span className="switch-title" style={{ display: 'block', fontWeight: '600', color: '#1a1a1a' }}>Visible to User</span>
+                                                <span className="switch-desc" style={{ display: 'block', fontSize: '13px', color: '#666', marginTop: '2px' }}>Show this product in store</span>
+                                            </span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
 
@@ -377,7 +583,7 @@ function ProductsManager() {
                                     Cancel
                                 </button>
                                 <button type="submit" className="btn btn-primary">
-                                    {editingProduct ? 'Update Product' : 'Add Product'}
+                                    {editingProduct ? 'Save Changes' : 'Create Product'}
                                 </button>
                             </div>
                         </form>

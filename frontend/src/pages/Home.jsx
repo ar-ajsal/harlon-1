@@ -1,14 +1,39 @@
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { FaWhatsapp } from 'react-icons/fa'
 import { FiArrowRight } from 'react-icons/fi'
 import { useProducts } from '../context/ProductContext'
 import ProductCard from '../components/ProductCard'
 import { WHATSAPP_NUMBER } from '../config/constants'
 
+// Animation variants
+const fadeInUp = {
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.6,
+            ease: [0.16, 1, 0.3, 1]
+        }
+    }
+}
+
+const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1
+        }
+    }
+}
+
 function Home() {
     const { products, categories, loading } = useProducts()
 
-    const featuredProducts = products.filter(p => p.featured).slice(0, 4)
+    const visibleProducts = products.filter(p => p.isVisible !== false)
+    const featuredProducts = visibleProducts.filter(p => p.featured).slice(0, 4)
 
     if (loading) {
         return (
@@ -22,19 +47,24 @@ function Home() {
         <div className="home">
             {/* Hero Section */}
             <section className="hero">
-                <div className="hero-bg-pattern"></div>
                 <div className="container">
-                    <div className="hero-content">
+                    <motion.div
+                        initial="hidden"
+                        animate="visible"
+                        variants={fadeInUp}
+                        className="hero-content"
+                    >
                         <h1 className="hero-title">
-                            Retro Footballs<br />
+                            Premium Retro
+                            <br />
                             <span>Jerseys</span>
                         </h1>
                         <p className="hero-subtitle">
-                            Premium collection of authentic retro football jerseys
+                            Authentic quality, timeless style. Handpicked collection of legendary football jerseys.
                         </p>
                         <div className="hero-buttons">
                             <Link to="/shop" className="btn btn-primary">
-                                Shop Now <FiArrowRight />
+                                Explore Collection <FiArrowRight />
                             </Link>
                             <a
                                 href={`https://wa.me/${WHATSAPP_NUMBER}`}
@@ -45,15 +75,20 @@ function Home() {
                                 <FaWhatsapp /> Order on WhatsApp
                             </a>
                         </div>
-                    </div>
-                    <div className="hero-image">
+                    </motion.div>
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        className="hero-image"
+                    >
                         <div className="hero-image-wrapper">
                             <img
                                 src={products[0]?.images?.[0] || '/images/placeholder.jpg'}
                                 alt="Featured Jersey"
                             />
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             </section>
 
@@ -61,28 +96,42 @@ function Home() {
             {categories.length > 0 && (
                 <section className="section categories-section">
                     <div className="container">
-                        <h2 className="section-title">Shop by Category</h2>
-                        <div className="categories-grid">
-                            {categories.map((category, index) => (
-                                <Link
-                                    key={category._id}
-                                    to={`/shop?category=${category.slug}`}
-                                    className="category-card"
-                                    style={{ animationDelay: `${index * 0.1}s` }}
-                                >
-                                    <div className="category-image">
-                                        <img
-                                            src={category.image || products.find(p => p.category === category.name)?.images?.[0] || '/images/placeholder.jpg'}
-                                            alt={category.name}
-                                        />
-                                    </div>
-                                    <div className="category-overlay">
-                                        <h3>{category.name}</h3>
-                                        <span>Shop Now <FiArrowRight /></span>
-                                    </div>
-                                </Link>
+                        <motion.h2
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, amount: 0.5 }}
+                            transition={{ duration: 0.5 }}
+                            className="section-title"
+                        >
+                            Shop by Category
+                        </motion.h2>
+                        <motion.div
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, amount: 0.2 }}
+                            variants={staggerContainer}
+                            className="categories-grid"
+                        >
+                            {categories.map((category) => (
+                                <motion.div key={category._id} variants={fadeInUp}>
+                                    <Link
+                                        to={`/shop?category=${category.slug}`}
+                                        className="category-card"
+                                    >
+                                        <div className="category-image">
+                                            <img
+                                                src={category.image || products.find(p => p.category === category.name)?.images?.[0] || '/images/placeholder.jpg'}
+                                                alt={category.name}
+                                            />
+                                        </div>
+                                        <div className="category-overlay">
+                                            <h3>{category.name}</h3>
+                                            <span>Shop Now <FiArrowRight /></span>
+                                        </div>
+                                    </Link>
+                                </motion.div>
                             ))}
-                        </div>
+                        </motion.div>
                     </div>
                 </section>
             )}
@@ -92,16 +141,39 @@ function Home() {
                 <section className="section">
                     <div className="container">
                         <div className="section-header">
-                            <h2 className="section-title">Featured Jerseys</h2>
-                            <Link to="/shop" className="view-all-link">
-                                View All <FiArrowRight />
-                            </Link>
+                            <motion.h2
+                                initial={{ opacity: 0, x: -20 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5 }}
+                                className="section-title"
+                            >
+                                Featured Jerseys
+                            </motion.h2>
+                            <motion.div
+                                initial={{ opacity: 0, x: 20 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5 }}
+                            >
+                                <Link to="/shop" className="view-all-link">
+                                    View All <FiArrowRight />
+                                </Link>
+                            </motion.div>
                         </div>
-                        <div className="products-grid">
+                        <motion.div
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, amount: 0.1 }}
+                            variants={staggerContainer}
+                            className="products-grid"
+                        >
                             {featuredProducts.map(product => (
-                                <ProductCard key={product._id} product={product} />
+                                <motion.div key={product._id} variants={fadeInUp}>
+                                    <ProductCard product={product} />
+                                </motion.div>
                             ))}
-                        </div>
+                        </motion.div>
                     </div>
                 </section>
             )}
@@ -110,16 +182,39 @@ function Home() {
             <section className="section">
                 <div className="container">
                     <div className="section-header">
-                        <h2 className="section-title">All Jerseys</h2>
-                        <Link to="/shop" className="view-all-link">
-                            View All <FiArrowRight />
-                        </Link>
+                        <motion.h2
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5 }}
+                            className="section-title"
+                        >
+                            All Jerseys
+                        </motion.h2>
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5 }}
+                        >
+                            <Link to="/shop" className="view-all-link">
+                                View All <FiArrowRight />
+                            </Link>
+                        </motion.div>
                     </div>
-                    <div className="products-grid">
-                        {products.slice(0, 8).map(product => (
-                            <ProductCard key={product._id} product={product} />
+                    <motion.div
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, amount: 0.1 }}
+                        variants={staggerContainer}
+                        className="products-grid"
+                    >
+                        {visibleProducts.slice(0, 8).map(product => (
+                            <motion.div key={product._id} variants={fadeInUp}>
+                                <ProductCard product={product} />
+                            </motion.div>
                         ))}
-                    </div>
+                    </motion.div>
                 </div>
             </section>
         </div>

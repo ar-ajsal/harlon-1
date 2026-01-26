@@ -35,36 +35,74 @@ function AdminLogin() {
     }
 
     return (
-        <div className="admin-login">
-            <div className="login-card">
-                <h1 className="login-title">Admin Login</h1>
-                <div style={{
-                    textAlign: 'center',
-                    marginBottom: '30px'
-                }}>
-                    <img src="/images/logo.png" alt="Harlon" style={{ height: '60px', marginBottom: '15px' }} />
-                    <h2 style={{ color: 'var(--text-secondary)' }}>Harlon Dashboard</h2>
+        <div className="admin-login-container" style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '100vh',
+            background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
+        }}>
+            <div className="login-card" style={{
+                background: 'white',
+                padding: '40px',
+                borderRadius: '16px',
+                boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                width: '100%',
+                maxWidth: '400px'
+            }}>
+                <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+                    <div style={{
+                        width: '60px',
+                        height: '60px',
+                        background: '#000',
+                        color: 'white',
+                        borderRadius: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 20px',
+                        fontSize: '24px',
+                        fontWeight: 'bold'
+                    }}>
+                        H
+                    </div>
+                    <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '8px', color: '#1a1a1a' }}>Admin Access</h1>
+                    <p style={{ color: '#666', fontSize: '14px' }}>Sign in to manage your store</p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label className="form-label">Password</label>
+                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                        <label className="form-label" style={{ display: 'block', marginBottom: '8px', color: '#333', fontWeight: '500' }}>Password</label>
                         <input
                             type="password"
                             className="form-input"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter admin password"
+                            style={{
+                                width: '100%',
+                                padding: '12px 16px',
+                                border: '1px solid #e1e1e1',
+                                borderRadius: '8px',
+                                fontSize: '16px',
+                                outline: 'none',
+                                transition: 'all 0.2s',
+                                backgroundColor: '#f8f9fa'
+                            }}
                             required
                         />
                     </div>
 
                     {error && (
                         <div style={{
-                            color: 'var(--error-color)',
-                            fontSize: '0.9rem',
+                            background: '#fee2e2',
+                            color: '#dc2626',
+                            padding: '12px',
+                            borderRadius: '8px',
+                            fontSize: '14px',
                             marginBottom: '20px',
-                            textAlign: 'center'
+                            textAlign: 'center',
+                            border: '1px solid #fecaca'
                         }}>
                             {error}
                         </div>
@@ -72,22 +110,35 @@ function AdminLogin() {
 
                     <button
                         type="submit"
-                        className="btn btn-primary"
-                        style={{ width: '100%' }}
                         disabled={loading}
+                        style={{
+                            width: '100%',
+                            padding: '12px',
+                            background: '#000',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '16px',
+                            fontWeight: '600',
+                            cursor: loading ? 'not-allowed' : 'pointer',
+                            opacity: loading ? 0.7 : 1,
+                            transition: 'all 0.2s'
+                        }}
                     >
-                        {loading ? 'Logging in...' : 'Login'}
+                        {loading ? 'Authenticating...' : 'Login to Dashboard'}
                     </button>
                 </form>
 
-                <p style={{
+                <div style={{
+                    marginTop: '30px',
                     textAlign: 'center',
-                    color: 'var(--text-muted)',
-                    fontSize: '0.85rem',
-                    marginTop: '30px'
+                    borderTop: '1px solid #eee',
+                    paddingTop: '20px'
                 }}>
-                    Default password: admin123
-                </p>
+                    <p style={{ color: '#888', fontSize: '12px' }}>
+                        &copy; 2024 Harlon. All rights reserved.
+                    </p>
+                </div>
             </div>
         </div>
     )

@@ -127,21 +127,49 @@ function ImageUploader({ images, onImagesChange, maxImages = 5, aspectRatio = nu
             <label
                 htmlFor="image-upload-input"
                 className={`upload-area ${uploading ? 'uploading' : ''}`}
+                style={{
+                    border: '2px dashed #e1e1e1',
+                    borderRadius: '12px',
+                    padding: '30px',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    backgroundColor: uploading ? '#f8f9fa' : 'white',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: '160px',
+                    gap: '10px'
+                }}
             >
                 {uploading ? (
                     <>
-                        <div className="spinner" style={{ width: '30px', height: '30px' }}></div>
-                        <p>Uploading...</p>
+                        <div className="spinner" style={{ width: '30px', height: '30px', border: '3px solid #f3f3f3', borderTop: '3px solid #000', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                        <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>Uploading...</p>
                     </>
                 ) : (
                     <>
-                        <FiUpload className="upload-icon" />
-                        <p><strong>Tap to upload</strong></p>
-                        <p className="upload-hint">
-                            <FiCrop style={{ marginRight: '4px' }} />
-                            Crop before upload
-                        </p>
-                        <p className="upload-hint">JPG, PNG, WebP up to 5MB</p>
+                        <div style={{
+                            width: '48px',
+                            height: '48px',
+                            background: '#f0f0f0',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginBottom: '5px'
+                        }}>
+                            <FiUpload className="upload-icon" style={{ fontSize: '24px', color: '#666' }} />
+                        </div>
+                        <div>
+                            <p style={{ margin: '0 0 4px', fontWeight: '600', color: '#1a1a1a' }}>Click to upload images</p>
+                            <p className="upload-hint" style={{ margin: 0, fontSize: '13px', color: '#888' }}>
+                                <FiCrop style={{ marginRight: '4px', verticalAlign: 'text-bottom' }} />
+                                Auto-crop enabled
+                            </p>
+                        </div>
+                        <p className="upload-hint" style={{ margin: 0, fontSize: '12px', color: '#aaa' }}>JPG, PNG, WebP up to 5MB</p>
                     </>
                 )}
             </label>
@@ -149,23 +177,62 @@ function ImageUploader({ images, onImagesChange, maxImages = 5, aspectRatio = nu
             {error && <p className="upload-error">{error}</p>}
 
             {images.length > 0 && (
-                <div className="uploaded-images">
+                <div className="uploaded-images" style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
+                    gap: '12px',
+                    marginTop: '20px'
+                }}>
                     {images.map((url, index) => (
-                        <div key={index} className="uploaded-image">
-                            <img src={url} alt={`Upload ${index + 1}`} />
+                        <div key={index} className="uploaded-image" style={{
+                            position: 'relative',
+                            aspectRatio: '1',
+                            borderRadius: '8px',
+                            overflow: 'hidden',
+                            border: '1px solid #eee'
+                        }}>
+                            <img src={url} alt={`Upload ${index + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             <button
                                 type="button"
                                 className="remove-image-btn"
                                 onClick={() => removeImage(index)}
+                                style={{
+                                    position: 'absolute',
+                                    top: '4px',
+                                    right: '4px',
+                                    background: 'rgba(0,0,0,0.5)',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '50%',
+                                    width: '24px',
+                                    height: '24px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    backdropFilter: 'blur(2px)'
+                                }}
                             >
-                                <FiX />
+                                <FiX size={14} />
                             </button>
                         </div>
                     ))}
                     {images.length < maxImages && (
-                        <label htmlFor="image-upload-input" className="add-more-btn">
-                            <FiImage />
-                            <span>Add More</span>
+                        <label htmlFor="image-upload-input" className="add-more-btn" style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            aspectRatio: '1',
+                            border: '1px dashed #ddd',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            color: '#888',
+                            backgroundColor: '#fcfcfc',
+                            transition: 'all 0.2s'
+                        }}>
+                            <FiImage size={20} style={{ marginBottom: '4px' }} />
+                            <span style={{ fontSize: '12px' }}>Add</span>
                         </label>
                     )}
                 </div>

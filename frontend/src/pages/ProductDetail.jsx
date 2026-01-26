@@ -1,34 +1,43 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { FaWhatsapp } from 'react-icons/fa'
-import { FiArrowLeft, FiCheck } from 'react-icons/fi'
-import { productsApi } from '../services/api'
+import { useParams, useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { FaWhatsapp, FaArrowLeft, FaCheck } from 'react-icons/fa'
+import { useProducts } from '../context/ProductContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 
 function ProductDetail() {
     const { id } = useParams()
+    const navigate = useNavigate()
+    const { products, loading } = useProducts()
     const [product, setProduct] = useState(null)
-    const [loading, setLoading] = useState(true)
-    const [selectedSize, setSelectedSize] = useState('')
     const [selectedImage, setSelectedImage] = useState(0)
+    const [selectedSize, setSelectedSize] = useState(null)
 
     useEffect(() => {
-        const fetchProduct = async () => {
-            try {
-                const response = await productsApi.getById(id)
-                if (response) {
-                    setProduct(response.data || response)
-                } else {
-                    setProduct(null)
-                }
-            } catch (err) {
-                console.error('Error fetching product:', err)
-            } finally {
-                setLoading(false)
+        if (products.length > 0) {
+            const foundProduct = products.find(p => p._id === id)
+            setProduct(foundProduct)
+            if (foundProduct?.sizes?.length > 0) {
+                setSelectedSize(foundProduct.sizes[0])
             }
         }
-        fetchProduct()
-    }, [id])
+    }, [id, products])
+
+    const handleWhatsAppOrder = () => {
+        if (!product || !selectedSize) return
+
+        const imageUrl = product.images?.[0] || '';
+
+        const message = `*Jersy_store Order Request*\n\n` +
+            `*Product:* ${product.name}\n` +
+            `*Size:* ${selectedSize}\n` +
+            `*Price:* ₹${product.price}\n\n` +
+            (imageUrl ? `*View Image:* ${imageUrl}\n\n` : ``) +
+            `I would like to place an order. Is this available?`
+
+        const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
+        window.open(whatsappUrl, '_blank', 'noopener,noreferrer')
+    }
 
     if (loading) {
         return (
@@ -38,168 +47,181 @@ function ProductDetail() {
         )
     }
 
-    if (!product) {
+    if (!product || product.isVisible === false) {
         return (
-            <div className="product-detail">
-                <div className="container" style={{ textAlign: 'center', padding: '100px 20px' }}>
-                    <h2>Product Not Found</h2>
-                    <p style={{ color: 'var(--base-color)', margin: '20px 0' }}>
-                        The product you're looking for doesn't exist.
-                    </p>
-                    <Link to="/shop" className="btn btn-primary">
-                        Back to Shop
-                    </Link>
+            <div className="product-not-found">
+                <div className="container">
+                    <h2>Product not found</h2>
+                    <button onClick={() => navigate('/shop')} className="btn btn-primary">
+                        <FaArrowLeft /> Back to Shop
+                    </button>
                 </div>
             </div>
         )
     }
 
-    const discount = product.originalPrice
-        ? Math.round((1 - product.price / product.originalPrice) * 100)
-        : 0
-
-    const generateWhatsAppLink = () => {
-        const message = `Hi! I want to buy:
-
-🛒 *${product.name}*
-${selectedSize ? `📏 Size: ${selectedSize}` : ''}
-💰 Price: ₹${product.price}
-
-Please confirm availability and share payment details.`
-
-        return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
-    }
+    const isOutOfStock = product.stock !== undefined && product.stock === 0
+    const isLowStock = product.stock !== undefined && product.stock > 0 && product.stock < 5
 
     return (
         <div className="product-detail">
             <div className="container">
-                <Link
-                    to="/shop"
-                    style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        color: 'var(--base-color)',
-                        marginBottom: '30px'
-                    }}
+                {/* Back Button */}
+                <motion.button
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="back-button"
+                    onClick={() => navigate(-1)}
                 >
-                    <FiArrowLeft />
-                    Back to Shop
-                </Link>
+                    <FaArrowLeft /> Back
+                </motion.button>
 
                 <div className="product-detail-grid">
-                    <div className="product-gallery">
-                        <img
-                            src={product.images?.[selectedImage] || '/images/placeholder.jpg'}
-                            alt={product.name}
-                            className="main-image"
-                        />
-                        {product.images?.length > 1 && (
-                            <div className="thumbnail-grid">
+                    {/* Image Gallery */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        className="product-gallery"
+                    >
+                        {/* Main Image */}
+                        <div className="gallery-main">
+                            <AnimatePresence mode="wait">
+                                <motion.img
+                                    key={selectedImage}
+                                    src={product.images[selectedImage] || '/images/placeholder.jpg'}
+                                    alt={product.name}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.4 }}
+                                />
+                            </AnimatePresence>
+                        </div>
+
+                        {/* Thumbnails */}
+                        {product.images && product.images.length > 1 && (
+                            <div className="gallery-thumbnails">
                                 {product.images.map((image, index) => (
-                                    <img
+                                    <motion.button
                                         key={index}
-                                        src={image}
-                                        alt={`${product.name} ${index + 1}`}
                                         className={`thumbnail ${selectedImage === index ? 'active' : ''}`}
                                         onClick={() => setSelectedImage(index)}
-                                    />
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                    >
+                                        <img src={image} alt={`${product.name} ${index + 1}`} />
+                                    </motion.button>
                                 ))}
                             </div>
                         )}
-                    </div>
+                    </motion.div>
 
-                    <div className="product-info-detail">
-                        <span className="product-category">{product.category}</span>
-                        <h1 className="product-title">{product.name}</h1>
-
-                        <div className="product-price-detail">
-                            <span className="price-current-detail">₹{product.price}</span>
-                            {product.originalPrice && (
-                                <>
-                                    <span className="price-original-detail">₹{product.originalPrice}</span>
-                                    <span className="discount-badge">{discount}% OFF</span>
-                                </>
+                    {/* Product Info */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        className="product-info-panel"
+                    >
+                        {/* Category & Bestseller Badge */}
+                        <div className="product-meta">
+                            <span className="category-badge">{product.category}</span>
+                            {product.bestSeller && (
+                                <span className="bestseller-badge">
+                                    <FaCheck /> Best Seller
+                                </span>
                             )}
                         </div>
 
-                        <p className="product-description">{product.description}</p>
+                        {/* Product Name */}
+                        <h1 className="product-detail-title">{product.name}</h1>
 
-                        {product.sizes?.length > 0 && (
-                            <div className="size-selector">
-                                <label className="size-label">Select Size:</label>
+                        {/* Price */}
+                        <div className="product-detail-price">
+                            <span className="price-current">₹{product.price}</span>
+                            {product.originalPrice && (
+                                <span className="price-original">₹{product.originalPrice}</span>
+                            )}
+                        </div>
+
+                        {/* Stock Status */}
+                        <div className="stock-status">
+                            {isOutOfStock ? (
+                                <span className="stock-badge out-of-stock">
+                                    <span className="stock-dot"></span>
+                                    Sold Out
+                                </span>
+                            ) : isLowStock ? (
+                                <span className="stock-badge low-stock">
+                                    <span className="stock-dot"></span>
+                                    Only {product.stock} left
+                                </span>
+                            ) : (
+                                <span className="stock-badge in-stock">
+                                    <span className="stock-dot"></span>
+                                    In Stock
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Description */}
+                        {product.description && (
+                            <div className="product-description">
+                                <p>{product.description}</p>
+                            </div>
+                        )}
+
+                        {/* Size Selection */}
+                        {product.sizes && product.sizes.length > 0 && (
+                            <div className="size-selection">
+                                <label className="size-label">Select Size</label>
                                 <div className="size-options">
-                                    {product.sizes.map(size => (
-                                        <button
+                                    {product.sizes.map((size) => (
+                                        <motion.button
                                             key={size}
-                                            className={`size-option ${selectedSize === size ? 'active' : ''}`}
+                                            className={`size-button ${selectedSize === size ? 'selected' : ''}`}
                                             onClick={() => setSelectedSize(size)}
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            transition={{ duration: 0.2 }}
+                                            disabled={isOutOfStock}
                                         >
                                             {size}
-                                        </button>
+                                        </motion.button>
                                     ))}
                                 </div>
                             </div>
                         )}
 
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            color: product.inStock ? 'var(--color-green)' : 'var(--color-red)',
-                            marginBottom: '20px'
-                        }}>
-                            <FiCheck />
-                            {product.inStock ? 'In Stock' : 'Out of Stock'}
-                        </div>
+                        {/* WhatsApp CTA */}
+                        <motion.button
+                            className={`btn btn-whatsapp whatsapp-cta ${isOutOfStock ? 'disabled' : ''}`}
+                            onClick={handleWhatsAppOrder}
+                            disabled={isOutOfStock || !selectedSize}
+                            whileHover={!isOutOfStock ? { scale: 1.02 } : {}}
+                            whileTap={!isOutOfStock ? { scale: 0.98 } : {}}
+                        >
+                            <FaWhatsapp />
+                            {isOutOfStock ? 'Sold Out' : 'Buy via WhatsApp'}
+                        </motion.button>
 
-                        <div className="buy-section">
-                            <a
-                                href={generateWhatsAppLink()}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="btn btn-whatsapp"
-                                style={{
-                                    width: '100%',
-                                    justifyContent: 'center',
-                                    fontSize: '18px',
-                                    padding: '18px'
-                                }}
-                            >
-                                <FaWhatsapp size={24} />
-                                Buy on WhatsApp
-                            </a>
-                            <p style={{
-                                textAlign: 'center',
-                                color: 'var(--primary-color)',
-                                fontSize: '14px',
-                                marginTop: '15px'
-                            }}>
-                                Fast delivery across India • Cash on Delivery Available
-                            </p>
+                        {/* Additional Info */}
+                        <div className="product-additional-info">
+                            <div className="info-item">
+                                <span className="info-icon">✓</span>
+                                <span>Authentic Quality</span>
+                            </div>
+                            <div className="info-item">
+                                <span className="info-icon">✓</span>
+                                <span>Premium Materials</span>
+                            </div>
+                            <div className="info-item">
+                                <span className="info-icon">✓</span>
+                                <span>Fast Delivery</span>
+                            </div>
                         </div>
-
-                        <div style={{
-                            marginTop: '40px',
-                            padding: '25px',
-                            background: 'var(--color-cream)',
-                            border: '1px solid var(--border-color)'
-                        }}>
-                            <h4 style={{ marginBottom: '15px', color: 'var(--heading-color)' }}>
-                                Features
-                            </h4>
-                            <ul style={{
-                                color: 'var(--base-color)',
-                                lineHeight: '2'
-                            }}>
-                                <li>✓ Premium quality fabric</li>
-                                <li>✓ Breathable & comfortable</li>
-                                <li>✓ True to size fit</li>
-                                <li>✓ Machine washable</li>
-                                <li>✓ Fast shipping across India</li>
-                            </ul>
-                        </div>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
         </div>
