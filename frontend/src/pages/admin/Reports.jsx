@@ -191,11 +191,11 @@ function Reports() {
                         </div>
 
                         {/* Daily Sales Table */}
-                        <div className="orders-table-container" style={{ marginTop: '2rem' }}>
+                        <div className="orders-table-container" style={{ marginTop: '2rem', overflowX: 'auto' }}>
                             <div className="table-header" style={{ padding: '1.5rem', borderBottom: '1px solid var(--noir-10)' }}>
                                 <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Daily Sales Breakdown</h3>
                             </div>
-                            <table className="orders-table">
+                            <table className="admin-table">
                                 <thead>
                                     <tr>
                                         <th>Date</th>

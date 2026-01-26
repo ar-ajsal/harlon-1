@@ -26,13 +26,12 @@ function ProductDetail() {
     const handleWhatsAppOrder = () => {
         if (!product || !selectedSize) return
 
-        const imageUrl = product.images?.[0] || '';
-
+        const productUrl = window.location.href
         const message = `*Jersy_store Order Request*\n\n` +
             `*Product:* ${product.name}\n` +
             `*Size:* ${selectedSize}\n` +
             `*Price:* ₹${product.price}\n\n` +
-            (imageUrl ? `*View Image:* ${imageUrl}\n\n` : ``) +
+            `*View Image:* ${productUrl}\n\n` +
             `I would like to place an order. Is this available?`
 
         const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
@@ -59,9 +58,6 @@ function ProductDetail() {
             </div>
         )
     }
-
-    const isOutOfStock = product.stock !== undefined && product.stock === 0
-    const isLowStock = product.stock !== undefined && product.stock > 0 && product.stock < 5
 
     return (
         <div className="product-detail">
@@ -145,26 +141,6 @@ function ProductDetail() {
                             )}
                         </div>
 
-                        {/* Stock Status */}
-                        <div className="stock-status">
-                            {isOutOfStock ? (
-                                <span className="stock-badge out-of-stock">
-                                    <span className="stock-dot"></span>
-                                    Sold Out
-                                </span>
-                            ) : isLowStock ? (
-                                <span className="stock-badge low-stock">
-                                    <span className="stock-dot"></span>
-                                    Only {product.stock} left
-                                </span>
-                            ) : (
-                                <span className="stock-badge in-stock">
-                                    <span className="stock-dot"></span>
-                                    In Stock
-                                </span>
-                            )}
-                        </div>
-
                         {/* Description */}
                         {product.description && (
                             <div className="product-description">
@@ -185,7 +161,6 @@ function ProductDetail() {
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             transition={{ duration: 0.2 }}
-                                            disabled={isOutOfStock}
                                         >
                                             {size}
                                         </motion.button>
@@ -196,14 +171,14 @@ function ProductDetail() {
 
                         {/* WhatsApp CTA */}
                         <motion.button
-                            className={`btn btn-whatsapp whatsapp-cta ${isOutOfStock ? 'disabled' : ''}`}
+                            className="btn btn-whatsapp whatsapp-cta"
                             onClick={handleWhatsAppOrder}
-                            disabled={isOutOfStock || !selectedSize}
-                            whileHover={!isOutOfStock ? { scale: 1.02 } : {}}
-                            whileTap={!isOutOfStock ? { scale: 0.98 } : {}}
+                            disabled={!selectedSize}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
                         >
                             <FaWhatsapp />
-                            {isOutOfStock ? 'Sold Out' : 'Buy via WhatsApp'}
+                            Buy via WhatsApp
                         </motion.button>
 
                         {/* Additional Info */}

@@ -24,8 +24,6 @@ function ProductsManager() {
         category: '',
         sizes: [],
         images: [],
-        stock: 0,
-        inStock: true,
         featured: false,
         bestSeller: false,
         isVisible: true
@@ -46,8 +44,6 @@ function ProductsManager() {
             category: categories[0]?.name || '',
             sizes: ['S', 'M', 'L', 'XL'],
             images: [],
-            stock: 0,
-            inStock: true,
             featured: false,
             bestSeller: false,
             isVisible: true
@@ -65,8 +61,6 @@ function ProductsManager() {
             category: product.category,
             sizes: product.sizes || [],
             images: product.images || [],
-            stock: product.stock || 0,
-            inStock: product.inStock,
             featured: product.featured,
             bestSeller: product.bestSeller || false,
             isVisible: product.isVisible !== false // Default to true if undefined
@@ -80,8 +74,7 @@ function ProductsManager() {
         const productData = {
             ...formData,
             price: parseFloat(formData.price),
-            originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
-            stock: parseInt(formData.stock) || 0
+            originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null
         }
 
         if (editingProduct) {
@@ -258,11 +251,18 @@ function ProductsManager() {
                                         />
                                         <div className="mobile-card-content">
                                             <div className="mobile-card-title">{product.name}</div>
-                                            <div className="mobile-card-subtitle">{product.category} • {product.stock} units</div>
+                                            <div className="mobile-card-subtitle">{product.category}</div>
                                             <div className="mobile-card-price">₹{product.price}</div>
-                                            <div className={`mobile-card-status ${product.isVisible !== false ? 'visible' : 'hidden'}`}>
+                                            <button
+                                                className={`mobile-card-status ${product.isVisible !== false ? 'visible' : 'hidden'}`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    handleVisibilityToggle(product)
+                                                }}
+                                                style={{ border: 'none', cursor: 'pointer' }}
+                                            >
                                                 {product.isVisible !== false ? 'Visible' : 'Hidden'}
-                                            </div>
+                                            </button>
                                         </div>
                                     </div>
                                 ))}
@@ -276,8 +276,6 @@ function ProductsManager() {
                                             <th>Product</th>
                                             <th>Category</th>
                                             <th>Price</th>
-                                            <th>Status</th>
-                                            <th>Stock</th>
                                             <th>Visibility</th>
                                             <th>Actions</th>
                                         </tr>
@@ -298,76 +296,33 @@ function ProductsManager() {
                                                                 {product.isVisible === false && <span style={{ fontSize: '10px', color: 'var(--error)', marginLeft: '6px', border: '1px solid var(--error)', padding: '1px 4px', borderRadius: '4px' }}>Hidden</span>}
                                                             </span>
                                                             {product.featured && <span className="badge badge-accent">Featured</span>}
-                                                            {product.bestSeller && <span className="badge badge-gold">Best Seller</span>}
+                                                            {product.bestSeller && <span className="badge badge-primary">Best Seller</span>}
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td><span className="category-pill">{product.category}</span></td>
-                                                <td>
-                                                    <div className="price-cell">
-                                                        <span className="price-current">₹{product.price}</span>
-                                                        {product.originalPrice && (
-                                                            <span className="price-original">₹{product.originalPrice}</span>
-                                                        )}
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <span className={`status-dot ${product.stock > 0 ? 'active' : 'inactive'}`}>
-                                                        {product.stock > 0 ? 'Active' : 'Sold Out'}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span style={{
-                                                        color: product.stock === 0 ? 'var(--error)' : product.stock < 5 ? 'var(--warning)' : 'var(--success)',
-                                                        fontWeight: '600'
-                                                    }}>
-                                                        {product.stock} units
-                                                    </span>
-                                                </td>
+                                                <td>{product.category}</td>
+                                                <td>₹{product.price}</td>
                                                 <td>
                                                     <button
-                                                        onClick={(e) => { e.stopPropagation(); handleVisibilityToggle(product); }}
-                                                        style={{
-                                                            background: 'none',
-                                                            border: 'none',
-                                                            cursor: 'pointer',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: '8px'
-                                                        }}
-                                                        title={product.isVisible !== false ? 'Click to Hide' : 'Click to Show'}
+                                                        className={`btn-icon ${product.isVisible !== false ? 'text-success' : 'text-danger'}`}
+                                                        onClick={() => handleVisibilityToggle(product)}
+                                                        title="Toggle Visibility"
                                                     >
-                                                        <div style={{
-                                                            width: '36px',
-                                                            height: '20px',
-                                                            background: product.isVisible !== false ? '#10b981' : '#e5e7eb',
-                                                            borderRadius: '20px',
-                                                            position: 'relative',
-                                                            transition: 'all 0.2s'
-                                                        }}>
-                                                            <div style={{
-                                                                width: '16px',
-                                                                height: '16px',
-                                                                background: 'white',
-                                                                borderRadius: '50%',
-                                                                position: 'absolute',
-                                                                top: '2px',
-                                                                left: product.isVisible !== false ? '18px' : '2px',
-                                                                transition: 'all 0.2s',
-                                                                boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                                                            }} />
-                                                        </div>
-                                                        <span style={{ fontSize: '13px', color: '#666' }}>
-                                                            {product.isVisible !== false ? 'Visible' : 'Hidden'}
-                                                        </span>
+                                                        {product.isVisible !== false ? 'Visible' : 'Hidden'}
                                                     </button>
                                                 </td>
                                                 <td>
-                                                    <div className="actions-cell">
-                                                        <button className="action-btn edit" onClick={() => openEditModal(product)} title="Edit">
+                                                    <div className="action-buttons">
+                                                        <button
+                                                            className="btn-icon"
+                                                            onClick={() => openEditModal(product)}
+                                                        >
                                                             <FiEdit2 />
                                                         </button>
-                                                        <button className="action-btn delete" onClick={() => handleDelete(product._id)} title="Delete">
+                                                        <button
+                                                            className="btn-icon delete-btn"
+                                                            onClick={() => handleDelete(product._id)}
+                                                        >
                                                             <FiTrash2 />
                                                         </button>
                                                     </div>
@@ -386,8 +341,8 @@ function ProductsManager() {
 
             {/* Premium Modal */}
             {showModal && (
-                <div className="modal-overlay" onClick={() => setShowModal(false)}>
-                    <div className="modal-content modal-lg" onClick={e => e.stopPropagation()}>
+                <div className="modal-overlay">
+                    <div className="modal-content modal-lg">
                         <div className="modal-header">
                             <div>
                                 <h2 className="modal-title">
@@ -474,19 +429,6 @@ function ProductsManager() {
                                     <h3 className="form-section-title">Inventory & Media</h3>
 
                                     <div className="form-group">
-                                        <label className="form-label">Stock Quantity *</label>
-                                        <input
-                                            type="number"
-                                            className="form-input"
-                                            value={formData.stock}
-                                            onChange={e => setFormData({ ...formData, stock: e.target.value })}
-                                            placeholder="0"
-                                            min="0"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="form-group">
                                         <label className="form-label">Available Sizes</label>
                                         <div className="size-selector">
                                             {availableSizes.map(size => (
@@ -521,19 +463,6 @@ function ProductsManager() {
                                         borderRadius: '12px',
                                         marginTop: '24px'
                                     }}>
-                                        <label className="switch-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
-                                            <input
-                                                type="checkbox"
-                                                checked={formData.inStock}
-                                                onChange={e => setFormData({ ...formData, inStock: e.target.checked })}
-                                                style={{ marginTop: '4px', width: '18px', height: '18px', cursor: 'pointer' }}
-                                            />
-                                            <span className="switch-text">
-                                                <span className="switch-title" style={{ display: 'block', fontWeight: '600', color: '#1a1a1a' }}>In Stock</span>
-                                                <span className="switch-desc" style={{ display: 'block', fontSize: '13px', color: '#666', marginTop: '2px' }}>Product is available for purchase</span>
-                                            </span>
-                                        </label>
-
                                         <label className="switch-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
                                             <input
                                                 type="checkbox"

@@ -5,42 +5,66 @@ import { useProducts } from '../context/ProductContext'
 import ProductCard from '../components/ProductCard'
 
 function Shop() {
-    const [searchParams] = useSearchParams()
+    const [searchParams, setSearchParams] = useSearchParams()
     const { products, categories, loading } = useProducts()
     const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all')
+    const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '')
     const [filteredProducts, setFilteredProducts] = useState([])
 
-    // Debug logging
-    console.log('[Shop] products:', products)
-    console.log('[Shop] products.length:', products.length)
-    console.log('[Shop] selectedCategory:', selectedCategory)
-    console.log('[Shop] filteredProducts:', filteredProducts)
-    console.log('[Shop] loading:', loading)
-
     useEffect(() => {
-        console.log('[Shop useEffect] Running filter logic')
-        console.log('[Shop useEffect] selectedCategory:', selectedCategory)
-        console.log('[Shop useEffect] products:', products)
-
         const visibleProducts = products.filter(p => p.isVisible !== false)
 
-        if (selectedCategory === 'all') {
-            setFilteredProducts(visibleProducts)
-        } else {
-            setFilteredProducts(
-                visibleProducts.filter(p =>
-                    p.category.toLowerCase() === selectedCategory.toLowerCase()
-                )
+        let result = visibleProducts
+
+        // Filter by Category
+        if (selectedCategory !== 'all') {
+            result = result.filter(p =>
+                p.category.toLowerCase() === selectedCategory.toLowerCase()
             )
         }
-    }, [selectedCategory, products])
+
+        // Filter by Search Term
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase()
+            result = result.filter(p =>
+                p.name.toLowerCase().includes(term) ||
+                p.category.toLowerCase().includes(term) ||
+                (p.description && p.description.toLowerCase().includes(term))
+            )
+        }
+
+        setFilteredProducts(result)
+    }, [selectedCategory, searchTerm, products])
 
     useEffect(() => {
         const categoryParam = searchParams.get('category')
         if (categoryParam) {
             setSelectedCategory(categoryParam)
         }
+
+        const searchParam = searchParams.get('search')
+        if (searchParam) {
+            setSearchTerm(searchParam)
+        } else if (!categoryParam) { // Only clear if no params at all, or preserve if just switching cat
+            // Actually better to keep sync with URL. 
+            // If URL has no search, but we have state, we should probably respect URL?
+            // But typing in input should update state.
+        }
     }, [searchParams])
+
+    const handleSearchChange = (e) => {
+        const term = e.target.value
+        setSearchTerm(term)
+
+        // Update URL
+        const newParams = new URLSearchParams(searchParams)
+        if (term) {
+            newParams.set('search', term)
+        } else {
+            newParams.delete('search')
+        }
+        setSearchParams(newParams, { replace: true })
+    }
 
     if (loading) {
         return (
@@ -67,37 +91,66 @@ function Shop() {
                         </p>
                     </motion.div>
 
-                    {/* Category Filters */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.2, duration: 0.5 }}
-                        className="category-filters"
-                    >
-                        <button
-                            className={`filter-pill ${selectedCategory === 'all' ? 'active' : ''}`}
-                            onClick={() => setSelectedCategory('all')}
+                    {/* Search & Filter Section */}
+                    <div className="shop-controls">
+                        {/* Search Input */}
+                        <div className="shop-search">
+                            <input
+                                type="text"
+                                placeholder="Search jerseys..."
+                                value={searchTerm}
+                                onChange={handleSearchChange}
+                                className="shop-search-input"
+                            />
+                        </div>
+
+                        {/* Category Filters */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2, duration: 0.5 }}
+                            className="category-filters"
                         >
-                            All Products
-                        </button>
-                        {categories.map((category) => (
                             <button
-                                key={category._id}
-                                className={`filter-pill ${selectedCategory === category.slug ||
-                                    selectedCategory === category.name.toLowerCase()
-                                    ? 'active'
-                                    : ''
-                                    }`}
-                                onClick={() => setSelectedCategory(category.name.toLowerCase())}
+                                className={`filter-pill ${selectedCategory === 'all' ? 'active' : ''}`}
+                                onClick={() => {
+                                    setSelectedCategory('all')
+                                    const newParams = new URLSearchParams(searchParams)
+                                    newParams.set('category', 'all')
+                                    setSearchParams(newParams)
+                                }}
                             >
-                                {category.name}
+                                All Products
                             </button>
-                        ))}
-                    </motion.div>
+                            {categories.map((category) => (
+                                <button
+                                    key={category._id}
+                                    className={`filter-pill ${selectedCategory === category.slug ||
+                                        selectedCategory === category.name.toLowerCase()
+                                        ? 'active'
+                                        : ''
+                                        }`}
+                                    onClick={() => {
+                                        const cat = category.name.toLowerCase()
+                                        setSelectedCategory(cat)
+                                        const newParams = new URLSearchParams(searchParams)
+                                        newParams.set('category', cat)
+                                        setSearchParams(newParams)
+                                    }}
+                                >
+                                    {category.name}
+                                </button>
+                            ))}
+                        </motion.div>
+                    </div>
 
                     {/* Product Count */}
                     <div className="product-count">
-                        <span>{filteredProducts.length} {filteredProducts.length === 1 ? 'Product' : 'Products'}</span>
+                        <span>
+                            {filteredProducts.length}
+                            {filteredProducts.length === 1 ? 'Product' : 'Products'}
+                            {searchTerm && ` found for "${searchTerm}"`}
+                        </span>
                     </div>
 
                     {/* Products Grid */}
