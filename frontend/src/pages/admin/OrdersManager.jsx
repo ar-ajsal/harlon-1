@@ -149,8 +149,8 @@ function OrdersManager() {
                     </div>
                 </div>
 
-                {/* Orders Table */}
-                <div className="orders-table-container">
+                {/* Orders Content */}
+                <div className="orders-content">
                     {loading ? (
                         <div className="loading-state">Loading orders...</div>
                     ) : filteredOrders.length === 0 ? (
@@ -163,62 +163,88 @@ function OrdersManager() {
                             </Link>
                         </div>
                     ) : (
-                        <table className="orders-table">
-                            <thead>
-                                <tr>
-                                    <th>Invoice</th>
-                                    <th>Customer</th>
-                                    <th>Date</th>
-                                    <th>Amount</th>
-                                    <th>Payment</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                        <>
+                            {/* Mobile Card List */}
+                            <div className="mobile-card-list">
                                 {filteredOrders.map(order => (
-                                    <tr key={order._id}>
-                                        <td className="invoice-number">{order.invoiceNumber}</td>
-                                        <td>
-                                            <div className="customer-info">
-                                                <span className="customer-name">{order.customer?.name}</span>
-                                                <span className="customer-phone">{order.customer?.phone}</span>
+                                    <div key={order._id} className="mobile-card" onClick={() => navigate(`/admin/orders/${order._id}`)}>
+                                        <div className="mobile-card-content">
+                                            <div className="mobile-card-title">{order.invoiceNumber}</div>
+                                            <div className="mobile-card-subtitle">{order.customer?.name}</div>
+                                            <div className="mobile-card-subtitle">{formatDate(order.date)}</div>
+                                            <div className="mobile-card-price">{formatCurrency(order.finalTotal)}</div>
+                                            <div className={`mobile-card-status ${order.status === 'Paid' ? 'visible' : 'hidden'}`} style={{
+                                                background: order.status === 'Paid' ? '#d1fae5' : order.status === 'Cancelled' ? '#fee2e2' : '#fef3c7',
+                                                color: order.status === 'Paid' ? '#065f46' : order.status === 'Cancelled' ? '#991b1b' : '#92400e'
+                                            }}>
+                                                {order.status}
                                             </div>
-                                        </td>
-                                        <td>{formatDate(order.date)}</td>
-                                        <td className="amount">{formatCurrency(order.finalTotal)}</td>
-                                        <td>{order.paymentMethod}</td>
-                                        <td>
-                                            <select
-                                                value={order.status}
-                                                onChange={(e) => handleStatusChange(order._id, e.target.value)}
-                                                className={`status-select ${getStatusClass(order.status)}`}
-                                            >
-                                                <option value="Pending">Pending</option>
-                                                <option value="Paid">Paid</option>
-                                                <option value="Cancelled">Cancelled</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <div className="action-buttons">
-                                                <Link to={`/admin/orders/${order._id}`} className="action-btn" title="View">
-                                                    <FiEye />
-                                                </Link>
-                                                <a
-                                                    href={ordersAPI.getPdfUrl(order._id)}
-                                                    className="action-btn"
-                                                    title="Download PDF"
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                >
-                                                    <FiDownload />
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                        </div>
+                                    </div>
                                 ))}
-                            </tbody>
-                        </table>
+                            </div>
+
+                            {/* Desktop Table */}
+                            <div className="orders-table-container table-responsive desktop-only">
+                                <table className="orders-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Invoice</th>
+                                            <th>Customer</th>
+                                            <th>Date</th>
+                                            <th>Amount</th>
+                                            <th>Payment</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {filteredOrders.map(order => (
+                                            <tr key={order._id}>
+                                                <td className="invoice-number">{order.invoiceNumber}</td>
+                                                <td>
+                                                    <div className="customer-info">
+                                                        <span className="customer-name">{order.customer?.name}</span>
+                                                        <span className="customer-phone">{order.customer?.phone}</span>
+                                                    </div>
+                                                </td>
+                                                <td>{formatDate(order.date)}</td>
+                                                <td className="amount">{formatCurrency(order.finalTotal)}</td>
+                                                <td>{order.paymentMethod}</td>
+                                                <td>
+                                                    <select
+                                                        value={order.status}
+                                                        onChange={(e) => handleStatusChange(order._id, e.target.value)}
+                                                        className={`status-select ${getStatusClass(order.status)}`}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        <option value="Pending">Pending</option>
+                                                        <option value="Paid">Paid</option>
+                                                        <option value="Cancelled">Cancelled</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <div className="action-buttons">
+                                                        <Link to={`/admin/orders/${order._id}`} className="action-btn" title="View">
+                                                            <FiEye />
+                                                        </Link>
+                                                        <a
+                                                            href={ordersAPI.getPdfUrl(order._id)}
+                                                            className="action-btn"
+                                                            title="Download PDF"
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                        >
+                                                            <FiDownload />
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </>
                     )}
                 </div>
             </main>

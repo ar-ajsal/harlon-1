@@ -5,6 +5,8 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useAuth } from '../../context/AuthContext'
 import { useProducts } from '../../context/ProductContext'
 import { ordersAPI } from '../../api/orders.api'
+import AdminBottomNav from '../../components/AdminBottomNav'
+import '../../styles/admin-responsive.css'
 
 function Dashboard() {
     const navigate = useNavigate()
@@ -207,6 +209,8 @@ function Dashboard() {
                     </div>
                 </div>
             </main>
+
+            <AdminBottomNav />
         </div>
     )
 }

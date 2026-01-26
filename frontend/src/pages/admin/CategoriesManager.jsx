@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiMenu } from 'react-icons/fi'
+import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiMenu, FiTrendingUp, FiFileText } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import { useProducts } from '../../context/ProductContext'
 import ImageUploader from '../../components/ImageUploader'
+import AdminBottomNav from '../../components/AdminBottomNav'
+import '../../styles/admin-responsive.css'
 
 function CategoriesManager() {
     const navigate = useNavigate()
@@ -81,113 +83,137 @@ function CategoriesManager() {
 
             <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
                 <div className="admin-logo">harlon</div>
-                <nav className="admin-nav">
-                    <NavLink
-                        to="/admin/dashboard"
-                        className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                        onClick={() => setSidebarOpen(false)}
-                    >
-                        <FiHome />
-                        Dashboard
-                    </NavLink>
-                    <NavLink
-                        to="/admin/products"
-                        className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                        onClick={() => setSidebarOpen(false)}
-                    >
-                        <FiPackage />
-                        Products
-                    </NavLink>
-                    <NavLink
-                        to="/admin/categories"
-                        className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                        onClick={() => setSidebarOpen(false)}
-                    >
-                        <FiLayers />
-                        Categories
-                    </NavLink>
-                    <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '20px 0' }} />
-                    <Link to="/" className="admin-nav-link" target="_blank">
-                        <FiShoppingBag />
-                        View Store
-                    </Link>
-                    <button onClick={handleLogout} className="admin-nav-link" style={{ width: '100%', textAlign: 'left' }}>
-                        <FiLogOut />
-                        Logout
-                    </button>
-                </nav>
+                <div className="sidebar-scroll">
+                    <nav className="admin-nav">
+                        <NavLink
+                            to="/admin/dashboard"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiHome /> Dashboard
+                        </NavLink>
+                        <NavLink
+                            to="/admin/products"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiPackage /> Products
+                        </NavLink>
+                        <NavLink
+                            to="/admin/categories"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiLayers /> Categories
+                        </NavLink>
+                        <NavLink
+                            to="/admin/orders"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiFileText /> Invoices
+                        </NavLink>
+                        <NavLink
+                            to="/admin/reports"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiTrendingUp /> Reports
+                        </NavLink>
+
+                        <div className="nav-divider" />
+
+                        <Link to="/" className="admin-nav-link" target="_blank">
+                            <FiShoppingBag /> View Store
+                        </Link>
+                        <button onClick={handleLogout} className="admin-nav-link logout-btn">
+                            <FiLogOut /> Logout
+                        </button>
+                    </nav>
+                </div>
             </aside>
 
             <main className="admin-content">
-                <div className="admin-header">
-                    <h1 className="admin-title">Categories</h1>
+                <div className="page-header">
+                    <div>
+                        <h1 className="admin-title">Categories</h1>
+                        <p className="admin-subtitle">Manage product categories</p>
+                    </div>
                     <button className="btn btn-primary" onClick={openAddModal}>
                         <FiPlus />
                         Add Category
                     </button>
                 </div>
 
-                <table className="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Image</th>
-                            <th>Name</th>
-                            <th>Slug</th>
-                            <th>Products</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {categories.map(category => (
-                            <tr key={category._id}>
-                                <td>
-                                    <img
-                                        src={category.image || '/images/placeholder.jpg'}
-                                        alt={category.name}
-                                        className="table-image"
-                                    />
-                                </td>
-                                <td style={{ fontWeight: '500', color: 'var(--text-primary)' }}>
-                                    {category.name}
-                                </td>
-                                <td style={{ color: 'var(--text-muted)' }}>
-                                    {category.slug}
-                                </td>
-                                <td>
-                                    <span style={{
-                                        background: 'var(--surface-light)',
-                                        padding: '4px 12px',
-                                        borderRadius: '20px',
-                                        fontSize: '0.9rem'
-                                    }}>
-                                        {getProductCount(category.name)} products
-                                    </span>
-                                </td>
-                                <td>
-                                    <button
-                                        className="action-btn edit"
-                                        onClick={() => openEditModal(category)}
-                                    >
-                                        <FiEdit2 />
-                                    </button>
-                                    <button
-                                        className="action-btn delete"
-                                        onClick={() => handleDelete(category._id)}
-                                    >
-                                        <FiTrash2 />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-
-                {categories.length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-secondary)' }}>
-                        No categories found. Click "Add Category" to create one.
+                <div className="content-card">
+                    <div className="table-responsive">
+                        <table className="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Name</th>
+                                    <th>Slug</th>
+                                    <th>Products</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {categories.map(category => (
+                                    <tr key={category._id}>
+                                        <td>
+                                            <img
+                                                src={category.image || '/images/placeholder.jpg'}
+                                                alt={category.name}
+                                                className="table-image"
+                                            />
+                                        </td>
+                                        <td style={{ fontWeight: '500', color: 'var(--text-primary)' }}>
+                                            {category.name}
+                                        </td>
+                                        <td style={{ color: 'var(--text-muted)' }}>
+                                            {category.slug}
+                                        </td>
+                                        <td>
+                                            <span style={{
+                                                background: 'var(--surface-light)',
+                                                padding: '4px 12px',
+                                                borderRadius: '20px',
+                                                fontSize: '0.9rem'
+                                            }}>
+                                                {getProductCount(category.name)} products
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div className="actions-cell">
+                                                <button
+                                                    className="action-btn edit"
+                                                    onClick={() => openEditModal(category)}
+                                                >
+                                                    <FiEdit2 />
+                                                </button>
+                                                <button
+                                                    className="action-btn delete"
+                                                    onClick={() => handleDelete(category._id)}
+                                                >
+                                                    <FiTrash2 />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
-                )}
+
+                    {categories.length === 0 && (
+                        <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-secondary)' }}>
+                            No categories found. Click "Add Category" to create one.
+                        </div>
+                    )}
+                </div>
             </main>
+
+            <AdminBottomNav />
 
             {/* Modal */}
             {showModal && (
@@ -203,7 +229,7 @@ function CategoriesManager() {
                         </div>
 
                         <form onSubmit={handleSubmit}>
-                            <div className="modal-body">
+                            <div className="modal-body-grid">
                                 <div className="form-group">
                                     <label className="form-label">Category Name *</label>
                                     <input
@@ -217,12 +243,14 @@ function CategoriesManager() {
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Category Image</label>
-                                    <ImageUploader
-                                        images={formData.image ? [formData.image] : []}
-                                        onImagesChange={(images) => setFormData({ ...formData, image: images[0] || '' })}
-                                        maxImages={1}
-                                        aspectRatio={1}
-                                    />
+                                    <div className="image-uploader-wrapper">
+                                        <ImageUploader
+                                            images={formData.image ? [formData.image] : []}
+                                            onImagesChange={(images) => setFormData({ ...formData, image: images[0] || '' })}
+                                            maxImages={1}
+                                            aspectRatio={1}
+                                        />
+                                    </div>
                                     <p style={{ fontSize: '12px', color: 'var(--primary-color)', marginTop: '8px' }}>
                                         Image will be cropped to square format
                                     </p>
