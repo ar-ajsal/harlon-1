@@ -1,16 +1,90 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiSearch, FiFilter, FiMenu, FiFileText, FiTrendingUp } from 'react-icons/fi'
+
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiSearch, FiFilter, FiMenu, FiFileText, FiTrendingUp, FiMove } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import { useProducts } from '../../context/ProductContext'
 import ImageUploader from '../../components/ImageUploader'
 import AdminBottomNav from '../../components/AdminBottomNav'
 import '../../styles/admin-responsive.css'
 
+
+
+function SortableRow({ product, onEdit, onDelete, onVisibilityToggle }) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+    } = useSortable({ id: product._id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
+
+    return (
+        <tr ref={setNodeRef} style={style}>
+            <td>
+                <div className="product-cell">
+                    <button {...attributes} {...listeners} className="drag-handle" style={{ cursor: 'grab', marginRight: '10px', background: 'none', border: 'none', color: '#999' }}>
+                        <FiMove />
+                    </button>
+                    <img
+                        src={product.images?.[0] || '/images/placeholder.jpg'}
+                        alt={product.name}
+                        className="table-image"
+                    />
+                    <div className="product-cell-info">
+                        <span className="product-cell-name">
+                            {product.name}
+                            {product.isVisible === false && <span style={{ fontSize: '10px', color: 'var(--error)', marginLeft: '6px', border: '1px solid var(--error)', padding: '1px 4px', borderRadius: '4px' }}>Hidden</span>}
+                        </span>
+                        {product.featured && <span className="badge badge-accent">Featured</span>}
+                        {product.bestSeller && <span className="badge badge-primary">Best Seller</span>}
+                    </div>
+                </div>
+            </td>
+            <td>{product.category}</td>
+            <td>₹{product.price}</td>
+            <td>
+                <label onClick={e => e.stopPropagation()} className="toggle-switch">
+                    <input
+                        type="checkbox"
+                        checked={product.isVisible !== false}
+                        onChange={() => onVisibilityToggle(product)}
+                    />
+                    <span className="toggle-slider"></span>
+                </label>
+            </td>
+            <td>
+                <div className="action-buttons">
+                    <button
+                        className="btn-icon"
+                        onClick={() => onEdit(product)}
+                    >
+                        <FiEdit2 />
+                    </button>
+                    <button
+                        className="btn-icon delete-btn"
+                        onClick={() => onDelete(product._id)}
+                    >
+                        <FiTrash2 />
+                    </button>
+                </div>
+            </td>
+        </tr>
+    );
+}
+
 function ProductsManager() {
     const navigate = useNavigate()
     const { logout } = useAuth()
-    const { products, categories, addProduct, updateProduct, deleteProduct } = useProducts()
+    const { products, categories, addProduct, updateProduct, deleteProduct, reorderProducts } = useProducts()
 
     const [showModal, setShowModal] = useState(false)
     const [editingProduct, setEditingProduct] = useState(null)
@@ -119,6 +193,27 @@ function ProductsManager() {
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.category.toLowerCase().includes(searchTerm.toLowerCase())
     )
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    const handleDragEnd = (event) => {
+        const { active, over } = event;
+
+        if (!over) return;
+
+        if (active.id !== over.id) {
+            const oldIndex = products.findIndex((p) => p._id === active.id);
+            const newIndex = products.findIndex((p) => p._id === over.id);
+
+            const newOrder = arrayMove(products, oldIndex, newIndex);
+            reorderProducts(newOrder);
+        }
+    };
 
     return (
         <div className="admin-layout">
@@ -279,55 +374,26 @@ function ProductsManager() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {filteredProducts.map(product => (
-                                            <tr key={product._id}>
-                                                <td>
-                                                    <div className="product-cell">
-                                                        <img
-                                                            src={product.images?.[0] || '/images/placeholder.jpg'}
-                                                            alt={product.name}
-                                                            className="table-image"
-                                                        />
-                                                        <div className="product-cell-info">
-                                                            <span className="product-cell-name">
-                                                                {product.name}
-                                                                {product.isVisible === false && <span style={{ fontSize: '10px', color: 'var(--error)', marginLeft: '6px', border: '1px solid var(--error)', padding: '1px 4px', borderRadius: '4px' }}>Hidden</span>}
-                                                            </span>
-                                                            {product.featured && <span className="badge badge-accent">Featured</span>}
-                                                            {product.bestSeller && <span className="badge badge-primary">Best Seller</span>}
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>{product.category}</td>
-                                                <td>₹{product.price}</td>
-                                                <td>
-                                                    <label onClick={e => e.stopPropagation()} className="toggle-switch">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={product.isVisible !== false}
-                                                            onChange={() => handleVisibilityToggle(product)}
-                                                        />
-                                                        <span className="toggle-slider"></span>
-                                                    </label>
-                                                </td>
-                                                <td>
-                                                    <div className="action-buttons">
-                                                        <button
-                                                            className="btn-icon"
-                                                            onClick={() => openEditModal(product)}
-                                                        >
-                                                            <FiEdit2 />
-                                                        </button>
-                                                        <button
-                                                            className="btn-icon delete-btn"
-                                                            onClick={() => handleDelete(product._id)}
-                                                        >
-                                                            <FiTrash2 />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
+                                        <DndContext
+                                            sensors={sensors}
+                                            collisionDetection={closestCenter}
+                                            onDragEnd={handleDragEnd}
+                                        >
+                                            <SortableContext
+                                                items={products.map(p => p._id)}
+                                                strategy={verticalListSortingStrategy}
+                                            >
+                                                {filteredProducts.map(product => (
+                                                    <SortableRow
+                                                        key={product._id}
+                                                        product={product}
+                                                        onEdit={openEditModal}
+                                                        onDelete={handleDelete}
+                                                        onVisibilityToggle={handleVisibilityToggle}
+                                                    />
+                                                ))}
+                                            </SortableContext>
+                                        </DndContext>
                                     </tbody>
                                 </table>
                             </div>

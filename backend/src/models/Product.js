@@ -52,6 +52,10 @@ const productSchema = new mongoose.Schema({
     isVisible: {
         type: Boolean,
         default: true
+    },
+    priority: {
+        type: Number,
+        default: 0
     }
 }, {
     timestamps: true

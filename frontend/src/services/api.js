@@ -52,6 +52,15 @@ export const productsApi = {
             headers: getAuthHeaders()
         });
         return res.json();
+    },
+
+    reorder: async (products) => {
+        const res = await fetch(`${API_URL}/products/reorder`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+            body: JSON.stringify({ products })
+        });
+        return res.json();
     }
 };
 

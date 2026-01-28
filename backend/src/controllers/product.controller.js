@@ -26,3 +26,8 @@ export const remove = asyncHandler(async (req, res) => {
     await productService.delete(req.params.id);
     res.json(ApiResponse.success(null, 'Product deleted successfully'));
 });
+
+export const reorder = asyncHandler(async (req, res) => {
+    await productService.reorder(req.body.products);
+    res.json(ApiResponse.success(null, 'Products reordered successfully'));
+});

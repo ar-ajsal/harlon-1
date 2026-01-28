@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import { FiMenu, FiX, FiShoppingBag, FiSearch } from 'react-icons/fi'
 import { WHATSAPP_NUMBER } from '../config/constants'
 
@@ -18,10 +19,21 @@ function Header() {
     }
 
     return (
-        <header className="header">
+        <motion.header
+            className="header"
+            initial={{ y: -100 }}
+            animate={{ y: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        >
             <div className="container header-container">
                 <Link to="/" className="logo">
-                    <img src="/images/logo.png" alt="Harlon" style={{ height: '40px' }} />
+                    <motion.img
+                        src="/images/logo.png"
+                        alt="Harlon"
+                        style={{ height: '40px' }}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                    />
                 </Link>
 
                 {/* Desktop Search */}
@@ -38,45 +50,59 @@ function Header() {
                     </div>
                 </form>
 
-                <nav className={`nav-links ${mobileMenuOpen ? 'active' : ''}`}>
-                    {/* Mobile Search */}
-                    <form onSubmit={handleSearch} className="header-search mobile-only">
-                        <div className="search-wrapper">
-                            <FiSearch className="search-icon" />
-                            <input
-                                type="text"
-                                placeholder="Search products..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="search-input"
-                            />
-                        </div>
-                    </form>
-
-                    <NavLink
-                        to="/"
-                        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-                        onClick={() => setMobileMenuOpen(false)}
-                    >
-                        Home
+                <nav className="nav-links desktop-only-flex">
+                    <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                        {({ isActive }) => (
+                            <motion.span whileHover={{ y: -2 }} style={{ display: 'inline-block' }}>
+                                Home
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="underline"
+                                        style={{
+                                            position: 'absolute',
+                                            bottom: '-2px',
+                                            left: 0,
+                                            right: 0,
+                                            height: '2px',
+                                            background: 'var(--noir-100)'
+                                        }}
+                                    />
+                                )}
+                            </motion.span>
+                        )}
                     </NavLink>
-                    <NavLink
-                        to="/shop"
-                        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-                        onClick={() => setMobileMenuOpen(false)}
-                    >
-                        Shop
+                    <NavLink to="/shop" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                        {({ isActive }) => (
+                            <motion.span whileHover={{ y: -2 }} style={{ display: 'inline-block' }}>
+                                Shop
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="underline"
+                                        style={{
+                                            position: 'absolute',
+                                            bottom: '-2px',
+                                            left: 0,
+                                            right: 0,
+                                            height: '2px',
+                                            background: 'var(--noir-100)'
+                                        }}
+                                    />
+                                )}
+                            </motion.span>
+                        )}
                     </NavLink>
-                    <a
+                    <motion.a
                         href={`https://wa.me/${WHATSAPP_NUMBER}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="nav-link"
+                        whileHover={{ y: -2 }}
                     >
                         Contact
-                    </a>
+                    </motion.a>
                 </nav>
 
+                {/* Mobile Menu Button */}
                 <button
                     className="mobile-menu-btn"
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -84,8 +110,58 @@ function Header() {
                 >
                     {mobileMenuOpen ? <FiX /> : <FiMenu />}
                 </button>
+
+                {/* Mobile Menu Overlay */}
+                <AnimatePresence>
+                    {mobileMenuOpen && (
+                        <motion.nav
+                            className="mobile-menu-overlay"
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            {/* Mobile Search */}
+                            <form onSubmit={handleSearch} className="header-search mobile-only-block" style={{ marginBottom: '20px' }}>
+                                <div className="search-wrapper">
+                                    <FiSearch className="search-icon" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search products..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="search-input"
+                                    />
+                                </div>
+                            </form>
+
+                            <NavLink
+                                to="/"
+                                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                Home
+                            </NavLink>
+                            <NavLink
+                                to="/shop"
+                                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                Shop
+                            </NavLink>
+                            <a
+                                href={`https://wa.me/${WHATSAPP_NUMBER}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="nav-link"
+                            >
+                                Contact
+                            </a>
+                        </motion.nav>
+                    )}
+                </AnimatePresence>
             </div>
-        </header>
+        </motion.header>
     )
 }
 

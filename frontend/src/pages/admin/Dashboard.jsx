@@ -25,12 +25,28 @@ function Dashboard() {
         monthProfit: 0
     })
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [graphData, setGraphData] = useState([])
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
+                // Fetch stats
                 const res = await ordersAPI.getTodayStats()
                 setDashboardStats(res.data)
+
+                // Fetch Graph Data
+                const date = new Date()
+                const currentYear = date.getFullYear()
+                const currentMonth = date.getMonth() + 1
+                const reportRes = await ordersAPI.getMonthlyReport(currentYear, currentMonth)
+
+                if (reportRes.data.success) {
+                    const dailyData = reportRes.data.data.daily.map(day => ({
+                        date: day._id.split('-').pop(), // Just show day number
+                        sales: day.sales
+                    }))
+                    setGraphData(dailyData)
+                }
             } catch (err) {
                 console.error('Error fetching dashboard stats:', err)
             }
@@ -159,6 +175,48 @@ function Dashboard() {
                             </div>
                         </div>
                     ))}
+                </div>
+
+                {/* Sales Graph */}
+                <div className="content-card" style={{ marginBottom: '24px', padding: '24px' }}>
+                    <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '20px', color: 'var(--noir-100)' }}>Sales Overview (This Month)</h3>
+                    <div style={{ height: '300px', width: '100%' }}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={graphData}>
+                                <defs>
+                                    <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8} />
+                                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
+                                <XAxis
+                                    dataKey="date"
+                                    tick={{ fill: '#666', fontSize: 12 }}
+                                    axisLine={false}
+                                    tickLine={false}
+                                />
+                                <YAxis
+                                    tick={{ fill: '#666', fontSize: 12 }}
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tickFormatter={(val) => `₹${val}`}
+                                />
+                                <Tooltip
+                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                                    formatter={(val) => [`₹${val}`, 'Sales']}
+                                />
+                                <Area
+                                    type="monotone"
+                                    dataKey="sales"
+                                    stroke="#8b5cf6"
+                                    strokeWidth={3}
+                                    fillOpacity={1}
+                                    fill="url(#colorSales)"
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
                 </div>
 
                 <div className="dashboard-grid-2">

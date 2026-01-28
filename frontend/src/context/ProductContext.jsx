@@ -72,6 +72,26 @@ export function ProductProvider({ children }) {
         }
     }
 
+    const reorderProducts = async (updatedProducts) => {
+        try {
+            // Optimistic update
+            setProducts(updatedProducts)
+
+            // Extract only needed data for API
+            const reorderData = updatedProducts.map((p, index) => ({
+                _id: p._id,
+                priority: updatedProducts.length - index // Higher priority for top items
+            }))
+
+            await productsApi.reorder(reorderData)
+        } catch (err) {
+            console.error('Error reordering products:', err)
+            // Revert on error (would need previous state, but for now just logging)
+            loadData()
+            throw err
+        }
+    }
+
     const getProduct = (id) => {
         return products.find(p => p._id === id || p.id === id)
     }
@@ -126,7 +146,9 @@ export function ProductProvider({ children }) {
         error,
         addProduct,
         updateProduct,
+        updateProduct,
         deleteProduct,
+        reorderProducts,
         getProduct,
         getProductsByCategory,
         addCategory,

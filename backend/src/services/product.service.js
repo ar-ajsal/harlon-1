@@ -18,7 +18,7 @@ class ProductService {
             query.$text = { $search: filters.search };
         }
 
-        return Product.find(query).sort({ createdAt: -1 });
+        return Product.find(query).sort({ priority: -1, createdAt: -1 });
     }
 
     async getById(id) {
@@ -50,6 +50,21 @@ class ProductService {
             throw ApiError.notFound('Product not found');
         }
         return product;
+    }
+
+    async reorder(updates) {
+        const operations = updates.map(({ _id, priority }) => ({
+            updateOne: {
+                filter: { _id },
+                update: { $set: { priority } }
+            }
+        }));
+
+        if (operations.length > 0) {
+            await Product.bulkWrite(operations);
+        }
+
+        return true;
     }
 
     async getCount() {

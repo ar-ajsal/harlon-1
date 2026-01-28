@@ -10,6 +10,7 @@ router.get('/:id', productController.getById);
 
 // Protected routes
 router.post('/', authMiddleware, productController.create);
+router.put('/reorder', authMiddleware, productController.reorder);
 router.put('/:id', authMiddleware, productController.update);
 router.delete('/:id', authMiddleware, productController.remove);
 

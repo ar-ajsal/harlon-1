@@ -477,6 +477,29 @@ h6 {
     display: none;
   }
 
+  .desktop-only-flex {
+    display: none !important;
+  }
+
+  .mobile-only-block {
+    display: block !important;
+  }
+
+  .mobile-menu-overlay {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 80px;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    padding: var(--space-6);
+    gap: var(--space-6);
+    border-bottom: 1px solid var(--noir-20);
+    box-shadow: var(--shadow-elevated);
+    z-index: 999;
+  }
+
   .mobile-menu-btn {
     display: block;
   }
