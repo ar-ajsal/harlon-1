@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate, useParams } from 'react-router-dom'
-import { FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag, FiFileText, FiArrowLeft, FiDownload, FiShare2, FiMenu } from 'react-icons/fi'
+import { FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag, FiFileText, FiArrowLeft, FiDownload, FiShare2, FiMenu, FiEdit2, FiTrash2 } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useAuth } from '../../context/AuthContext'
 import { ordersAPI } from '../../api/orders.api'
@@ -101,6 +101,20 @@ Thank you for your order! 🙏
         }
     }
 
+    const handleDelete = async () => {
+        if (!window.confirm(`Are you sure you want to delete invoice ${order.invoiceNumber}? This action cannot be undone.`)) {
+            return
+        }
+
+        try {
+            await ordersAPI.delete(id)
+            navigate('/admin/orders')
+        } catch (err) {
+            console.error('Failed to delete order:', err)
+            alert('Failed to delete invoice. Please try again.')
+        }
+    }
+
     if (loading) {
         return (
             <div className="admin-layout">
@@ -172,6 +186,12 @@ Thank you for your order! 🙏
                         <p className="admin-subtitle">Created on {formatDate(order.createdAt)}</p>
                     </div>
                     <div className="header-actions">
+                        <Link
+                            to={`/admin/orders/${id}/edit`}
+                            className="btn btn-secondary"
+                        >
+                            <FiEdit2 /> Edit Invoice
+                        </Link>
                         <a
                             href={ordersAPI.getPdfUrl(id)}
                             className="btn btn-secondary"
@@ -182,6 +202,9 @@ Thank you for your order! 🙏
                         </a>
                         <button onClick={shareOnWhatsApp} className="btn btn-whatsapp">
                             <FaWhatsapp /> Share on WhatsApp
+                        </button>
+                        <button onClick={handleDelete} className="btn btn-danger">
+                            <FiTrash2 /> Delete
                         </button>
                     </div>
                 </header>

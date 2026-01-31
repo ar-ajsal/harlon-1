@@ -11,6 +11,7 @@ import ProductsManager from './pages/admin/ProductsManager'
 import CategoriesManager from './pages/admin/CategoriesManager'
 import OrdersManager from './pages/admin/OrdersManager'
 import CreateOrder from './pages/admin/CreateOrder'
+import EditOrder from './pages/admin/EditOrder'
 import OrderDetail from './pages/admin/OrderDetail'
 import Reports from './pages/admin/Reports'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -44,6 +45,11 @@ function App() {
                 <Route path="/admin/orders/new" element={
                     <ProtectedRoute>
                         <CreateOrder />
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin/orders/:id/edit" element={
+                    <ProtectedRoute>
+                        <EditOrder />
                     </ProtectedRoute>
                 } />
                 <Route path="/admin/orders/:id" element={

@@ -9,10 +9,13 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'RedCaard Admin',
-        short_name: 'RedCaard',
-        description: 'RedCaard Admin Panel & Store',
+        name: 'Harlon',
+        short_name: 'Harlon',
+        description: 'Retro Football Jerseys',
         theme_color: '#ffffff',
+        display: 'standalone',
+        background_color: '#ffffff',
+        orientation: 'portrait',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -23,6 +26,12 @@ export default defineConfig({
             src: 'pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png'
+          },
+          {
+            src: 'pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable'
           }
         ]
       }

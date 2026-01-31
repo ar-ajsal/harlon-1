@@ -13,6 +13,12 @@ export const ordersAPI = {
     // Update order status
     updateStatus: (id, status) => api.put(`/orders/${id}/status`, { status }),
 
+    // Update complete order (edit invoice)
+    update: (id, data) => api.put(`/orders/${id}`, data),
+
+    // Delete order
+    delete: (id) => api.delete(`/orders/${id}`),
+
     // Get order statistics
     getStats: () => api.get('/orders/stats/summary'),
 

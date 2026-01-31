@@ -26,12 +26,15 @@ function ProductDetail() {
     const handleWhatsAppOrder = () => {
         if (!product || !selectedSize) return
 
-        const productUrl = window.location.href
+        const currentImage = product.images[selectedImage] || product.images[0] || ''
+        const pageUrl = `${window.location.origin}/product/${product._id}`
+
         const message = `*Jersy_store Order Request*\n\n` +
             `*Product:* ${product.name}\n` +
             `*Size:* ${selectedSize}\n` +
             `*Price:* ₹${product.price}\n\n` +
-            `*View Image:* ${productUrl}\n\n` +
+            `*Product Image:* ${currentImage}\n` +
+            `*Page Link:* ${pageUrl}\n\n` +
             `I would like to place an order. Is this available?`
 
         const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`

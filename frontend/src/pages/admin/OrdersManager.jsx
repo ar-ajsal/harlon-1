@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag, FiFileText, FiSearch, FiPlus, FiEye, FiDownload, FiMenu } from 'react-icons/fi'
+import { FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag, FiFileText, FiSearch, FiPlus, FiEye, FiDownload, FiMenu, FiEdit2, FiTrash2 } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import { ordersAPI } from '../../api/orders.api'
 
@@ -40,6 +40,20 @@ function OrdersManager() {
             fetchOrders()
         } catch (error) {
             console.error('Error updating status:', error)
+        }
+    }
+
+    const handleDelete = async (orderId, invoiceNumber) => {
+        if (!window.confirm(`Are you sure you want to delete invoice ${invoiceNumber}? This action cannot be undone.`)) {
+            return
+        }
+
+        try {
+            await ordersAPI.delete(orderId)
+            fetchOrders()
+        } catch (error) {
+            console.error('Error deleting order:', error)
+            alert('Failed to delete invoice. Please try again.')
         }
     }
 
@@ -195,7 +209,7 @@ function OrdersManager() {
                                             <th>Amount</th>
                                             <th>Payment</th>
                                             <th>Status</th>
-                                            <th>Actions</th>
+                                            <th style={{ minWidth: '140px' }}>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -228,6 +242,9 @@ function OrdersManager() {
                                                         <Link to={`/admin/orders/${order._id}`} className="action-btn" title="View">
                                                             <FiEye />
                                                         </Link>
+                                                        <Link to={`/admin/orders/${order._id}/edit`} className="action-btn" title="Edit">
+                                                            <FiEdit2 />
+                                                        </Link>
                                                         <a
                                                             href={ordersAPI.getPdfUrl(order._id)}
                                                             className="action-btn"
@@ -237,6 +254,16 @@ function OrdersManager() {
                                                         >
                                                             <FiDownload />
                                                         </a>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                handleDelete(order._id, order.invoiceNumber)
+                                                            }}
+                                                            className="action-btn delete-btn"
+                                                            title="Delete"
+                                                        >
+                                                            <FiTrash2 />
+                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>
