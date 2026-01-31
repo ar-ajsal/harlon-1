@@ -40,7 +40,8 @@ export function ProductProvider({ children }) {
 
             setProducts(Array.isArray(productsData) ? productsData : [])
             setPagination(paginationData)
-            setCategories(categoriesData.data || categoriesData || [])
+            const categoriesResult = categoriesData.data || categoriesData || []
+            setCategories(Array.isArray(categoriesResult) ? categoriesResult : [])
         } catch (err) {
             console.error('Error loading data:', err)
             setError('Failed to load data. Make sure the server is running.')

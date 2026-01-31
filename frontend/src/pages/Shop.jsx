@@ -134,7 +134,7 @@ function Shop() {
                             >
                                 All Products
                             </button>
-                            {categories.map((category) => (
+                            {Array.isArray(categories) && categories.map((category) => (
                                 <button
                                     key={category._id}
                                     className={`filter-pill ${selectedCategory === category.slug ||

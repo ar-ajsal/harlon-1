@@ -158,7 +158,7 @@ function CategoriesManager() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {categories.map(category => (
+                                {Array.isArray(categories) && categories.map(category => (
                                     <tr key={category._id}>
                                         <td>
                                             <img

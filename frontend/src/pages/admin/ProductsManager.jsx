@@ -520,7 +520,7 @@ function ProductsManager() {
                                             required
                                         >
                                             <option value="" disabled>Select Category</option>
-                                            {categories.map(cat => (
+                                            {Array.isArray(categories) && categories.map(cat => (
                                                 <option key={cat._id} value={cat.name}>{cat.name}</option>
                                             ))}
                                         </select>

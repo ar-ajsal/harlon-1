@@ -112,7 +112,7 @@ function Home() {
                             variants={staggerContainer}
                             className="categories-grid"
                         >
-                            {categories.map((category) => (
+                            {Array.isArray(categories) && categories.map((category) => (
                                 <motion.div key={category._id} variants={fadeInUp}>
                                     <Link
                                         to={`/shop?category=${category.slug}`}
