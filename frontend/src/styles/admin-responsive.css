@@ -1,3 +1,55 @@
+/* ===== Admin Dashboard Styles ===== */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+}
+
+.stat-card {
+    background: var(--white);
+    padding: var(--space-6);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--noir-20);
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    color: var(--noir-100);
+}
+
+.stat-label {
+    font-size: var(--text-sm);
+    color: var(--noir-60);
+}
+
+.chart-container {
+    width: 100%;
+    height: 350px;
+    margin-top: var(--space-4);
+}
+
 /* ===== Admin Responsive Layout ===== */
 
 /* Admin Layout Container */
