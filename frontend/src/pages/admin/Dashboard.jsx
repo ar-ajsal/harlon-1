@@ -57,10 +57,8 @@ function Dashboard() {
                     const fullMonthData = []
 
                     for (let i = 1; i <= daysInMonth; i++) {
-                        const dayStr = i.toString().padStart(2, '0') // "01", "02"
-                        // Find matching data for this day
-                        // expected _id format "YYYY-MM-DD", splitting to get DD
-                        const found = dailyData.find(d => d._id.split('-').pop() === dayStr)
+                        // Find matching data for this day (backend returns _id as day number 1-31)
+                        const found = dailyData.find(d => d._id === i)
 
                         fullMonthData.push({
                             date: i, // Simple number for X axis
