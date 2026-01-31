@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate, useParams } from 'react-router-dom'
 import { FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag, FiFileText, FiArrowLeft, FiDownload, FiShare2, FiMenu, FiEdit2, FiTrash2 } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
+import { toast } from 'react-toastify'
 import { useAuth } from '../../context/AuthContext'
 import { ordersAPI } from '../../api/orders.api'
 
@@ -39,9 +40,11 @@ function OrderDetail() {
     const handleStatusChange = async (newStatus) => {
         try {
             await ordersAPI.updateStatus(id, newStatus)
+            toast.success('Order status updated successfully')
             fetchOrder()
         } catch (err) {
             console.error('Failed to update status:', err)
+            toast.error('Failed to update order status')
         }
     }
 
@@ -108,10 +111,11 @@ Thank you for your order! 🙏
 
         try {
             await ordersAPI.delete(id)
+            toast.success('Invoice deleted successfully')
             navigate('/admin/orders')
         } catch (err) {
             console.error('Failed to delete order:', err)
-            alert('Failed to delete invoice. Please try again.')
+            toast.error('Failed to delete invoice. Please try again.')
         }
     }
 

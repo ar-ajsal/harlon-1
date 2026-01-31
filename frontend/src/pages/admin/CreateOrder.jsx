@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag, FiFileText, FiPlus, FiTrash2, FiArrowLeft, FiMenu } from 'react-icons/fi'
+import { toast } from 'react-toastify'
 import { useAuth } from '../../context/AuthContext'
 import { useProducts } from '../../context/ProductContext'
 import { ordersAPI } from '../../api/orders.api'
@@ -102,11 +103,13 @@ function CreateOrder() {
 
         if (!formData.customer.name || !formData.customer.phone) {
             setError('Customer name and phone are required')
+            toast.error('Customer name and phone are required')
             return
         }
 
         if (formData.items.length === 0) {
             setError('Please add at least one item')
+            toast.error('Please add at least one item')
             return
         }
 
@@ -120,10 +123,12 @@ function CreateOrder() {
                 paymentMethod: formData.paymentMethod
             })
 
+            toast.success('Invoice created successfully')
             // Navigate to the order detail page
             navigate(`/admin/orders/${response.data._id}`)
         } catch (err) {
             setError(err.message || 'Failed to create order')
+            toast.error(err.message || 'Failed to create invoice')
         } finally {
             setLoading(false)
         }

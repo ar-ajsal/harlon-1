@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag, FiFileText, FiSearch, FiPlus, FiEye, FiDownload, FiMenu, FiEdit2, FiTrash2 } from 'react-icons/fi'
+import { toast } from 'react-toastify'
 import { useAuth } from '../../context/AuthContext'
 import { ordersAPI } from '../../api/orders.api'
 
@@ -29,6 +30,7 @@ function OrdersManager() {
             setOrders(response.data || [])
         } catch (error) {
             console.error('Error fetching orders:', error)
+            toast.error('Failed to load orders')
         } finally {
             setLoading(false)
         }
@@ -37,9 +39,11 @@ function OrdersManager() {
     const handleStatusChange = async (orderId, newStatus) => {
         try {
             await ordersAPI.updateStatus(orderId, newStatus)
+            toast.success('Order status updated successfully')
             fetchOrders()
         } catch (error) {
             console.error('Error updating status:', error)
+            toast.error('Failed to update order status')
         }
     }
 
@@ -50,10 +54,11 @@ function OrdersManager() {
 
         try {
             await ordersAPI.delete(orderId)
+            toast.success(`Invoice ${invoiceNumber} deleted successfully`)
             fetchOrders()
         } catch (error) {
             console.error('Error deleting order:', error)
-            alert('Failed to delete invoice. Please try again.')
+            toast.error('Failed to delete invoice. Please try again.')
         }
     }
 

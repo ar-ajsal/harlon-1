@@ -438,5 +438,69 @@ router.get('/:id/pdf', async (req, res) => {
     }
 });
 
+// UPDATE complete order (edit invoice)
+router.put('/:id', async (req, res) => {
+    try {
+        const { customer, items, discount, notes, paymentMethod, status } = req.body;
+
+        // Calculate totals server-side for security
+        let subtotal = 0;
+
+        // Prepare items with snapshot data
+        const orderItems = items.map(item => {
+            const itemTotal = item.price * item.quantity;
+            subtotal += itemTotal;
+            return {
+                product: item.product, // ID
+                name: item.name,
+                price: item.price,
+                costPrice: item.costPrice || 0,
+                quantity: item.quantity,
+                total: itemTotal
+            };
+        });
+
+        const finalTotal = subtotal - (discount || 0);
+
+        const order = await Order.findByIdAndUpdate(
+            req.params.id,
+            {
+                customer,
+                items: orderItems,
+                subtotal,
+                discount: discount || 0,
+                finalTotal,
+                notes,
+                paymentMethod,
+                status: status || 'Pending'
+            },
+            { new: true, runValidators: true }
+        );
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        res.json({ success: true, data: order });
+    } catch (err) {
+        res.status(400).json({ success: false, message: err.message });
+    }
+});
+
+// DELETE order
+router.delete('/:id', async (req, res) => {
+    try {
+        const order = await Order.findByIdAndDelete(req.params.id);
+
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        res.json({ success: true, message: 'Order deleted successfully', data: order });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
 export default router;
 

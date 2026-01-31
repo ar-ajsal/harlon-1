@@ -1,4 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import MobileNav from './components/MobileNav'
@@ -79,6 +81,18 @@ function App() {
                     </>
                 } />
             </Routes>
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </div>
     )
 }
