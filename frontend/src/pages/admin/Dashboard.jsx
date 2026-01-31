@@ -255,41 +255,37 @@ function Dashboard() {
                 <div className="content-card" style={{ marginBottom: '24px', padding: '24px' }}>
                     <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '20px', color: 'var(--noir-100)' }}>Sales Overview (This Month)</h3>
                     <div style={{ height: '300px', width: '100%' }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={graphData}>
-                                <defs>
-                                    <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8} />
-                                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
-                                <XAxis
-                                    dataKey="date"
-                                    tick={{ fill: '#666', fontSize: 12 }}
-                                    axisLine={false}
-                                    tickLine={false}
-                                />
-                                <YAxis
-                                    tick={{ fill: '#666', fontSize: 12 }}
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tickFormatter={(val) => `₹${val}`}
-                                />
-                                <Tooltip
-                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                                    formatter={(val) => [`₹${val}`, 'Sales']}
-                                />
-                                <Area
-                                    type="monotone"
-                                    dataKey="sales"
-                                    stroke="#8b5cf6"
-                                    strokeWidth={3}
-                                    fillOpacity={1}
-                                    fill="url(#colorSales)"
-                                />
-                            </AreaChart>
-                        </ResponsiveContainer>
+                        {graphData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={graphData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                                    <defs>
+                                        <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="var(--gold)" stopOpacity={0.8} />
+                                            <stop offset="95%" stopColor="var(--gold)" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <XAxis dataKey="date" stroke="var(--noir-60)" fontSize={12} tickLine={false} axisLine={false} />
+                                    <YAxis stroke="var(--noir-60)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `₹${value}`} />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--noir-20)" />
+                                    <Tooltip
+                                        contentStyle={{ backgroundColor: 'var(--white)', border: '1px solid var(--noir-20)', borderRadius: '8px' }}
+                                        formatter={(value) => [`₹${value}`, 'Sales']}
+                                    />
+                                    <Area
+                                        type="monotone"
+                                        dataKey="sales"
+                                        stroke="var(--gold)"
+                                        strokeWidth={2}
+                                        fillOpacity={1}
+                                        fill="url(#colorSales)"
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--noir-40)' }}>
+                                No sales data available for this month
+                            </div>
+                        )}
                     </div>
                 </div>
 
