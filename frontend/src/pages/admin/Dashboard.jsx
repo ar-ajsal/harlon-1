@@ -203,6 +203,13 @@ function Dashboard() {
                         >
                             <FiTrendingUp /> Reports
                         </NavLink>
+                        <NavLink
+                            to="/admin/investments"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiBriefcase /> Investments
+                        </NavLink>
 
                         <div className="nav-divider" />
 

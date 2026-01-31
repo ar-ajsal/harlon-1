@@ -4,7 +4,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiSearch, FiFilter, FiMenu, FiFileText, FiTrendingUp, FiMove } from 'react-icons/fi'
+import { FiHome, FiPackage, FiLayers, FiFileText, FiTrendingUp, FiBriefcase, FiShoppingBag, FiLogOut, FiMenu, FiPlus, FiEdit2, FiTrash2, FiSearch, FiFilter, FiX, FiCheck, FiMoreVertical } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import { useProducts } from '../../context/ProductContext'
 import ImageUploader from '../../components/ImageUploader'
@@ -266,6 +266,13 @@ function ProductsManager() {
                             onClick={() => setSidebarOpen(false)}
                         >
                             <FiFileText /> Invoices
+                        </NavLink>
+                        <NavLink
+                            to="/admin/investments"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiBriefcase /> Investments
                         </NavLink>
                         <NavLink
                             to="/admin/reports"
