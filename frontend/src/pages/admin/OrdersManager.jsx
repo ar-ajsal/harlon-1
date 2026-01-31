@@ -4,6 +4,7 @@ import { FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag, FiFileText, FiSea
 import { toast } from 'react-toastify'
 import { useAuth } from '../../context/AuthContext'
 import { ordersAPI } from '../../api/orders.api'
+import Pagination from '../../components/Pagination'
 
 function OrdersManager() {
     const navigate = useNavigate()
@@ -13,6 +14,8 @@ function OrdersManager() {
     const [search, setSearch] = useState('')
     const [statusFilter, setStatusFilter] = useState('all')
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [currentPage, setCurrentPage] = useState(1)
+    const [pagination, setPagination] = useState({ total: 0, pages: 1, limit: 20 })
 
     const handleLogout = () => {
         logout()
@@ -21,19 +24,27 @@ function OrdersManager() {
 
     useEffect(() => {
         fetchOrders()
-    }, [search])
+    }, [search, currentPage])
 
     const fetchOrders = async () => {
         try {
             setLoading(true)
-            const response = await ordersAPI.getAll(search)
+            const response = await ordersAPI.getAll(search, currentPage, 20)
             setOrders(response.data || [])
+            if (response.pagination) {
+                setPagination(response.pagination)
+            }
         } catch (error) {
             console.error('Error fetching orders:', error)
             toast.error('Failed to load orders')
         } finally {
             setLoading(false)
         }
+    }
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page)
+        window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
     const handleStatusChange = async (orderId, newStatus) => {

@@ -18,7 +18,28 @@ class ProductService {
             query.$text = { $search: filters.search };
         }
 
-        return Product.find(query).sort({ priority: -1, createdAt: -1 });
+        // Pagination
+        const page = parseInt(filters.page) || 1;
+        const limit = parseInt(filters.limit) || 20;
+        const skip = (page - 1) * limit;
+
+        const [products, total] = await Promise.all([
+            Product.find(query)
+                .sort({ priority: -1, createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            Product.countDocuments(query)
+        ]);
+
+        return {
+            data: products,
+            pagination: {
+                total,
+                page,
+                pages: Math.ceil(total / limit),
+                limit
+            }
+        };
     }
 
     async getById(id) {

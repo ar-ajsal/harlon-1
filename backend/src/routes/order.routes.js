@@ -27,7 +27,7 @@ const generateInvoiceNumber = async () => {
 // GET all orders
 router.get('/', async (req, res) => {
     try {
-        const { search } = req.query;
+        const { search, page = 1, limit = 20 } = req.query;
         let query = {};
 
         if (search) {
@@ -40,8 +40,23 @@ router.get('/', async (req, res) => {
             };
         }
 
-        const orders = await Order.find(query).sort({ createdAt: -1 });
-        res.json({ success: true, data: orders });
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+
+        const [orders, total] = await Promise.all([
+            Order.find(query).sort({ createdAt: -1 }).skip(skip).limit(parseInt(limit)),
+            Order.countDocuments(query)
+        ]);
+
+        res.json({
+            success: true,
+            data: orders,
+            pagination: {
+                total,
+                page: parseInt(page),
+                pages: Math.ceil(total / parseInt(limit)),
+                limit: parseInt(limit)
+            }
+        });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }

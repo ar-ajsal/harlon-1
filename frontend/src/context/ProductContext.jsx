@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { productsApi, categoriesApi } from '../services/api'
 
 const ProductContext = createContext()
@@ -11,24 +11,35 @@ export function ProductProvider({ children }) {
     const [products, setProducts] = useState([])
     const [categories, setCategories] = useState([])
     const [loading, setLoading] = useState(true)
+    const [loadingMore, setLoadingMore] = useState(false)
     const [error, setError] = useState(null)
+    const [pagination, setPagination] = useState({
+        page: 1,
+        pages: 1,
+        total: 0,
+        limit: 12
+    })
 
     useEffect(() => {
         loadData()
     }, [])
 
-    const loadData = async () => {
+    const loadData = async (options = {}) => {
         try {
             setLoading(true)
             setError(null)
 
-            const [productsData, categoriesData] = await Promise.all([
-                productsApi.getAll(),
+            const [productsResponse, categoriesData] = await Promise.all([
+                productsApi.getAll({ page: 1, limit: 100, ...options }), // Load more for initial
                 categoriesApi.getAll()
             ])
 
-            // Handle ApiResponse structure { success: true, data: [...] }
-            setProducts(productsData.data || productsData || [])
+            // Handle pagination response structure
+            const productsData = productsResponse.data?.data || productsResponse.data || productsResponse || []
+            const paginationData = productsResponse.data?.pagination || productsResponse.pagination || { page: 1, pages: 1, total: productsData.length, limit: 12 }
+
+            setProducts(Array.isArray(productsData) ? productsData : [])
+            setPagination(paginationData)
             setCategories(categoriesData.data || categoriesData || [])
         } catch (err) {
             console.error('Error loading data:', err)
@@ -37,6 +48,26 @@ export function ProductProvider({ children }) {
             setLoading(false)
         }
     }
+
+    const loadMore = useCallback(async (page, filters = {}) => {
+        try {
+            setLoadingMore(true)
+            const response = await productsApi.getAll({ page, limit: pagination.limit, ...filters })
+
+            const newProducts = response.data?.data || response.data || response || []
+            const newPagination = response.data?.pagination || response.pagination || pagination
+
+            setProducts(prev => [...prev, ...(Array.isArray(newProducts) ? newProducts : [])])
+            setPagination(newPagination)
+
+            return { products: newProducts, pagination: newPagination }
+        } catch (err) {
+            console.error('Error loading more products:', err)
+            throw err
+        } finally {
+            setLoadingMore(false)
+        }
+    }, [pagination.limit])
 
     const addProduct = async (product) => {
         try {
@@ -139,13 +170,17 @@ export function ProductProvider({ children }) {
         loadData()
     }
 
+    const hasMore = pagination.page < pagination.pages
+
     const value = {
         products,
         categories,
         loading,
+        loadingMore,
         error,
+        pagination,
+        hasMore,
         addProduct,
-        updateProduct,
         updateProduct,
         deleteProduct,
         reorderProducts,
@@ -154,7 +189,8 @@ export function ProductProvider({ children }) {
         addCategory,
         updateCategory,
         deleteCategory,
-        refreshData
+        refreshData,
+        loadMore
     }
 
     return (

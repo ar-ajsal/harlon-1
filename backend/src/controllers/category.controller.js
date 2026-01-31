@@ -3,7 +3,7 @@ import ApiResponse from '../utils/ApiResponse.js';
 import asyncHandler from '../utils/asyncHandler.js';
 
 export const getAll = asyncHandler(async (req, res) => {
-    const categories = await categoryService.getAll();
+    const categories = await categoryService.getAll(req.query);
     res.json(ApiResponse.success(categories));
 });
 

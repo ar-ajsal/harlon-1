@@ -2,8 +2,28 @@ import Category from '../models/Category.js';
 import ApiError from '../utils/ApiError.js';
 
 class CategoryService {
-    async getAll() {
-        return Category.find().sort({ name: 1 });
+    async getAll(filters = {}) {
+        const query = {};
+
+        // Pagination
+        const page = parseInt(filters.page) || 1;
+        const limit = parseInt(filters.limit) || 20;
+        const skip = (page - 1) * limit;
+
+        const [categories, total] = await Promise.all([
+            Category.find(query).sort({ name: 1 }).skip(skip).limit(limit),
+            Category.countDocuments(query)
+        ]);
+
+        return {
+            data: categories,
+            pagination: {
+                total,
+                page,
+                pages: Math.ceil(total / limit),
+                limit
+            }
+        };
     }
 
     async getById(id) {

@@ -4,12 +4,15 @@ import { motion } from 'framer-motion'
 import { useProducts } from '../context/ProductContext'
 import ProductCard from '../components/ProductCard'
 
+const PRODUCTS_PER_PAGE = 12
+
 function Shop() {
     const [searchParams, setSearchParams] = useSearchParams()
-    const { products, categories, loading } = useProducts()
+    const { products, categories, loading, pagination, loadingMore } = useProducts()
     const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all')
     const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '')
     const [filteredProducts, setFilteredProducts] = useState([])
+    const [displayCount, setDisplayCount] = useState(PRODUCTS_PER_PAGE)
 
     useEffect(() => {
         const visibleProducts = products.filter(p => p.isVisible !== false)
@@ -34,6 +37,8 @@ function Shop() {
         }
 
         setFilteredProducts(result)
+        // Reset display count when filters change
+        setDisplayCount(PRODUCTS_PER_PAGE)
     }, [selectedCategory, searchTerm, products])
 
     useEffect(() => {
@@ -65,6 +70,13 @@ function Shop() {
         }
         setSearchParams(newParams, { replace: true })
     }
+
+    const handleLoadMore = () => {
+        setDisplayCount(prev => prev + PRODUCTS_PER_PAGE)
+    }
+
+    const displayedProducts = filteredProducts.slice(0, displayCount)
+    const hasMoreToShow = displayCount < filteredProducts.length
 
     if (loading) {
         return (
@@ -147,21 +159,68 @@ function Shop() {
                     {/* Product Count */}
                     <div className="product-count">
                         <span>
-                            {filteredProducts.length}
-                            {filteredProducts.length === 1 ? 'Product' : 'Products'}
-                            {searchTerm && ` found for "${searchTerm}"`}
+                            Showing {displayedProducts.length} of {filteredProducts.length}
+                            {filteredProducts.length === 1 ? ' Product' : ' Products'}
+                            {searchTerm && ` for "${searchTerm}"`}
                         </span>
                     </div>
 
                     {/* Products Grid */}
-                    {filteredProducts.length > 0 ? (
-                        <div className="products-grid">
-                            {filteredProducts.map((product, index) => (
-                                <div key={product._id}>
-                                    <ProductCard product={product} />
+                    {displayedProducts.length > 0 ? (
+                        <>
+                            <div className="products-grid">
+                                {displayedProducts.map((product, index) => (
+                                    <motion.div
+                                        key={product._id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.3) }}
+                                    >
+                                        <ProductCard product={product} />
+                                    </motion.div>
+                                ))}
+                            </div>
+
+                            {/* Load More Button */}
+                            {hasMoreToShow && (
+                                <div className="pagination-controls" style={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    marginTop: '3rem',
+                                    marginBottom: '2rem'
+                                }}>
+                                    <button
+                                        className="btn btn-primary btn-load-more"
+                                        onClick={handleLoadMore}
+                                        disabled={loadingMore}
+                                        style={{
+                                            padding: '1rem 3rem',
+                                            fontSize: '1rem',
+                                            borderRadius: '50px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem'
+                                        }}
+                                    >
+                                        {loadingMore ? (
+                                            <>
+                                                <span className="spinner-small" style={{
+                                                    width: '16px',
+                                                    height: '16px',
+                                                    border: '2px solid rgba(255,255,255,0.3)',
+                                                    borderTopColor: '#fff',
+                                                    borderRadius: '50%',
+                                                    animation: 'spin 0.8s linear infinite'
+                                                }}></span>
+                                                Loading...
+                                            </>
+                                        ) : (
+                                            `Load More (${filteredProducts.length - displayCount} remaining)`
+                                        )}
+                                    </button>
                                 </div>
-                            ))}
-                        </div>
+                            )}
+                        </>
                     ) : (
                         <motion.div
                             initial={{ opacity: 0 }}
