@@ -160,3 +160,53 @@ export const authApi = {
         return res.json();
     }
 };
+
+// Investments API
+export const investmentsApi = {
+    getAll: async () => {
+        const res = await fetch(`${API_URL}/investments`, {
+            headers: getAuthHeaders()
+        });
+        return res.json();
+    },
+
+    getTotal: async () => {
+        const res = await fetch(`${API_URL}/investments/total`, {
+            headers: getAuthHeaders()
+        });
+        return res.json();
+    },
+
+    getByCategory: async () => {
+        const res = await fetch(`${API_URL}/investments/by-category`, {
+            headers: getAuthHeaders()
+        });
+        return res.json();
+    },
+
+    create: async (investment) => {
+        const res = await fetch(`${API_URL}/investments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+            body: JSON.stringify(investment)
+        });
+        return res.json();
+    },
+
+    update: async (id, investment) => {
+        const res = await fetch(`${API_URL}/investments/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+            body: JSON.stringify(investment)
+        });
+        return res.json();
+    },
+
+    delete: async (id) => {
+        const res = await fetch(`${API_URL}/investments/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
+        return res.json();
+    }
+};

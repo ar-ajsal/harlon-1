@@ -94,6 +94,7 @@ function ProductsManager() {
         name: '',
         price: '',
         originalPrice: '',
+        costPrice: '',
         description: '',
         category: '',
         sizes: [],
@@ -114,6 +115,7 @@ function ProductsManager() {
             name: '',
             price: '',
             originalPrice: '',
+            costPrice: '',
             description: '',
             category: categories[0]?.name || '',
             sizes: ['S', 'M', 'L', 'XL'],
@@ -131,6 +133,7 @@ function ProductsManager() {
             name: product.name,
             price: product.price.toString(),
             originalPrice: product.originalPrice?.toString() || '',
+            costPrice: product.costPrice?.toString() || '',
             description: product.description,
             category: product.category,
             sizes: product.sizes || [],
@@ -148,7 +151,8 @@ function ProductsManager() {
         const productData = {
             ...formData,
             price: parseFloat(formData.price),
-            originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null
+            originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
+            costPrice: formData.costPrice ? parseFloat(formData.costPrice) : 0
         }
 
         if (editingProduct) {
@@ -440,7 +444,7 @@ function ProductsManager() {
 
                                     <div className="form-row">
                                         <div className="form-group">
-                                            <label className="form-label">Price (₹) *</label>
+                                            <label className="form-label">Selling Price (₹) *</label>
                                             <input
                                                 type="number"
                                                 className="form-input"
@@ -459,6 +463,40 @@ function ProductsManager() {
                                                 onChange={e => setFormData({ ...formData, originalPrice: e.target.value })}
                                                 placeholder="0.00"
                                             />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label className="form-label">Cost Price (₹)</label>
+                                            <input
+                                                type="number"
+                                                className="form-input"
+                                                value={formData.costPrice}
+                                                onChange={e => setFormData({ ...formData, costPrice: e.target.value })}
+                                                placeholder="What you paid to buy this"
+                                            />
+                                            <small style={{ color: 'var(--noir-60)', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                                                Amount paid to supplier/seller
+                                            </small>
+                                        </div>
+                                        <div className="form-group">
+                                            <label className="form-label">Profit per Item</label>
+                                            <div style={{
+                                                padding: '12px 16px',
+                                                background: formData.price && formData.costPrice && (parseFloat(formData.price) - parseFloat(formData.costPrice)) > 0
+                                                    ? 'rgba(34, 197, 94, 0.1)'
+                                                    : 'rgba(239, 68, 68, 0.1)',
+                                                borderRadius: '8px',
+                                                fontWeight: '600',
+                                                color: formData.price && formData.costPrice && (parseFloat(formData.price) - parseFloat(formData.costPrice)) > 0
+                                                    ? 'var(--success)'
+                                                    : 'var(--error)'
+                                            }}>
+                                                ₹{formData.price && formData.costPrice
+                                                    ? (parseFloat(formData.price) - parseFloat(formData.costPrice)).toFixed(2)
+                                                    : '0.00'}
+                                            </div>
                                         </div>
                                     </div>
 
