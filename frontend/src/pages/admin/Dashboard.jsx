@@ -50,11 +50,24 @@ function Dashboard() {
                 const reportRes = await ordersAPI.getMonthlyReport(currentYear, currentMonth)
 
                 if (reportRes.data.success) {
-                    const dailyData = reportRes.data.data.daily.map(day => ({
-                        date: day._id.split('-').pop(), // Just show day number
-                        sales: day.sales
-                    }))
-                    setGraphData(dailyData)
+                    const dailyData = reportRes.data.data.daily || []
+
+                    // Create array of all days in month
+                    const daysInMonth = new Date(currentYear, currentMonth, 0).getDate()
+                    const fullMonthData = []
+
+                    for (let i = 1; i <= daysInMonth; i++) {
+                        const dayStr = i.toString().padStart(2, '0') // "01", "02"
+                        // Find matching data for this day
+                        // expected _id format "YYYY-MM-DD", splitting to get DD
+                        const found = dailyData.find(d => d._id.split('-').pop() === dayStr)
+
+                        fullMonthData.push({
+                            date: i, // Simple number for X axis
+                            sales: found ? found.sales : 0
+                        })
+                    }
+                    setGraphData(fullMonthData)
                 }
 
                 // Fetch total investment

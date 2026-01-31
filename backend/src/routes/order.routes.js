@@ -288,7 +288,7 @@ router.get('/reports/:year/:month', async (req, res) => {
             { $match: { date: { $gte: startOfMonth, $lte: endOfMonth } } },
             {
                 $group: {
-                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$date", timezone: "+05:30" } },
                     orders: { $sum: 1 },
                     sales: { $sum: '$finalTotal' }
                 }
