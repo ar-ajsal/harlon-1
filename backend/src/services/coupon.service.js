@@ -77,6 +77,8 @@ class CouponService {
         return {
             code: coupon.code,
             name: coupon.name,
+            discountType: coupon.discountType,
+            discountValue: coupon.discountValue,
             currentSales: coupon.currentSales,
             targetSales: coupon.targetSales,
             remainingSales: coupon.targetSales - coupon.currentSales,
