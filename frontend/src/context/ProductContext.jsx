@@ -31,7 +31,7 @@ export function ProductProvider({ children }) {
 
             const [productsResponse, categoriesData] = await Promise.all([
                 productsApi.getAll({ page: 1, limit: 100, ...options }), // Load more for initial
-                categoriesApi.getAll()
+                categoriesApi.getAll({ limit: 1000 })
             ])
 
             // Handle pagination response structure
@@ -40,7 +40,9 @@ export function ProductProvider({ children }) {
 
             setProducts(Array.isArray(productsData) ? productsData : [])
             setPagination(paginationData)
-            const categoriesResult = categoriesData.data || categoriesData || []
+
+            // Handle nested response structure: success.data.data
+            const categoriesResult = categoriesData.data?.data || categoriesData.data || categoriesData || []
             setCategories(Array.isArray(categoriesResult) ? categoriesResult : [])
         } catch (err) {
             console.error('Error loading data:', err)

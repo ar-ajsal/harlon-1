@@ -15,8 +15,9 @@ import OrdersManager from './pages/admin/OrdersManager'
 import CreateOrder from './pages/admin/CreateOrder'
 import EditOrder from './pages/admin/EditOrder'
 import OrderDetail from './pages/admin/OrderDetail'
-import InvestmentsManager from './pages/admin/InvestmentsManager'
 import Reports from './pages/admin/Reports'
+import CouponsManager from './pages/admin/CouponsManager'
+import CouponDetails from './pages/admin/CouponDetails'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -38,6 +39,16 @@ function App() {
                 <Route path="/admin/categories" element={
                     <ProtectedRoute>
                         <CategoriesManager />
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin/coupons" element={
+                    <ProtectedRoute>
+                        <CouponsManager />
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin/coupons/:id" element={
+                    <ProtectedRoute>
+                        <CouponDetails />
                     </ProtectedRoute>
                 } />
                 <Route path="/admin/orders" element={
@@ -63,11 +74,6 @@ function App() {
                 <Route path="/admin/reports" element={
                     <ProtectedRoute>
                         <Reports />
-                    </ProtectedRoute>
-                } />
-                <Route path="/admin/investments" element={
-                    <ProtectedRoute>
-                        <InvestmentsManager />
                     </ProtectedRoute>
                 } />
 

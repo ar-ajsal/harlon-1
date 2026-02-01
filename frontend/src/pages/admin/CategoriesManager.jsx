@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiMenu, FiTrendingUp, FiFileText, FiBriefcase } from 'react-icons/fi'
+import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiMenu, FiTrendingUp, FiFileText } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import { useProducts } from '../../context/ProductContext'
 import ImageUploader from '../../components/ImageUploader'
@@ -114,13 +114,6 @@ function CategoriesManager() {
                             <FiFileText /> Invoices
                         </NavLink>
                         <NavLink
-                            to="/admin/investments"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiBriefcase /> Investments
-                        </NavLink>
-                        <NavLink
                             to="/admin/reports"
                             className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
                             onClick={() => setSidebarOpen(false)}
@@ -165,7 +158,7 @@ function CategoriesManager() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {Array.isArray(categories) && categories.map(category => (
+                                {categories.map(category => (
                                     <tr key={category._id}>
                                         <td>
                                             <img

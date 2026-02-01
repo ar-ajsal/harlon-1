@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag, FiFileText, FiPlus, FiTrash2, FiArrowLeft, FiMenu, FiBriefcase, FiTrendingUp } from 'react-icons/fi'
+import { FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag, FiFileText, FiPlus, FiTrash2, FiArrowLeft, FiMenu } from 'react-icons/fi'
 import { toast } from 'react-toastify'
 import { useAuth } from '../../context/AuthContext'
 import { useProducts } from '../../context/ProductContext'
@@ -169,12 +169,6 @@ function CreateOrder() {
                         </NavLink>
                         <NavLink to="/admin/orders" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}>
                             <FiFileText /> Invoices
-                        </NavLink>
-                        <NavLink to="/admin/investments" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}>
-                            <FiBriefcase /> Investments
-                        </NavLink>
-                        <NavLink to="/admin/reports" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}>
-                            <FiTrendingUp /> Reports
                         </NavLink>
 
                         <div className="nav-divider" />

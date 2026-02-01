@@ -75,8 +75,14 @@ export const productsApi = {
 
 // Categories API
 export const categoriesApi = {
-    getAll: async () => {
-        const res = await fetch(`${API_URL}/categories`);
+    getAll: async (options = {}) => {
+        const params = new URLSearchParams();
+        if (options.page) params.append('page', options.page);
+        if (options.limit) params.append('limit', options.limit);
+
+        const queryString = params.toString();
+        const url = queryString ? `${API_URL}/categories?${queryString}` : `${API_URL}/categories`;
+        const res = await fetch(url);
         return res.json();
     },
 
@@ -156,56 +162,6 @@ export const authApi = {
     verify: async (token) => {
         const res = await fetch(`${API_URL}/auth/verify`, {
             headers: { 'Authorization': `Bearer ${token}` }
-        });
-        return res.json();
-    }
-};
-
-// Investments API
-export const investmentsApi = {
-    getAll: async () => {
-        const res = await fetch(`${API_URL}/investments`, {
-            headers: getAuthHeaders()
-        });
-        return res.json();
-    },
-
-    getTotal: async () => {
-        const res = await fetch(`${API_URL}/investments/total`, {
-            headers: getAuthHeaders()
-        });
-        return res.json();
-    },
-
-    getByCategory: async () => {
-        const res = await fetch(`${API_URL}/investments/by-category`, {
-            headers: getAuthHeaders()
-        });
-        return res.json();
-    },
-
-    create: async (investment) => {
-        const res = await fetch(`${API_URL}/investments`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-            body: JSON.stringify(investment)
-        });
-        return res.json();
-    },
-
-    update: async (id, investment) => {
-        const res = await fetch(`${API_URL}/investments/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-            body: JSON.stringify(investment)
-        });
-        return res.json();
-    },
-
-    delete: async (id) => {
-        const res = await fetch(`${API_URL}/investments/${id}`, {
-            method: 'DELETE',
-            headers: getAuthHeaders()
         });
         return res.json();
     }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag, FiFileText, FiSearch, FiPlus, FiEye, FiDownload, FiMenu, FiEdit2, FiTrash2, FiBriefcase, FiTrendingUp } from 'react-icons/fi'
+import { FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag, FiFileText, FiSearch, FiPlus, FiEye, FiDownload, FiMenu, FiEdit2, FiTrash2 } from 'react-icons/fi'
 import { toast } from 'react-toastify'
 import { useAuth } from '../../context/AuthContext'
 import { ordersAPI } from '../../api/orders.api'
@@ -129,12 +129,6 @@ function OrdersManager() {
                         </NavLink>
                         <NavLink to="/admin/orders" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}>
                             <FiFileText /> Invoices
-                        </NavLink>
-                        <NavLink to="/admin/investments" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}>
-                            <FiBriefcase /> Investments
-                        </NavLink>
-                        <NavLink to="/admin/reports" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}>
-                            <FiTrendingUp /> Reports
                         </NavLink>
 
                         <div className="nav-divider" />

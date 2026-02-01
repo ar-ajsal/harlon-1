@@ -4,7 +4,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FiHome, FiPackage, FiLayers, FiFileText, FiTrendingUp, FiBriefcase, FiShoppingBag, FiLogOut, FiMenu, FiPlus, FiEdit2, FiTrash2, FiSearch, FiFilter, FiX, FiCheck, FiMoreVertical } from 'react-icons/fi'
+import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiSearch, FiFilter, FiMenu, FiFileText, FiTrendingUp, FiMove } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import { useProducts } from '../../context/ProductContext'
 import ImageUploader from '../../components/ImageUploader'
@@ -93,8 +93,8 @@ function ProductsManager() {
     const [formData, setFormData] = useState({
         name: '',
         price: '',
-        originalPrice: '',
         costPrice: '',
+        originalPrice: '',
         description: '',
         category: '',
         sizes: [],
@@ -114,8 +114,8 @@ function ProductsManager() {
         setFormData({
             name: '',
             price: '',
-            originalPrice: '',
             costPrice: '',
+            originalPrice: '',
             description: '',
             category: categories[0]?.name || '',
             sizes: ['S', 'M', 'L', 'XL'],
@@ -132,8 +132,8 @@ function ProductsManager() {
         setFormData({
             name: product.name,
             price: product.price.toString(),
-            originalPrice: product.originalPrice?.toString() || '',
             costPrice: product.costPrice?.toString() || '',
+            originalPrice: product.originalPrice?.toString() || '',
             description: product.description,
             category: product.category,
             sizes: product.sizes || [],
@@ -151,8 +151,8 @@ function ProductsManager() {
         const productData = {
             ...formData,
             price: parseFloat(formData.price),
-            originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
-            costPrice: formData.costPrice ? parseFloat(formData.costPrice) : 0
+            costPrice: formData.costPrice ? parseFloat(formData.costPrice) : 0,
+            originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null
         }
 
         if (editingProduct) {
@@ -266,13 +266,6 @@ function ProductsManager() {
                             onClick={() => setSidebarOpen(false)}
                         >
                             <FiFileText /> Invoices
-                        </NavLink>
-                        <NavLink
-                            to="/admin/investments"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiBriefcase /> Investments
                         </NavLink>
                         <NavLink
                             to="/admin/reports"
@@ -449,31 +442,22 @@ function ProductsManager() {
                                         />
                                     </div>
 
-                                    <div className="form-row">
-                                        <div className="form-group">
-                                            <label className="form-label">Selling Price (₹) *</label>
-                                            <input
-                                                type="number"
-                                                className="form-input"
-                                                value={formData.price}
-                                                onChange={e => setFormData({ ...formData, price: e.target.value })}
-                                                placeholder="0.00"
-                                                required
-                                            />
-                                        </div>
-                                        <div className="form-group">
-                                            <label className="form-label">Original Price (₹)</label>
-                                            <input
-                                                type="number"
-                                                className="form-input"
-                                                value={formData.originalPrice}
-                                                onChange={e => setFormData({ ...formData, originalPrice: e.target.value })}
-                                                placeholder="0.00"
-                                            />
-                                        </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Category *</label>
+                                        <select
+                                            className="form-select"
+                                            value={formData.category}
+                                            onChange={e => setFormData({ ...formData, category: e.target.value })}
+                                            required
+                                        >
+                                            <option value="" disabled>Select Category</option>
+                                            {categories.map(cat => (
+                                                <option key={cat._id} value={cat.name}>{cat.name}</option>
+                                            ))}
+                                        </select>
                                     </div>
 
-                                    <div className="form-row">
+                                    <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                                         <div className="form-group">
                                             <label className="form-label">Cost Price (₹)</label>
                                             <input
@@ -481,30 +465,60 @@ function ProductsManager() {
                                                 className="form-input"
                                                 value={formData.costPrice}
                                                 onChange={e => setFormData({ ...formData, costPrice: e.target.value })}
-                                                placeholder="What you paid to buy this"
+                                                placeholder="Buying Price"
                                             />
-                                            <small style={{ color: 'var(--noir-60)', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                                                Amount paid to supplier/seller
-                                            </small>
+                                            <small style={{ color: '#666', fontSize: '11px' }}>What you pay (Buying Price)</small>
                                         </div>
                                         <div className="form-group">
-                                            <label className="form-label">Profit per Item</label>
-                                            <div style={{
-                                                padding: '12px 16px',
-                                                background: formData.price && formData.costPrice && (parseFloat(formData.price) - parseFloat(formData.costPrice)) > 0
-                                                    ? 'rgba(34, 197, 94, 0.1)'
-                                                    : 'rgba(239, 68, 68, 0.1)',
-                                                borderRadius: '8px',
-                                                fontWeight: '600',
-                                                color: formData.price && formData.costPrice && (parseFloat(formData.price) - parseFloat(formData.costPrice)) > 0
-                                                    ? 'var(--success)'
-                                                    : 'var(--error)'
-                                            }}>
-                                                ₹{formData.price && formData.costPrice
-                                                    ? (parseFloat(formData.price) - parseFloat(formData.costPrice)).toFixed(2)
-                                                    : '0.00'}
+                                            <label className="form-label">Selling Price (₹) *</label>
+                                            <input
+                                                type="number"
+                                                className="form-input"
+                                                value={formData.price}
+                                                onChange={e => setFormData({ ...formData, price: e.target.value })}
+                                                placeholder="Selling Price"
+                                                required
+                                            />
+                                            <small style={{ color: '#666', fontSize: '11px' }}>What customers pay</small>
+                                        </div>
+                                    </div>
+
+                                    {/* Profit Calculator Display */}
+                                    {formData.price && formData.costPrice && (
+                                        <div style={{
+                                            padding: '12px',
+                                            background: 'var(--success-light)',
+                                            border: '1px solid var(--success)',
+                                            borderRadius: '8px',
+                                            marginBottom: '16px',
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center'
+                                        }}>
+                                            <div>
+                                                <div style={{ fontSize: '12px', color: '#666' }}>Estimated Profit</div>
+                                                <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--success)' }}>
+                                                    ₹{(parseFloat(formData.price) - parseFloat(formData.costPrice)).toLocaleString()}
+                                                </div>
+                                            </div>
+                                            <div style={{ textAlign: 'right' }}>
+                                                <div style={{ fontSize: '12px', color: '#666' }}>Margin</div>
+                                                <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--noir-80)' }}>
+                                                    {Math.round(((parseFloat(formData.price) - parseFloat(formData.costPrice)) / parseFloat(formData.price)) * 100)}%
+                                                </div>
                                             </div>
                                         </div>
+                                    )}
+
+                                    <div className="form-group">
+                                        <label className="form-label">Original Price / MRP (₹)</label>
+                                        <input
+                                            type="number"
+                                            className="form-input"
+                                            value={formData.originalPrice}
+                                            onChange={e => setFormData({ ...formData, originalPrice: e.target.value })}
+                                            placeholder="Market Price (shown struck-through)"
+                                        />
                                     </div>
 
                                     <div className="form-group">
@@ -518,20 +532,7 @@ function ProductsManager() {
                                         />
                                     </div>
 
-                                    <div className="form-group">
-                                        <label className="form-label">Category *</label>
-                                        <select
-                                            className="form-select"
-                                            value={formData.category}
-                                            onChange={e => setFormData({ ...formData, category: e.target.value })}
-                                            required
-                                        >
-                                            <option value="" disabled>Select Category</option>
-                                            {Array.isArray(categories) && categories.map(cat => (
-                                                <option key={cat._id} value={cat.name}>{cat.name}</option>
-                                            ))}
-                                        </select>
-                                    </div>
+
                                 </div>
 
                                 {/* Right Column: Inventory & Stats */}

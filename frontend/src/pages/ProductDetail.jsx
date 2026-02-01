@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaWhatsapp, FaArrowLeft, FaCheck } from 'react-icons/fa'
+import { FaWhatsapp, FaArrowLeft, FaCheck, FaTags } from 'react-icons/fa'
 import { useProducts } from '../context/ProductContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
+import { couponsApi, couponSalesApi } from '../api/coupons.api'
+import { toast } from 'react-toastify'
 
 function ProductDetail() {
     const { id } = useParams()
@@ -12,6 +14,9 @@ function ProductDetail() {
     const [product, setProduct] = useState(null)
     const [selectedImage, setSelectedImage] = useState(0)
     const [selectedSize, setSelectedSize] = useState(null)
+    const [couponCode, setCouponCode] = useState('')
+    const [validatedCoupon, setValidatedCoupon] = useState(null)
+    const [couponLoading, setCouponLoading] = useState(false)
 
     useEffect(() => {
         if (products.length > 0) {
@@ -23,19 +28,63 @@ function ProductDetail() {
         }
     }, [id, products])
 
-    const handleWhatsAppOrder = () => {
+    const handleApplyCoupon = async () => {
+        if (!couponCode.trim()) {
+            toast.error('Please enter a coupon code')
+            return
+        }
+
+        try {
+            setCouponLoading(true)
+            const response = await couponsApi.validate(couponCode.toUpperCase())
+            setValidatedCoupon(response.data)
+            toast.success(`✓ Coupon ${response.data.code} applied!`)
+        } catch (error) {
+            console.error('Coupon validation error:', error)
+            setValidatedCoupon(null)
+            toast.error(error.message || 'Invalid or expired coupon code')
+        } finally {
+            setCouponLoading(false)
+        }
+    }
+
+    const handleWhatsAppOrder = async () => {
         if (!product || !selectedSize) return
 
         const currentImage = product.images[selectedImage] || product.images[0] || ''
         const pageUrl = `${window.location.origin}/product/${product._id}`
 
-        const message = `*Jersy_store Order Request*\n\n` +
+        let message = `*Jersy_store Order Request*\n\n` +
             `*Product:* ${product.name}\n` +
             `*Size:* ${selectedSize}\n` +
-            `*Price:* ₹${product.price}\n\n` +
-            `*Product Image:* ${currentImage}\n` +
-            `*Page Link:* ${pageUrl}\n\n` +
+            `*Price:* ₹${product.price}\n`
+
+        // Add coupon code if applied (simple, no friend details)
+        if (validatedCoupon) {
+            message += `*🎫 Coupon Code:* ${validatedCoupon.code}\n`
+        }
+
+        message += `\n*Page Link:* ${pageUrl}\n\n` +
             `I would like to place an order. Is this available?`
+
+        // Record pending sale if coupon is applied
+        if (validatedCoupon) {
+            try {
+                await couponSalesApi.create({
+                    couponCode: validatedCoupon.code,
+                    customerName: 'Customer', // You could add a name input if needed
+                    customerPhone: 'From WhatsApp',
+                    productName: product.name,
+                    productId: product._id,
+                    amount: product.price,
+                    size: selectedSize,
+                    whatsappMessage: message
+                })
+            } catch (error) {
+                console.error('Error recording sale:', error)
+                // Don't block the WhatsApp flow even if recording fails
+            }
+        }
 
         const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
         window.open(whatsappUrl, '_blank', 'noopener,noreferrer')
@@ -171,6 +220,53 @@ function ProductDetail() {
                                 </div>
                             </div>
                         )}
+
+                        {/* Coupon Code Input */}
+                        <div className="coupon-section">
+                            <label className="coupon-label">
+                                <FaTags /> Have a Coupon Code?
+                            </label>
+                            <div className="coupon-input-group">
+                                <input
+                                    type="text"
+                                    className="coupon-input"
+                                    placeholder="Enter code (e.g., FRIEND123)"
+                                    value={couponCode}
+                                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                    onKeyPress={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                                    disabled={couponLoading}
+                                />
+                                <motion.button
+                                    className="btn btn-secondary coupon-apply-btn"
+                                    onClick={handleApplyCoupon}
+                                    disabled={couponLoading || !couponCode.trim()}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                >
+                                    {couponLoading ? 'Checking...' : 'Apply'}
+                                </motion.button>
+                            </div>
+
+                            {/* Coupon Success Message */}
+                            {validatedCoupon && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="coupon-success"
+                                >
+                                    ✓ Coupon <strong>{validatedCoupon.code}</strong> applied successfully!
+                                    {validatedCoupon.discountType !== 'none' && validatedCoupon.discountValue > 0 && (
+                                        <div style={{ marginTop: '4px', fontSize: '13px' }}>
+                                            You get <strong>
+                                                {validatedCoupon.discountType === 'percentage'
+                                                    ? `${validatedCoupon.discountValue}% OFF`
+                                                    : `₹${validatedCoupon.discountValue} OFF`}
+                                            </strong>
+                                        </div>
+                                    )}
+                                </motion.div>
+                            )}
+                        </div>
 
                         {/* WhatsApp CTA */}
                         <motion.button

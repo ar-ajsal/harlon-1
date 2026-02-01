@@ -5,6 +5,7 @@ import App from './App.jsx'
 import { ProductProvider } from './context/ProductContext.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import './styles/index.css'
+import './styles/coupon.css'
 
 class ErrorBoundary extends React.Component {
     constructor(props) {

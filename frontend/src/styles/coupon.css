@@ -1,0 +1,83 @@
+/* ===== Coupon Section ===== */
+.coupon-section {
+    margin: var(--space-6) 0;
+    padding: var(--space-5);
+    background: var(--noir-10);
+    border-radius: var(--border-radius-lg);
+}
+
+.coupon-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--noir-80);
+    margin-bottom: var(--space-3);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+}
+
+.coupon-input-group {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.coupon-input {
+    flex: 1;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--noir-20);
+    border-radius: var(--border-radius);
+    font-size: var(--text-base);
+    font-family: monospace;
+    text-transform: uppercase;
+    color: var(--noir-100);
+    background: var(--white);
+    transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.coupon-input:focus {
+    outline: none;
+    border-color: var(--noir-100);
+    box-shadow: 0 0 0 2px hsla(240, 8%, 12%, 0.1);
+}
+
+.coupon-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.coupon-apply-btn {
+    padding: var(--space-3) var(--space-6);
+    white-space: nowrap;
+}
+
+.coupon-success {
+    margin-top: var(--space-3);
+    padding: var(--space-3);
+    background: linear-gradient(135deg, hsl(142, 45%, 95%), hsl(142, 45%, 90%));
+    border-left: 3px solid var(--success);
+    border-radius: var(--border-radius);
+    font-size: var(--text-sm);
+    color: var(--noir-80);
+    line-height: var(--leading-relaxed);
+}
+
+.coupon-success strong {
+    color: var(--success);
+    font-weight: var(--weight-semibold);
+}
+
+@media (max-width: 768px) {
+    .coupon-input-group {
+        flex-direction: column;
+    }
+
+    .coupon-apply-btn {
+        width: 100%;
+    }
+
+    .coupon-section {
+        padding: var(--space-4);
+    }
+}

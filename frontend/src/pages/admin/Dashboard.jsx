@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { FiHome, FiPackage, FiGrid, FiLogOut, FiShoppingBag, FiLayers, FiTrendingUp, FiDollarSign, FiFileText, FiPlus, FiClipboard, FiMenu, FiFilter, FiX, FiBriefcase } from 'react-icons/fi'
+import { FiHome, FiPackage, FiGrid, FiLogOut, FiShoppingBag, FiLayers, FiTrendingUp, FiDollarSign, FiFileText, FiPlus, FiClipboard, FiMenu, FiFilter, FiX, FiBriefcase, FiGift } from 'react-icons/fi'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useAuth } from '../../context/AuthContext'
 import { useProducts } from '../../context/ProductContext'
 import { ordersAPI } from '../../api/orders.api'
-import { investmentsApi } from '../../services/api'
+
 import AdminBottomNav from '../../components/AdminBottomNav'
 import '../../styles/admin-responsive.css'
 
@@ -27,14 +27,7 @@ function Dashboard() {
     })
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [graphData, setGraphData] = useState([])
-    const [totalInvestment, setTotalInvestment] = useState(0)
-    const [showInvestmentModal, setShowInvestmentModal] = useState(false)
-    const [investmentForm, setInvestmentForm] = useState({
-        amount: '',
-        description: '',
-        category: 'inventory',
-        notes: ''
-    })
+
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -68,15 +61,7 @@ function Dashboard() {
                     setGraphData(fullMonthData)
                 }
 
-                // Fetch total investment
-                try {
-                    const investRes = await investmentsApi.getTotal()
-                    if (investRes.data?.total !== undefined) {
-                        setTotalInvestment(investRes.data.total)
-                    }
-                } catch (e) {
-                    console.log('Investment API not available yet')
-                }
+
             } catch (err) {
                 console.error('Error fetching dashboard stats:', err)
             }
@@ -87,27 +72,9 @@ function Dashboard() {
     // Calculate total product cost (inventory value)
     const totalProductCost = products.reduce((sum, p) => sum + (p.costPrice || 0), 0)
 
-    const formatCurrency = (val) => `₹${(val || 0).toLocaleString('en-IN')}`
+    const formatCurrency = (val) => `\u20B9${(val || 0).toLocaleString('en-IN')}`
 
-    const handleAddInvestment = async (e) => {
-        e.preventDefault()
-        try {
-            await investmentsApi.create({
-                ...investmentForm,
-                amount: parseFloat(investmentForm.amount)
-            })
-            // Refresh total
-            const investRes = await investmentsApi.getTotal()
-            if (investRes.data?.total !== undefined) {
-                setTotalInvestment(investRes.data.total)
-            }
-            setShowInvestmentModal(false)
-            setInvestmentForm({ amount: '', description: '', category: 'inventory', notes: '' })
-        } catch (err) {
-            console.error('Error adding investment:', err)
-            alert('Failed to add investment')
-        }
-    }
+
 
     const stats = [
         {
@@ -134,12 +101,7 @@ function Dashboard() {
             label: 'Month Profit',
             color: 'var(--noir-100)'
         },
-        {
-            icon: <FiBriefcase />,
-            value: formatCurrency(totalInvestment),
-            label: 'Total Investment',
-            color: 'var(--info)'
-        },
+
         {
             icon: <FiPackage />,
             value: formatCurrency(totalProductCost),
@@ -190,6 +152,13 @@ function Dashboard() {
                             <FiLayers /> Categories
                         </NavLink>
                         <NavLink
+                            to="/admin/coupons"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiGift /> Coupons
+                        </NavLink>
+                        <NavLink
                             to="/admin/orders"
                             className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
                             onClick={() => setSidebarOpen(false)}
@@ -202,13 +171,6 @@ function Dashboard() {
                             onClick={() => setSidebarOpen(false)}
                         >
                             <FiTrendingUp /> Reports
-                        </NavLink>
-                        <NavLink
-                            to="/admin/investments"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiBriefcase /> Investments
                         </NavLink>
 
                         <div className="nav-divider" />
@@ -229,17 +191,8 @@ function Dashboard() {
                         <h1 className="admin-title">Overview</h1>
                         <p className="admin-subtitle">Welcome back, Admin</p>
                     </div>
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                        <button
-                            className="btn btn-primary"
-                            onClick={() => setShowInvestmentModal(true)}
-                            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-                        >
-                            <FiPlus /> Add Investment
-                        </button>
-                        <div className="date-badge">
-                            {new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
-                        </div>
+                    <div className="date-badge">
+                        {new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
                     </div>
                 </header>
 
@@ -272,11 +225,11 @@ function Dashboard() {
                                         </linearGradient>
                                     </defs>
                                     <XAxis dataKey="date" stroke="var(--noir-60)" fontSize={12} tickLine={false} axisLine={false} />
-                                    <YAxis stroke="var(--noir-60)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `₹${value}`} />
+                                    <YAxis stroke="var(--noir-60)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `Ã¢â€šÂ¹${value}`} />
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--noir-20)" />
                                     <Tooltip
                                         contentStyle={{ backgroundColor: 'var(--white)', border: '1px solid var(--noir-20)', borderRadius: '8px' }}
-                                        formatter={(value) => [`₹${value}`, 'Sales']}
+                                        formatter={(value) => [`Ã¢â€šÂ¹${value}`, 'Sales']}
                                     />
                                     <Area
                                         type="monotone"
@@ -313,10 +266,7 @@ function Dashboard() {
                                 <span className="icon"><FiPackage /></span>
                                 <span>Add Product</span>
                             </Link>
-                            <button onClick={() => setShowInvestmentModal(true)} className="action-tile">
-                                <span className="icon"><FiBriefcase /></span>
-                                <span>Add Investment</span>
-                            </button>
+
                         </div>
                     </div>
 
@@ -338,13 +288,13 @@ function Dashboard() {
                                         <span>{product.category}</span>
                                     </div>
                                     <div style={{ textAlign: 'right' }}>
-                                        <span className="recent-price">₹{product.price}</span>
+                                        <span className="recent-price">Ã¢â€šÂ¹{product.price}</span>
                                         {product.costPrice > 0 && (
                                             <div style={{
                                                 fontSize: '11px',
                                                 color: product.price - product.costPrice > 0 ? 'var(--success)' : 'var(--error)'
                                             }}>
-                                                Profit: ₹{product.price - product.costPrice}
+                                                Profit: Ã¢â€šÂ¹{product.price - product.costPrice}
                                             </div>
                                         )}
                                     </div>
@@ -354,91 +304,9 @@ function Dashboard() {
                     </div>
                 </div>
             </main>
-
             <AdminBottomNav />
-
-            {/* Investment Modal */}
-            {showInvestmentModal && (
-                <div className="modal-overlay">
-                    <div className="modal-content" style={{ maxWidth: '500px' }}>
-                        <div className="modal-header">
-                            <div>
-                                <h2 className="modal-title">Add Investment</h2>
-                                <p className="modal-subtitle">Track money invested in your business</p>
-                            </div>
-                            <button className="modal-close" onClick={() => setShowInvestmentModal(false)}>
-                                <FiX />
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleAddInvestment}>
-                            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                                <div className="form-group">
-                                    <label className="form-label">Amount (₹) *</label>
-                                    <input
-                                        type="number"
-                                        className="form-input"
-                                        value={investmentForm.amount}
-                                        onChange={e => setInvestmentForm({ ...investmentForm, amount: e.target.value })}
-                                        placeholder="0.00"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label className="form-label">Description *</label>
-                                    <input
-                                        type="text"
-                                        className="form-input"
-                                        value={investmentForm.description}
-                                        onChange={e => setInvestmentForm({ ...investmentForm, description: e.target.value })}
-                                        placeholder="e.g., Bought 50 jerseys from supplier"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label className="form-label">Category</label>
-                                    <select
-                                        className="form-select"
-                                        value={investmentForm.category}
-                                        onChange={e => setInvestmentForm({ ...investmentForm, category: e.target.value })}
-                                    >
-                                        <option value="inventory">Inventory</option>
-                                        <option value="marketing">Marketing</option>
-                                        <option value="equipment">Equipment</option>
-                                        <option value="shipping">Shipping</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-
-                                <div className="form-group">
-                                    <label className="form-label">Notes (Optional)</label>
-                                    <textarea
-                                        className="form-textarea"
-                                        rows="3"
-                                        value={investmentForm.notes}
-                                        onChange={e => setInvestmentForm({ ...investmentForm, notes: e.target.value })}
-                                        placeholder="Additional notes..."
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={() => setShowInvestmentModal(false)}>
-                                    Cancel
-                                </button>
-                                <button type="submit" className="btn btn-primary">
-                                    Add Investment
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
         </div>
     )
 }
 
 export default Dashboard
-
