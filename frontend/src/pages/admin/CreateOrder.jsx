@@ -5,6 +5,7 @@ import { toast } from 'react-toastify'
 import { useAuth } from '../../context/AuthContext'
 import { useProducts } from '../../context/ProductContext'
 import { ordersAPI } from '../../api/orders.api'
+import AdminBottomNav from '../../components/AdminBottomNav'
 
 function CreateOrder() {
     const navigate = useNavigate()
@@ -383,6 +384,8 @@ function CreateOrder() {
                     </div>
                 </form>
             </main>
+
+            <AdminBottomNav />
         </div>
     )
 }

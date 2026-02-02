@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag, FiFileText, FiTrendingUp, FiDollarSign, FiActivity, FiMenu } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import { ordersAPI } from '../../api/orders.api'
+import AdminBottomNav from '../../components/AdminBottomNav'
 
 function Reports() {
     const navigate = useNavigate()
@@ -223,6 +224,8 @@ function Reports() {
                     </>
                 )}
             </main>
+
+            <AdminBottomNav />
         </div>
     )
 }

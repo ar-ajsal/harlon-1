@@ -5,6 +5,7 @@ import { FaWhatsapp } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import { useAuth } from '../../context/AuthContext'
 import { ordersAPI } from '../../api/orders.api'
+import AdminBottomNav from '../../components/AdminBottomNav'
 
 function OrderDetail() {
     const { id } = useParams()
@@ -300,6 +301,8 @@ Thank you for your order! 🙏
                     </div>
                 </div>
             </main>
+
+            <AdminBottomNav />
         </div>
     )
 }

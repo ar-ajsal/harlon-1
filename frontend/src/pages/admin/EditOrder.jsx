@@ -5,6 +5,7 @@ import { toast } from 'react-toastify'
 import { useAuth } from '../../context/AuthContext'
 import { useProducts } from '../../context/ProductContext'
 import { ordersAPI } from '../../api/orders.api'
+import AdminBottomNav from '../../components/AdminBottomNav'
 
 function EditOrder() {
     const { id } = useParams()
@@ -435,6 +436,8 @@ function EditOrder() {
                     </div>
                 </form>
             </main>
+
+            <AdminBottomNav />
         </div>
     )
 }

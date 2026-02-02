@@ -5,6 +5,7 @@ import { toast } from 'react-toastify'
 import { useAuth } from '../../context/AuthContext'
 import { ordersAPI } from '../../api/orders.api'
 import Pagination from '../../components/Pagination'
+import AdminBottomNav from '../../components/AdminBottomNav'
 
 function OrdersManager() {
     const navigate = useNavigate()
@@ -290,8 +291,11 @@ function OrdersManager() {
                         </>
                     )}
                 </div>
-            </main>
         </div>
+            </main >
+
+        <AdminBottomNav />
+        </div >
     )
 }
 
