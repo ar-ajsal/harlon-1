@@ -291,10 +291,10 @@ function OrdersManager() {
                         </>
                     )}
                 </div>
-        </div>
+
             </main >
 
-        <AdminBottomNav />
+            <AdminBottomNav />
         </div >
     )
 }
