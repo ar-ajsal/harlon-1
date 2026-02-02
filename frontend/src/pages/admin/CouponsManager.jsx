@@ -230,7 +230,74 @@ function CouponsManager() {
                     </div>
                 ) : (
                     <div className="content-card">
-                        <div className="table-responsive">
+                        {/* Mobile Card View */}
+                        <div className="mobile-card-list">
+                            {coupons.map(coupon => {
+                                const progress = Math.min(100, Math.round((coupon.currentSales / coupon.targetSales) * 100))
+                                const isExpired = new Date() > new Date(coupon.expiryDate)
+
+                                return (
+                                    <div key={coupon._id} className="mobile-card" onClick={() => openEditModal(coupon)}>
+                                        <div className="mobile-card-content">
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                                <div className="mobile-card-title" style={{ fontFamily: 'monospace', fontSize: '16px' }}>
+                                                    {coupon.code}
+                                                </div>
+                                                <div className={`mobile-card-status ${coupon.isActive ? 'active' : 'inactive'}`}
+                                                    style={{
+                                                        background: coupon.isActive ? 'var(--success-light)' : 'var(--noir-10)',
+                                                        color: coupon.isActive ? 'var(--success)' : 'var(--noir-60)'
+                                                    }}>
+                                                    {coupon.isActive ? 'Active' : 'Inactive'}
+                                                </div>
+                                            </div>
+
+                                            <div className="mobile-card-subtitle">{coupon.name}</div>
+
+                                            <div style={{ marginTop: '8px', marginBottom: '8px' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
+                                                    <span>Progress: {coupon.currentSales}/{coupon.targetSales}</span>
+                                                    <span style={{ color: getProgressColor(progress) }}>{progress}%</span>
+                                                </div>
+                                                <div style={{ height: '4px', background: 'var(--surface-light)', borderRadius: '2px', overflow: 'hidden' }}>
+                                                    <div style={{ width: `${progress}%`, height: '100%', background: getProgressColor(progress) }} />
+                                                </div>
+                                            </div>
+
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--text-muted)' }}>
+                                                <span>Exp: {new Date(coupon.expiryDate).toLocaleDateString()}</span>
+                                                {isExpired && <span style={{ color: 'var(--error)' }}>Expired</span>}
+                                            </div>
+                                        </div>
+
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', justifyContent: 'center' }}>
+                                            <button
+                                                className="btn-icon"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleActive(coupon);
+                                                }}
+                                                style={{ color: coupon.isActive ? 'var(--success)' : 'var(--text-muted)' }}
+                                            >
+                                                {coupon.isActive ? <FiToggleRight size={20} /> : <FiToggleLeft size={20} />}
+                                            </button>
+                                            <button
+                                                className="btn-icon delete-btn"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDelete(coupon._id);
+                                                }}
+                                                style={{ color: 'var(--error)' }}
+                                            >
+                                                <FiTrash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+
+                        <div className="table-responsive desktop-only">
                             <table className="admin-table">
                                 <thead>
                                     <tr>

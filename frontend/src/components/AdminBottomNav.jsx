@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { FiHome, FiPackage, FiLayers, FiFileText, FiTrendingUp } from 'react-icons/fi'
+import { FiHome, FiPackage, FiLayers, FiFileText, FiTrendingUp, FiTag } from 'react-icons/fi'
 import '../styles/admin-bottom-nav.css'
 
 function AdminBottomNav() {
@@ -32,6 +32,13 @@ function AdminBottomNav() {
             >
                 <FiLayers />
                 <span>Cats</span>
+            </NavLink>
+            <NavLink
+                to="/admin/coupons"
+                className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            >
+                <FiTag />
+                <span>Coupons</span>
             </NavLink>
             <NavLink
                 to="/admin/reports"
