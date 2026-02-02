@@ -146,7 +146,43 @@ function CategoriesManager() {
                 </div>
 
                 <div className="content-card">
-                    <div className="table-responsive">
+                    {/* Mobile Card View */}
+                    <div className="mobile-card-list">
+                        {categories.map(category => (
+                            <div key={category._id} className="mobile-card" onClick={() => openEditModal(category)}>
+                                <img
+                                    src={category.image || '/images/placeholder.jpg'}
+                                    alt={category.name}
+                                    className="mobile-card-image"
+                                />
+                                <div className="mobile-card-content">
+                                    <div className="mobile-card-title">{category.name}</div>
+                                    <div className="mobile-card-subtitle">{category.slug}</div>
+                                    <div className="mobile-card-subtitle" style={{ color: 'var(--primary-color)', fontSize: '12px' }}>
+                                        {getProductCount(category.name)} products
+                                    </div>
+                                </div>
+                                <button
+                                    className="btn-icon delete-btn"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDelete(category._id);
+                                    }}
+                                    style={{
+                                        padding: '8px',
+                                        color: 'var(--error)',
+                                        alignSelf: 'flex-start',
+                                        marginTop: '-8px',
+                                        marginRight: '-8px'
+                                    }}
+                                >
+                                    <FiTrash2 />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="table-responsive desktop-only">
                         <table className="admin-table">
                             <thead>
                                 <tr>
