@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { FiUpload, FiX, FiImage, FiCrop, FiMove } from 'react-icons/fi'
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, rectSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { uploadApi } from '../services/api'
@@ -86,7 +86,17 @@ function ImageUploader({ images, onImagesChange, maxImages = 5, aspectRatio = nu
     const fileInputRef = useRef(null)
 
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8, // Require 8px movement to start drag
+            },
+        }),
+        useSensor(TouchSensor, {
+            activationConstraint: {
+                delay: 200,      // 200ms press before drag starts
+                tolerance: 5,    // 5px movement tolerance during delay
+            },
+        }),
         useSensor(KeyboardSensor)
     );
 

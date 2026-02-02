@@ -305,7 +305,6 @@ function CouponsManager() {
                                                     <button
                                                         onClick={() => toggleActive(coupon)}
                                                         style={{
-                                                            background: 'transparent',
                                                             border: 'none',
                                                             cursor: 'pointer',
                                                             display: 'flex',

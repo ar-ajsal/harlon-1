@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiSearch, FiFilter, FiMenu, FiFileText, FiTrendingUp, FiMove } from 'react-icons/fi'
@@ -80,6 +80,71 @@ function SortableRow({ product, onEdit, onDelete, onVisibilityToggle }) {
         </tr>
     );
 }
+
+// Sortable Mobile Card Component
+function SortableMobileCard({ product, onEdit, onVisibilityToggle }) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: product._id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        cursor: isDragging ? 'grabbing' : 'grab',
+    };
+
+    return (
+        <div
+            ref={setNodeRef}
+            style={style}
+            className="mobile-card"
+        >
+            <div
+                {...attributes}
+                {...listeners}
+                style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '8px',
+                    transform: 'translateY(-50%)',
+                    cursor: 'grab',
+                    padding: '8px',
+                    color: '#999',
+                    touchAction: 'none',
+                }}
+            >
+                <FiMove size={20} />
+            </div>
+            <div onClick={() => onEdit(product)} style={{ paddingLeft: '36px' }}>
+                <img
+                    src={product.images?.[0] || '/images/placeholder.jpg'}
+                    alt={product.name}
+                    className="mobile-card-image"
+                />
+                <div className="mobile-card-content">
+                    <div className="mobile-card-title">{product.name}</div>
+                    <div className="mobile-card-subtitle">{product.category}</div>
+                    <div className="mobile-card-price">₹{product.price}</div>
+                    <label onClick={e => e.stopPropagation()} className="toggle-switch">
+                        <input
+                            type="checkbox"
+                            checked={product.isVisible !== false}
+                            onChange={() => onVisibilityToggle(product)}
+                        />
+                        <span className="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 
 function ProductsManager() {
     const navigate = useNavigate()
@@ -199,7 +264,17 @@ function ProductsManager() {
     )
 
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8, // Require 8px movement to start drag (prevents accidental drags)
+            },
+        }),
+        useSensor(TouchSensor, {
+            activationConstraint: {
+                delay: 200,      // 200ms press before drag starts
+                tolerance: 5,    // 5px movement tolerance during delay
+            },
+        }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
         })
@@ -341,28 +416,25 @@ function ProductsManager() {
                         <div className="products-list-container">
                             {/* Mobile Card View */}
                             <div className="mobile-card-list">
-                                {filteredProducts.map(product => (
-                                    <div key={product._id} className="mobile-card" onClick={() => openEditModal(product)}>
-                                        <img
-                                            src={product.images?.[0] || '/images/placeholder.jpg'}
-                                            alt={product.name}
-                                            className="mobile-card-image"
-                                        />
-                                        <div className="mobile-card-content">
-                                            <div className="mobile-card-title">{product.name}</div>
-                                            <div className="mobile-card-subtitle">{product.category}</div>
-                                            <div className="mobile-card-price">₹{product.price}</div>
-                                            <label onClick={e => e.stopPropagation()} className="toggle-switch">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={product.isVisible !== false}
-                                                    onChange={() => handleVisibilityToggle(product)}
-                                                />
-                                                <span className="toggle-slider"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                ))}
+                                <DndContext
+                                    sensors={sensors}
+                                    collisionDetection={closestCenter}
+                                    onDragEnd={handleDragEnd}
+                                >
+                                    <SortableContext
+                                        items={filteredProducts.map(p => p._id)}
+                                        strategy={verticalListSortingStrategy}
+                                    >
+                                        {filteredProducts.map(product => (
+                                            <SortableMobileCard
+                                                key={product._id}
+                                                product={product}
+                                                onEdit={openEditModal}
+                                                onVisibilityToggle={handleVisibilityToggle}
+                                            />
+                                        ))}
+                                    </SortableContext>
+                                </DndContext>
                             </div>
 
                             {/* Desktop Table View */}

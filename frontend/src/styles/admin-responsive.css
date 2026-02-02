@@ -245,7 +245,7 @@
     padding: 0 24px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 968px) {
     .content-card {
         padding: var(--space-4);
     }
@@ -294,7 +294,8 @@
     }
 
     /* Hide Desktop Elements on Mobile */
-    .desktop-only {
+    .desktop-only,
+    .table-actions {
         display: none !important;
     }
 
