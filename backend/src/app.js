@@ -7,21 +7,21 @@ const app = express();
 
 // CORS - Allow your Vercel frontend and local development
 const corsOptions = {
-    origin: [
-        process.env.FRONTEND_URL,
-        'https://harlon-1.vercel.app',
-        'https://harlon.shop',
-        'http://localhost:5173',
-        'http://localhost:5174',
-        'http://127.0.0.1:5173',
-        'http://127.0.0.1:5174'
-    ].filter(Boolean),
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    optionsSuccessStatus: 200
+  origin: [
+    process.env.FRONTEND_URL,
+    'https://harlon-1.vercel.app',
+    'https://harlon.shop',        // ✅ remove trailing slash
+    'https://www.harlon.shop',    // ✅ ADD THIS (very important)
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174'
+  ].filter(Boolean),
+  credentials: true
 };
+
 app.use(cors(corsOptions));
+
 
 // Body parsing with increased limit for image uploads
 app.use(express.json({ limit: '10mb' }));
