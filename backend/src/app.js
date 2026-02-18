@@ -10,6 +10,7 @@ const corsOptions = {
     origin: [
         process.env.FRONTEND_URL,
         'https://harlon-1.vercel.app',
+        'https://www.harlon.shop/',
         'http://localhost:5173',
         'http://localhost:5174',
         'http://127.0.0.1:5173',
