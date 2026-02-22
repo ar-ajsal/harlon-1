@@ -58,6 +58,10 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    soldOut: {
+        type: Boolean,
+        default: false
+    },
     priority: {
         type: Number,
         default: 0

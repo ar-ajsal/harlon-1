@@ -4,11 +4,12 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiSearch, FiFilter, FiMenu, FiFileText, FiTrendingUp, FiMove } from 'react-icons/fi'
+import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiSearch, FiFilter, FiMenu, FiFileText, FiTrendingUp, FiMove, FiGift, FiBriefcase } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import { useProducts } from '../../context/ProductContext'
 import ImageUploader from '../../components/ImageUploader'
 import AdminBottomNav from '../../components/AdminBottomNav'
+import { toast } from 'react-toastify'
 import '../../styles/admin-responsive.css'
 
 
@@ -43,6 +44,7 @@ function SortableRow({ product, onEdit, onDelete, onVisibilityToggle }) {
                         <span className="product-cell-name">
                             {product.name}
                             {product.isVisible === false && <span style={{ fontSize: '10px', color: 'var(--error)', marginLeft: '6px', border: '1px solid var(--error)', padding: '1px 4px', borderRadius: '4px' }}>Hidden</span>}
+                            {product.soldOut && <span style={{ fontSize: '10px', color: '#dc2626', marginLeft: '6px', border: '1px solid #dc2626', padding: '1px 4px', borderRadius: '4px', background: '#fff1f1' }}>Sold Out</span>}
                         </span>
                         {product.featured && <span className="badge badge-accent">Featured</span>}
                         {product.bestSeller && <span className="badge badge-primary">Best Seller</span>}
@@ -128,7 +130,10 @@ function SortableMobileCard({ product, onEdit, onVisibilityToggle }) {
                     className="mobile-card-image"
                 />
                 <div className="mobile-card-content">
-                    <div className="mobile-card-title">{product.name}</div>
+                    <div className="mobile-card-title">
+                        {product.name}
+                        {product.soldOut && <span style={{ fontSize: '10px', color: '#dc2626', marginLeft: '6px', border: '1px solid #dc2626', padding: '1px 4px', borderRadius: '4px', background: '#fff1f1' }}>Sold Out</span>}
+                    </div>
                     <div className="mobile-card-subtitle">{product.category}</div>
                     <div className="mobile-card-price">₹{product.price}</div>
                     <label onClick={e => e.stopPropagation()} className="toggle-switch">
@@ -166,7 +171,8 @@ function ProductsManager() {
         images: [],
         featured: false,
         bestSeller: false,
-        isVisible: true
+        isVisible: true,
+        soldOut: false
     })
 
     const handleLogout = () => {
@@ -187,7 +193,8 @@ function ProductsManager() {
             images: [],
             featured: false,
             bestSeller: false,
-            isVisible: true
+            isVisible: true,
+            soldOut: false
         })
         setShowModal(true)
     }
@@ -205,28 +212,54 @@ function ProductsManager() {
             images: product.images || [],
             featured: product.featured,
             bestSeller: product.bestSeller || false,
-            isVisible: product.isVisible !== false // Default to true if undefined
+            isVisible: product.isVisible !== false, // Default to true if undefined
+            soldOut: product.soldOut || false
         })
         setShowModal(true)
     }
 
-    const handleSubmit = (e) => {
+    const [submitting, setSubmitting] = useState(false)
+
+    const handleSubmit = async (e) => {
         e.preventDefault()
+
+        // --- Client-side validation ---
+        const name = formData.name.trim()
+        if (!name) { toast.error('Product name is required'); return }
+
+        const price = parseFloat(formData.price)
+        if (!formData.price || isNaN(price) || price <= 0) { toast.error('Enter a valid selling price'); return }
+
+        if (!formData.category) { toast.error('Please select a category'); return }
+
+        if (!formData.sizes || formData.sizes.length === 0) { toast.error('Select at least one size'); return }
+
+        if (!formData.images || formData.images.length === 0) { toast.error('Upload at least one product image'); return }
 
         const productData = {
             ...formData,
-            price: parseFloat(formData.price),
+            name,
+            price,
             costPrice: formData.costPrice ? parseFloat(formData.costPrice) : 0,
             originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null
         }
 
-        if (editingProduct) {
-            updateProduct(editingProduct._id, productData)
-        } else {
-            addProduct(productData)
+        setSubmitting(true)
+        try {
+            if (editingProduct) {
+                await updateProduct(editingProduct._id, productData)
+                toast.success('Product updated successfully!')
+            } else {
+                await addProduct(productData)
+                toast.success('Product added successfully!')
+            }
+            setShowModal(false)
+        } catch (err) {
+            toast.error(err.message || 'Failed to save product. Please try again.')
+            // Modal stays open so admin can fix and retry
+        } finally {
+            setSubmitting(false)
         }
-
-        setShowModal(false)
     }
 
     const handleDelete = (id) => {
@@ -336,6 +369,13 @@ function ProductsManager() {
                             <FiLayers /> Categories
                         </NavLink>
                         <NavLink
+                            to="/admin/coupons"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiGift /> Coupons
+                        </NavLink>
+                        <NavLink
                             to="/admin/orders"
                             className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
                             onClick={() => setSidebarOpen(false)}
@@ -348,6 +388,27 @@ function ProductsManager() {
                             onClick={() => setSidebarOpen(false)}
                         >
                             <FiTrendingUp /> Reports
+                        </NavLink>
+                        <NavLink
+                            to="/admin/stock"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiPackage /> Stock
+                        </NavLink>
+                        <NavLink
+                            to="/admin/guest-orders"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiShoppingBag /> Guest Orders
+                        </NavLink>
+                        <NavLink
+                            to="/admin/guest-inquiries"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiBriefcase /> Inquiries
                         </NavLink>
 
                         <div className="nav-divider" />
@@ -686,6 +747,19 @@ function ProductsManager() {
                                                 <span className="switch-desc" style={{ display: 'block', fontSize: '13px', color: '#666', marginTop: '2px' }}>Show this product in store</span>
                                             </span>
                                         </label>
+
+                                        <label className="switch-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.soldOut}
+                                                onChange={e => setFormData({ ...formData, soldOut: e.target.checked })}
+                                                style={{ marginTop: '4px', width: '18px', height: '18px', cursor: 'pointer', accentColor: '#dc2626' }}
+                                            />
+                                            <span className="switch-text">
+                                                <span className="switch-title" style={{ display: 'block', fontWeight: '600', color: formData.soldOut ? '#dc2626' : '#1a1a1a' }}>Sold Out</span>
+                                                <span className="switch-desc" style={{ display: 'block', fontSize: '13px', color: '#666', marginTop: '2px' }}>Block purchases — shows "Sold Out" badge to customers</span>
+                                            </span>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -694,8 +768,8 @@ function ProductsManager() {
                                 <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
                                     Cancel
                                 </button>
-                                <button type="submit" className="btn btn-primary">
-                                    {editingProduct ? 'Save Changes' : 'Create Product'}
+                                <button type="submit" className="btn btn-primary" disabled={submitting}>
+                                    {submitting ? 'Saving...' : editingProduct ? 'Save Changes' : 'Create Product'}
                                 </button>
                             </div>
                         </form>

@@ -7,6 +7,8 @@ import MobileNav from './components/MobileNav'
 import Home from './pages/Home'
 import Shop from './pages/Shop'
 import ProductDetail from './pages/ProductDetail'
+import Checkout from './pages/Checkout'
+import TrackOrder from './pages/TrackOrder'
 import AdminLogin from './pages/admin/AdminLogin'
 import Dashboard from './pages/admin/Dashboard'
 import ProductsManager from './pages/admin/ProductsManager'
@@ -18,6 +20,9 @@ import OrderDetail from './pages/admin/OrderDetail'
 import Reports from './pages/admin/Reports'
 import CouponsManager from './pages/admin/CouponsManager'
 import CouponDetails from './pages/admin/CouponDetails'
+import GuestOrders from './pages/admin/GuestOrders'
+import InquiriesManager from './pages/admin/InquiriesManager'
+import StockManager from './pages/admin/StockManager'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -76,6 +81,21 @@ function App() {
                         <Reports />
                     </ProtectedRoute>
                 } />
+                <Route path="/admin/guest-orders" element={
+                    <ProtectedRoute>
+                        <GuestOrders />
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin/guest-inquiries" element={
+                    <ProtectedRoute>
+                        <InquiriesManager />
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin/stock" element={
+                    <ProtectedRoute>
+                        <StockManager />
+                    </ProtectedRoute>
+                } />
 
                 {/* Customer Routes */}
                 <Route path="/*" element={
@@ -86,6 +106,8 @@ function App() {
                                 <Route path="/" element={<Home />} />
                                 <Route path="/shop" element={<Shop />} />
                                 <Route path="/product/:id" element={<ProductDetail />} />
+                                <Route path="/checkout" element={<Checkout />} />
+                                <Route path="/track-order" element={<TrackOrder />} />
                             </Routes>
                         </main>
                         <Footer />

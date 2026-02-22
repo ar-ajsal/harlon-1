@@ -172,6 +172,27 @@ function Dashboard() {
                         >
                             <FiTrendingUp /> Reports
                         </NavLink>
+                        <NavLink
+                            to="/admin/stock"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiPackage /> Stock
+                        </NavLink>
+                        <NavLink
+                            to="/admin/guest-orders"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiShoppingBag /> Guest Orders
+                        </NavLink>
+                        <NavLink
+                            to="/admin/guest-inquiries"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiBriefcase /> Inquiries
+                        </NavLink>
 
                         <div className="nav-divider" />
 
@@ -225,11 +246,11 @@ function Dashboard() {
                                         </linearGradient>
                                     </defs>
                                     <XAxis dataKey="date" stroke="var(--noir-60)" fontSize={12} tickLine={false} axisLine={false} />
-                                    <YAxis stroke="var(--noir-60)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `Ã¢â€šÂ¹${value}`} />
+                                    <YAxis stroke="var(--noir-60)" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `₹${value}`} />
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--noir-20)" />
                                     <Tooltip
                                         contentStyle={{ backgroundColor: 'var(--white)', border: '1px solid var(--noir-20)', borderRadius: '8px' }}
-                                        formatter={(value) => [`Ã¢â€šÂ¹${value}`, 'Sales']}
+                                        formatter={(value) => [`₹${value}`, 'Sales']}
                                     />
                                     <Area
                                         type="monotone"
@@ -265,6 +286,14 @@ function Dashboard() {
                             <Link to="/admin/products" className="action-tile">
                                 <span className="icon"><FiPackage /></span>
                                 <span>Add Product</span>
+                            </Link>
+                            <Link to="/admin/stock" className="action-tile">
+                                <span className="icon">📦</span>
+                                <span>Stock Manager</span>
+                            </Link>
+                            <Link to="/admin/guest-orders" className="action-tile">
+                                <span className="icon"><FiShoppingBag /></span>
+                                <span>Guest Orders</span>
                             </Link>
 
                         </div>

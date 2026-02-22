@@ -8,7 +8,7 @@ function ProductCard({ product }) {
     return (
         <Link
             to={`/product/${product._id}`}
-            className="product-card"
+            className={`product-card${product.soldOut ? ' sold-out' : ''}`}
         >
             <div className="product-image-wrapper">
                 <img
@@ -16,8 +16,11 @@ function ProductCard({ product }) {
                     alt={product.name}
                     className="product-image"
                     loading="lazy"
+                    style={product.soldOut ? { opacity: 0.55, filter: 'grayscale(40%)' } : undefined}
                 />
-                {product.bestSeller ? (
+                {product.soldOut ? (
+                    <span className="product-badge sold-out-badge">⛔ Sold Out</span>
+                ) : product.bestSeller ? (
                     <span className="product-badge bestseller">Best Seller</span>
                 ) : discount > 0 ? (
                     <span className="product-badge">{discount}% OFF</span>

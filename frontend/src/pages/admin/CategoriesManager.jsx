@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiMenu, FiTrendingUp, FiFileText } from 'react-icons/fi'
+import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiMenu, FiTrendingUp, FiFileText, FiGift, FiBriefcase } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import { useProducts } from '../../context/ProductContext'
 import ImageUploader from '../../components/ImageUploader'
@@ -107,6 +107,13 @@ function CategoriesManager() {
                             <FiLayers /> Categories
                         </NavLink>
                         <NavLink
+                            to="/admin/coupons"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiGift /> Coupons
+                        </NavLink>
+                        <NavLink
                             to="/admin/orders"
                             className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
                             onClick={() => setSidebarOpen(false)}
@@ -119,6 +126,27 @@ function CategoriesManager() {
                             onClick={() => setSidebarOpen(false)}
                         >
                             <FiTrendingUp /> Reports
+                        </NavLink>
+                        <NavLink
+                            to="/admin/stock"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiPackage /> Stock
+                        </NavLink>
+                        <NavLink
+                            to="/admin/guest-orders"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiShoppingBag /> Guest Orders
+                        </NavLink>
+                        <NavLink
+                            to="/admin/guest-inquiries"
+                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <FiBriefcase /> Inquiries
                         </NavLink>
 
                         <div className="nav-divider" />

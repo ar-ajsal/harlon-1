@@ -100,6 +100,26 @@ function Header() {
                     >
                         Contact
                     </motion.a>
+                    <NavLink to="/track-order" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                        {({ isActive }) => (
+                            <motion.span whileHover={{ y: -2 }} style={{ display: 'inline-block' }}>
+                                Track Order
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="underline"
+                                        style={{
+                                            position: 'absolute',
+                                            bottom: '-2px',
+                                            left: 0,
+                                            right: 0,
+                                            height: '2px',
+                                            background: 'var(--noir-100)'
+                                        }}
+                                    />
+                                )}
+                            </motion.span>
+                        )}
+                    </NavLink>
                 </nav>
 
                 {/* Mobile Menu Button */}
@@ -157,6 +177,13 @@ function Header() {
                             >
                                 Contact
                             </a>
+                            <NavLink
+                                to="/track-order"
+                                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                                onClick={() => setMobileMenuOpen(false)}
+                            >
+                                Track Order
+                            </NavLink>
                         </motion.nav>
                     )}
                 </AnimatePresence>

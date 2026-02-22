@@ -31,3 +31,16 @@ export const reorder = asyncHandler(async (req, res) => {
     await productService.reorder(req.body.products);
     res.json(ApiResponse.success(null, 'Products reordered successfully'));
 });
+
+export const updateStock = asyncHandler(async (req, res) => {
+    const { stock } = req.body;
+    if (stock === undefined || isNaN(Number(stock)) || Number(stock) < 0) {
+        return res.status(400).json(ApiResponse.error('stock must be a non-negative number'));
+    }
+    const newStock = Math.floor(Number(stock));
+    const product = await productService.update(req.params.id, {
+        stock: newStock,
+        inStock: newStock > 0
+    });
+    res.json(ApiResponse.success(product, `Stock updated to ${newStock}`));
+});
