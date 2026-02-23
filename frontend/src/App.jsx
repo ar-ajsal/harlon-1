@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -25,6 +26,15 @@ import InquiriesManager from './pages/admin/InquiriesManager'
 import StockManager from './pages/admin/StockManager'
 import ProtectedRoute from './components/ProtectedRoute'
 
+function AdminFallback() {
+    return (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+            <div className="spinner" />
+        </div>
+    )
+}
+
+
 function App() {
     return (
         <div className="app">
@@ -33,67 +43,93 @@ function App() {
                 <Route path="/admin" element={<AdminLogin />} />
                 <Route path="/admin/dashboard" element={
                     <ProtectedRoute>
-                        <Dashboard />
+                        <Suspense fallback={<AdminFallback />}>
+                            <Dashboard />
+                        </Suspense>
                     </ProtectedRoute>
                 } />
                 <Route path="/admin/products" element={
                     <ProtectedRoute>
-                        <ProductsManager />
+                        <Suspense fallback={<AdminFallback />}>
+                            <ProductsManager />
+                        </Suspense>
                     </ProtectedRoute>
                 } />
                 <Route path="/admin/categories" element={
                     <ProtectedRoute>
-                        <CategoriesManager />
+                        <Suspense fallback={<AdminFallback />}>
+                            <CategoriesManager />
+                        </Suspense>
                     </ProtectedRoute>
                 } />
                 <Route path="/admin/coupons" element={
                     <ProtectedRoute>
-                        <CouponsManager />
+                        <Suspense fallback={<AdminFallback />}>
+                            <CouponsManager />
+                        </Suspense>
                     </ProtectedRoute>
                 } />
                 <Route path="/admin/coupons/:id" element={
                     <ProtectedRoute>
-                        <CouponDetails />
+                        <Suspense fallback={<AdminFallback />}>
+                            <CouponDetails />
+                        </Suspense>
                     </ProtectedRoute>
                 } />
                 <Route path="/admin/orders" element={
                     <ProtectedRoute>
-                        <OrdersManager />
+                        <Suspense fallback={<AdminFallback />}>
+                            <OrdersManager />
+                        </Suspense>
                     </ProtectedRoute>
                 } />
                 <Route path="/admin/orders/new" element={
                     <ProtectedRoute>
-                        <CreateOrder />
+                        <Suspense fallback={<AdminFallback />}>
+                            <CreateOrder />
+                        </Suspense>
                     </ProtectedRoute>
                 } />
                 <Route path="/admin/orders/:id/edit" element={
                     <ProtectedRoute>
-                        <EditOrder />
+                        <Suspense fallback={<AdminFallback />}>
+                            <EditOrder />
+                        </Suspense>
                     </ProtectedRoute>
                 } />
                 <Route path="/admin/orders/:id" element={
                     <ProtectedRoute>
-                        <OrderDetail />
+                        <Suspense fallback={<AdminFallback />}>
+                            <OrderDetail />
+                        </Suspense>
                     </ProtectedRoute>
                 } />
                 <Route path="/admin/reports" element={
                     <ProtectedRoute>
-                        <Reports />
+                        <Suspense fallback={<AdminFallback />}>
+                            <Reports />
+                        </Suspense>
                     </ProtectedRoute>
                 } />
                 <Route path="/admin/guest-orders" element={
                     <ProtectedRoute>
-                        <GuestOrders />
+                        <Suspense fallback={<AdminFallback />}>
+                            <GuestOrders />
+                        </Suspense>
                     </ProtectedRoute>
                 } />
                 <Route path="/admin/guest-inquiries" element={
                     <ProtectedRoute>
-                        <InquiriesManager />
+                        <Suspense fallback={<AdminFallback />}>
+                            <InquiriesManager />
+                        </Suspense>
                     </ProtectedRoute>
                 } />
                 <Route path="/admin/stock" element={
                     <ProtectedRoute>
-                        <StockManager />
+                        <Suspense fallback={<AdminFallback />}>
+                            <StockManager />
+                        </Suspense>
                     </ProtectedRoute>
                 } />
 
@@ -108,6 +144,7 @@ function App() {
                                 <Route path="/product/:id" element={<ProductDetail />} />
                                 <Route path="/checkout" element={<Checkout />} />
                                 <Route path="/track-order" element={<TrackOrder />} />
+                                <Route path="/t/:token" element={<TrackOrder />} />
                             </Routes>
                         </main>
                         <Footer />

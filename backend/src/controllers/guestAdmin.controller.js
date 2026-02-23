@@ -3,7 +3,10 @@ import Inquiry from '../models/Inquiry.js';
 import { sendOrderEmail } from '../config/mailer.js';
 
 const PAGE_SIZE = 50;
-const SITE_URL = process.env.SITE_URL || process.env.FRONTEND_URL || 'https://harlon.shop';
+// Read lazily at call-time so dotenv has already populated process.env
+function getSiteUrl() {
+    return process.env.SITE_URL || process.env.FRONTEND_URL || 'https://harlon.shop';
+}
 
 // ─── ORDERS ──────────────────────────────────────────────────────────────────
 
@@ -164,7 +167,7 @@ export const notifyWhatsApp = async (req, res) => {
         if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
 
         const firstName = order.customer?.firstName || 'Customer';
-        const trackLink = `${SITE_URL}/track-order?token=${order.trackToken}`;
+        const trackLink = `${getSiteUrl()}/track-order?token=${order.trackToken}`;
         const status = order.deliveryStatus;
         const product = order.product?.name || 'your jersey';
 

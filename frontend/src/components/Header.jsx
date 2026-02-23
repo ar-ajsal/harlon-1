@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiMenu, FiX, FiShoppingBag, FiSearch } from 'react-icons/fi'
+import { FiMenu, FiX, FiShoppingBag, FiSearch, FiSun, FiMoon } from 'react-icons/fi'
+import { useTheme } from '../context/ThemeContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 
 function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
     const navigate = useNavigate()
+    const { theme, toggleTheme } = useTheme()
 
     const handleSearch = (e) => {
         e.preventDefault()
@@ -120,6 +122,14 @@ function Header() {
                             </motion.span>
                         )}
                     </NavLink>
+                    <button
+                        type="button"
+                        className="p-2 rounded-lg text-[var(--noir-80)] hover:bg-[var(--noir-10)] focus:outline-none focus-visible:ring-2 focus-visible:ring-success ml-2"
+                        onClick={toggleTheme}
+                        aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                    >
+                        {theme === 'dark' ? <FiSun size={20} /> : <FiMoon size={20} />}
+                    </button>
                 </nav>
 
                 {/* Mobile Menu Button */}
@@ -184,6 +194,14 @@ function Header() {
                             >
                                 Track Order
                             </NavLink>
+                            <button
+                                type="button"
+                                className="nav-link"
+                                onClick={() => { toggleTheme(); setMobileMenuOpen(false); }}
+                                aria-label={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+                            >
+                                {theme === 'dark' ? <FiSun size={20} /> : <FiMoon size={20} />} {theme === 'dark' ? 'Light' : 'Dark'}
+                            </button>
                         </motion.nav>
                     )}
                 </AnimatePresence>

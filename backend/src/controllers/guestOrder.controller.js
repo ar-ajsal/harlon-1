@@ -17,6 +17,7 @@ function sanitize(str) {
 
 // Minimal public-safe order view (no internal IDs, full customer details)
 function publicView(order) {
+    const siteUrl = process.env.SITE_URL || process.env.FRONTEND_URL || 'https://harlon.shop';
     return {
         orderId: order.orderId,
         product: order.product,
@@ -27,7 +28,7 @@ function publicView(order) {
         trackingEvents: order.trackingEvents,
         courier: order.courier,
         createdAt: order.createdAt,
-        trackLink: `${process.env.SITE_URL || process.env.FRONTEND_URL || 'https://harlon.shop'}/track-order?token=${order.trackToken}`
+        trackLink: `${siteUrl}/track-order?token=${order.trackToken}`
     };
 }
 

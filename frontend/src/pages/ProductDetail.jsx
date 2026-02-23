@@ -7,6 +7,8 @@ import { WHATSAPP_NUMBER } from '../config/constants'
 import { couponsApi, couponSalesApi } from '../api/coupons.api'
 import { toast } from 'react-toastify'
 import InquiryModal from '../components/InquiryModal'
+import ProductGallery from '../components/product/ProductGallery'
+import ProductSummary from '../components/product/ProductSummary'
 
 // ─── Delivery helpers ────────────────────────────────────────────────────────
 function getDeliveryDates() {
@@ -105,6 +107,30 @@ function ProductDetail() {
         }
     }, [id, products])
 
+    // Related products: same category, exclude current, limit 12
+    const relatedProducts = useMemo(() => {
+        if (!product || !products.length) return []
+        return products.filter(
+            p => p._id !== product._id && p.category === product.category && p.isVisible !== false
+        ).slice(0, 12)
+    }, [product, products])
+
+    // Auto-slider: advance related products every 4s
+    const relatedSliderRef = useRef(null)
+    useEffect(() => {
+        if (relatedProducts.length <= 1) return
+        const el = relatedSliderRef.current
+        if (!el) return
+        const step = () => {
+            const { scrollLeft, clientWidth, scrollWidth } = el
+            const next = scrollLeft + clientWidth
+            if (next >= scrollWidth - 2) el.scrollTo({ left: 0, behavior: 'smooth' })
+            else el.scrollBy({ left: clientWidth, behavior: 'smooth' })
+        }
+        const id = setInterval(step, 4000)
+        return () => clearInterval(id)
+    }, [relatedProducts.length])
+
     const handleApplyCoupon = async () => {
         if (!couponCode.trim()) { toast.error('Please enter a coupon code'); return }
         try {
@@ -178,253 +204,110 @@ function ProductDetail() {
                     <FaArrowLeft /> Back
                 </motion.button>
 
-                <div className="product-detail-grid">
+                <div className="product-detail-grid grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                     {/* Image Gallery */}
                     <motion.div
                         initial={{ opacity: 0, y: 40 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="product-gallery"
+                        transition={{ duration: 0.5, ease: [0.2, 0.9, 0.2, 1] }}
                     >
-                        <div className="gallery-main">
-                            <AnimatePresence mode="wait">
-                                <motion.img
-                                    key={selectedImage}
-                                    src={product.images[selectedImage] || '/images/placeholder.jpg'}
-                                    alt={product.name}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.4 }}
-                                />
-                            </AnimatePresence>
-                        </div>
-
-                        {product.images && product.images.length > 1 && (
-                            <div className="gallery-thumbnails">
-                                {product.images.map((image, index) => (
-                                    <motion.button
-                                        key={index}
-                                        className={`thumbnail ${selectedImage === index ? 'active' : ''}`}
-                                        onClick={() => setSelectedImage(index)}
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                    >
-                                        <img src={image} alt={`${product.name} ${index + 1}`} />
-                                    </motion.button>
-                                ))}
-                            </div>
-                        )}
+                        <ProductGallery
+                            images={product.images}
+                            selected={selectedImage}
+                            onSelect={setSelectedImage}
+                            alt={product.name}
+                        />
                     </motion.div>
 
-                    {/* Product Info */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 40 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                        className="product-info-panel"
-                    >
-                        {/* Category & Bestseller Badge */}
-                        <div className="product-meta">
-                            <span className="category-badge">{product.category}</span>
-                            {product.bestSeller && (
-                                <span className="bestseller-badge"><FaCheck /> Best Seller</span>
-                            )}
+                    {/* Sticky Product Summary + extras */}
+                    <div className="lg:sticky lg:top-24 lg:self-start space-y-6">
+                        <ProductSummary
+                            product={product}
+                            selectedSize={selectedSize}
+                            onSizeSelect={setSelectedSize}
+                            onBuy={() => {
+                                if (!selectedSize) { toast.error('Please select a size first'); return }
+                                navigate(`/checkout?productId=${product._id}&size=${selectedSize}&method=razorpay`)
+                            }}
+                            onWhatsApp={handleWhatsAppOrder}
+                            soldOut={product.soldOut}
+                            deliveryEstimate={dates.rangeLabel ? `By ${dates.rangeLabel}` : '4–9 business days'}
+                        />
+
+                        {/* Delivery countdown */}
+                        <div className="rounded-card border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm">
+                            <span className="text-muted">Order within </span>
+                            <span className="font-mono font-semibold text-charcoal dark:text-off-white">{h}:{m}:{s}</span>
+                            <span className="text-muted"> for delivery between </span>
+                            <span className="font-medium text-charcoal dark:text-off-white">{dates.rangeLabel}</span>
                         </div>
 
-                        {/* Product Name */}
-                        <h1 className="product-detail-title">{product.name}</h1>
-
-                        {/* Price */}
-                        <div className="product-detail-price">
-                            <span className="price-current">₹{product.price}</span>
-                            {product.originalPrice && (
-                                <span className="price-original">₹{product.originalPrice}</span>
-                            )}
+                        {/* Delivery timeline (compact) */}
+                        <div className="flex items-center gap-2 text-sm text-muted">
+                            <FaShoppingBag className="w-4 h-4 flex-shrink-0" />
+                            <span>{dates.purchasedLabel}</span>
+                            <span className="mx-1">→</span>
+                            <FaCog className="w-4 h-4 flex-shrink-0" />
+                            <span>{dates.processingLabel}</span>
+                            <span className="mx-1">→</span>
+                            <FaMapMarkerAlt className="w-4 h-4 flex-shrink-0" />
+                            <span>{dates.deliveredLabel}</span>
                         </div>
 
-                        {/* ── Sold Out Banner ── */}
-                        {product.soldOut && (
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '10px',
-                                padding: '12px 18px',
-                                background: '#fff1f1',
-                                border: '1.5px solid #f87171',
-                                borderRadius: '10px',
-                                color: '#dc2626',
-                                fontWeight: '700',
-                                fontSize: '15px',
-                                marginBottom: '12px'
-                            }}>
-                                ⛔ This product is currently sold out
-                                <span style={{ fontWeight: '400', fontSize: '13px', color: '#9b1c1c', marginLeft: '4px' }}>
-                                    — use Inquiry to ask about restock
-                                </span>
-                            </div>
-                        )}
-
-                        {/* ── Delivery Countdown ── */}
-                        <div className="delivery-countdown">
-                            <span className="delivery-countdown__text">Order within </span>
-                            <span className="delivery-countdown__timer">
-                                {h}<span className="delivery-countdown__sep">:</span>
-                                {m}<span className="delivery-countdown__sep">:</span>
-                                {s}
-                            </span>
-                            <span className="delivery-countdown__text"> for delivery between </span>
-                            <span className="delivery-countdown__range">{dates.rangeLabel}</span>
-                        </div>
-
-                        {/* ── Delivery Timeline ── */}
-                        <div className="delivery-timeline">
-                            {/* Step 1 – Purchased */}
-                            <div className="delivery-timeline__step">
-                                <div className="delivery-timeline__icon">
-                                    <FaShoppingBag />
-                                </div>
-                                <div className="delivery-timeline__label">Purchased</div>
-                                <div className="delivery-timeline__date">{dates.purchasedLabel}</div>
-                            </div>
-
-                            <div className="delivery-timeline__line" />
-
-                            {/* Step 2 – Processing */}
-                            <div className="delivery-timeline__step">
-                                <div className="delivery-timeline__icon">
-                                    <FaCog />
-                                </div>
-                                <div className="delivery-timeline__label">Processing</div>
-                                <div className="delivery-timeline__date">{dates.processingLabel}</div>
-                            </div>
-
-                            <div className="delivery-timeline__line" />
-
-                            {/* Step 3 – Delivered */}
-                            <div className="delivery-timeline__step">
-                                <div className="delivery-timeline__icon">
-                                    <FaMapMarkerAlt />
-                                </div>
-                                <div className="delivery-timeline__label">Delivered</div>
-                                <div className="delivery-timeline__date">{dates.deliveredLabel}</div>
-                            </div>
-                        </div>
-
-                        {/* Size Selection */}
-                        {product.sizes && product.sizes.length > 0 && (
-                            <div className="size-selection">
-                                <label className="size-label">Select Size</label>
-                                <div className="size-options">
-                                    {product.sizes.map((size) => (
-                                        <motion.button
-                                            key={size}
-                                            className={`size-button ${selectedSize === size ? 'selected' : ''}`}
-                                            onClick={() => setSelectedSize(size)}
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                            transition={{ duration: 0.2 }}
-                                        >
-                                            {size}
-                                        </motion.button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Coupon Code Input */}
+                        {/* Coupon */}
                         <div className="coupon-section">
-                            <label className="coupon-label">
-                                <FaTags /> Have a Coupon Code?
+                            <label className="coupon-label block text-sm font-semibold text-charcoal dark:text-off-white mb-2">
+                                <FaTags className="inline mr-1" /> Have a Coupon Code?
                             </label>
-                            <div className="coupon-input-group">
+                            <div className="flex gap-2">
                                 <input
                                     type="text"
-                                    className="coupon-input"
-                                    placeholder="Enter code (e.g., FRIEND123)"
+                                    className="form-input flex-1 rounded-card border border-slate-200 dark:border-white/20 px-3 py-2"
+                                    placeholder="e.g. FRIEND123"
                                     value={couponCode}
                                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                                     onKeyPress={(e) => e.key === 'Enter' && handleApplyCoupon()}
                                     disabled={couponLoading}
                                 />
                                 <motion.button
-                                    className="btn btn-secondary coupon-apply-btn"
+                                    type="button"
+                                    className="btn btn-secondary rounded-card px-4"
                                     onClick={handleApplyCoupon}
                                     disabled={couponLoading || !couponCode.trim()}
-                                    whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                 >
                                     {couponLoading ? 'Checking...' : 'Apply'}
                                 </motion.button>
                             </div>
-
                             {validatedCoupon && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -10 }}
+                                <motion.p
+                                    initial={{ opacity: 0, y: -4 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="coupon-success"
+                                    className="mt-2 text-sm text-success font-medium"
                                 >
-                                    ✓ Coupon <strong>{validatedCoupon.code}</strong> applied successfully!
-                                    {validatedCoupon.discountType !== 'none' && validatedCoupon.discountValue > 0 && (
-                                        <div style={{ marginTop: '4px', fontSize: '13px' }}>
-                                            You get <strong>
-                                                {validatedCoupon.discountType === 'percentage'
-                                                    ? `${validatedCoupon.discountValue}% OFF`
-                                                    : `₹${validatedCoupon.discountValue} OFF`}
-                                            </strong>
-                                        </div>
+                                    ✓ {validatedCoupon.code} applied
+                                    {validatedCoupon.discountValue > 0 && (
+                                        validatedCoupon.discountType === 'percentage'
+                                            ? ` — ${validatedCoupon.discountValue}% OFF`
+                                            : ` — ₹${validatedCoupon.discountValue} OFF`
                                     )}
-                                </motion.div>
+                                </motion.p>
                             )}
                         </div>
 
-                        {/* Purchase Buttons */}
-                        <div className="purchase-buttons">
-                            <motion.button
-                                className="btn btn-primary"
-                                disabled={product.soldOut || !selectedSize}
-                                onClick={() => {
-                                    if (!selectedSize) { toast.error('Please select a size first'); return }
-                                    navigate(`/checkout?productId=${product._id}&size=${selectedSize}&method=razorpay`)
-                                }}
-                                whileHover={product.soldOut ? {} : { scale: 1.02 }}
-                                whileTap={product.soldOut ? {} : { scale: 0.98 }}
-                                style={product.soldOut ? { opacity: 0.45, cursor: 'not-allowed' } : undefined}
-                            >
-                                <FaCreditCard /> {product.soldOut ? 'Sold Out' : 'Pay Online'}
-                            </motion.button>
-
-                            <motion.button
-                                className="btn btn-whatsapp whatsapp-cta"
-                                onClick={handleWhatsAppOrder}
-                                disabled={product.soldOut || !selectedSize}
-                                whileHover={product.soldOut ? {} : { scale: 1.02 }}
-                                whileTap={product.soldOut ? {} : { scale: 0.98 }}
-                                style={product.soldOut ? { opacity: 0.45, cursor: 'not-allowed' } : undefined}
-                            >
-                                <FaWhatsapp /> {product.soldOut ? 'Not Available' : 'WhatsApp Order'}
-                            </motion.button>
-
-                            <motion.button
-                                className="btn btn-outline"
-                                onClick={() => setShowInquiry(true)}
-                                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                            >
-                                <FaEnvelope /> Inquiry
-                            </motion.button>
-                        </div>
+                        <motion.button
+                            type="button"
+                            className="w-full btn btn-outline min-h-[48px]"
+                            onClick={() => setShowInquiry(true)}
+                            whileTap={{ scale: 0.98 }}
+                        >
+                            <FaEnvelope /> Inquiry
+                        </motion.button>
 
                         {showInquiry && (
                             <InquiryModal product={product} onClose={() => setShowInquiry(false)} />
                         )}
-
-                        {/* Additional Info */}
-                        <div className="product-additional-info">
-                            <div className="info-item"><span className="info-icon">✓</span><span>Authentic Quality</span></div>
-                            <div className="info-item"><span className="info-icon">✓</span><span>Premium Materials</span></div>
-                            <div className="info-item"><span className="info-icon">✓</span><span>Fast Delivery</span></div>
-                        </div>
-                    </motion.div>
+                    </div>
                 </div>
 
                 {/* ── Description / Size Chart Tabs ── */}
@@ -533,6 +416,31 @@ function ProductDetail() {
                         )}
                     </AnimatePresence>
                 </div>
+
+                {/* Related products auto-slider */}
+                {relatedProducts.length > 0 && (
+                    <motion.section
+                        className="related-products"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.2 }}
+                    >
+                        <h2 className="related-products__title">You might also like</h2>
+                        <div
+                            ref={relatedSliderRef}
+                            className="related-products-slider"
+                            aria-label="Related products carousel"
+                        >
+                            <div className="related-products-track">
+                                {relatedProducts.map((p) => (
+                                    <div key={p._id} className="related-products-slide">
+                                        <ProductCard product={p} />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </motion.section>
+                )}
             </div>
         </div>
     )

@@ -1,8 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-toastify'
 import { trackOrder as trackByEmailId, trackByToken } from '../api/guestOrder.api'
+import { WHATSAPP_NUMBER } from '../config/constants'
+import TrackHero from '../components/track/HeroCard'
+import TrackTimeline from '../components/track/TrackTimeline'
+
+const REACTION_KEY = 'harlon_celebrate'
+
 
 // ── Step definitions (canonical order) ───────────────────────────────────────
 const STEPS = [
@@ -210,21 +216,27 @@ function Timeline({ trackingEvents }) {
 // ── Main component ─────────────────────────────────────────────────────────────
 function TrackOrder() {
     const [searchParams] = useSearchParams()
+    const { token: tokenParam } = useParams()
+    const tokenFromUrl = searchParams.get('token') || tokenParam
     const [form, setForm] = useState({
         email: searchParams.get('email') || '',
         orderId: searchParams.get('orderId') || ''
     })
     const [loading, setLoading] = useState(false)
     const [order, setOrder] = useState(null)
-    const trackLinkRef = useRef(null)
+    const [celebrateCount, setCelebrateCount] = useState(() => {
+        try { return parseInt(localStorage.getItem(REACTION_KEY) || '0', 10) } catch { return 0 }
+    })
 
-    // Auto-load on mount via token or query params
     useEffect(() => {
-        const token = searchParams.get('token')
-        if (token) {
-            loadByToken(token)
-        } else if (form.email && form.orderId) {
-            handleTrack()
+        if (tokenFromUrl) loadByToken(tokenFromUrl)
+        else if (form.email && form.orderId) {
+            setLoading(true)
+            setOrder(null)
+            trackByEmailId(form.email.trim(), form.orderId.trim())
+                .then((res) => setOrder(res.order))
+                .catch((err) => toast.error(err.message || "Hmm — we couldn't find that. Try the link we sent, or tap WhatsApp to chat."))
+                .finally(() => setLoading(false))
         }
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -255,18 +267,30 @@ function TrackOrder() {
             const res = await trackByEmailId(form.email.trim(), form.orderId.trim())
             setOrder(res.order)
         } catch (err) {
-            toast.error(err.message || 'Order not found. Check your email and Order ID.')
+            toast.error(err.message || "Hmm — we couldn't find your order. Try the email or contact us on WhatsApp.")
         } finally {
             setLoading(false)
         }
     }
 
     const handleCopyTrackLink = () => {
-        if (!order?.trackLink) return
-        navigator.clipboard.writeText(order.trackLink)
-            .then(() => toast.success('Tracking link copied!'))
+        const link = order?.trackLink || (order?.trackToken ? `${window.location.origin}/t/${order.trackToken}` : null)
+        if (!link) return
+        navigator.clipboard.writeText(link)
+            .then(() => toast.success('Copy tracking link'))
             .catch(() => toast.error('Copy failed — please copy manually'))
     }
+
+    const handleCelebrate = () => {
+        const next = celebrateCount + 1
+        setCelebrateCount(next)
+        try { localStorage.setItem(REACTION_KEY, String(next)) } catch (_) { }
+        toast.success('Share your hype! 🎉')
+    }
+
+    const emailLink = order?.orderId
+        ? `mailto:?subject=Track my Harlon order ${order.orderId}&body=Track your order: ${order.trackLink || window.location.origin + '/t/' + (order.trackToken || '')}`
+        : ''
 
     const payBadge = order ? (PAY_BADGE[order.paymentStatus] || { label: order.paymentStatus, bg: '#f9fafb', color: '#374151', border: '#d1d5db' }) : {}
     const delBadge = order ? (DELIVERY_BADGE[order.deliveryStatus] || { label: order.deliveryStatus, bg: '#f9fafb', color: '#374151', border: '#d1d5db' }) : {}
@@ -326,132 +350,102 @@ function TrackOrder() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="track-result"
+                            className="track-result space-y-6"
                         >
-                            {/* Product + Summary Card */}
-                            <div className="track-summary-card">
-                                <div className="track-product-card">
-                                    {order.product?.image && (
-                                        <img
-                                            src={order.product.image}
-                                            alt={order.product.name}
-                                            className="track-product-img"
-                                        />
-                                    )}
-                                    <div className="track-product-info">
-                                        <div className="track-product-name">{order.product?.name}</div>
-                                        <div className="track-product-meta">
-                                            <span>Size: <strong>{order.product?.size}</strong></span>
-                                            <span style={{ color: '#d1d5db' }}>·</span>
-                                            <span style={{ fontWeight: 700, color: '#111827', fontSize: 16 }}>
-                                                ₹{order.amount || order.product?.price}
-                                            </span>
-                                        </div>
-                                        <div className="track-order-meta">
-                                            <code className="track-orderid-badge">{order.orderId}</code>
-                                            <span style={{ color: '#9ca3af', fontSize: 12 }}>
-                                                Placed {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                                                    day: '2-digit', month: 'short', year: 'numeric'
-                                                })}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
+                            <TrackHero orderSummary={order} />
 
-                                {/* Status badges + ETA row */}
-                                <div className="track-status-row">
-                                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-                                        <Pill {...payBadge} />
-                                        <Pill {...delBadge} />
-                                    </div>
-                                    <div className="track-eta">
-                                        {order.deliveryStatus === 'delivered' ? (
-                                            <span style={{ color: '#166534', fontWeight: 700, fontSize: 14 }}>✅ Delivered</span>
-                                        ) : order.deliveryStatus === 'cancelled' ? (
-                                            <span style={{ color: '#991b1b', fontWeight: 600, fontSize: 14 }}>❌ Cancelled</span>
-                                        ) : (
-                                            <>
-                                                <span className="track-label-sm">Estimated Delivery</span>
-                                                <div style={{ fontWeight: 600, color: '#111827', fontSize: 14, marginTop: 4 }}>
-                                                    {etaDate(order.createdAt)}
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
+                            {/* ETA module — friendly copy */}
+                            {order.deliveryStatus !== 'delivered' && order.deliveryStatus !== 'cancelled' && (
+                                <div className="p-4 rounded-card bg-soft-white dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                                    <p className="text-sm text-muted">
+                                        Expected within 2–4 business days — we&apos;ll nudge you when out for delivery.
+                                    </p>
+                                    <p className="font-semibold text-charcoal dark:text-soft-white mt-1">{etaDate(order.createdAt)}</p>
                                 </div>
+                            )}
 
-                                {/* Copy tracking link */}
-                                {order.trackLink && (
+                            {/* Timeline */}
+                            <div className="track-section">
+                                <TrackTimeline
+                                    events={order.trackingEvents || []}
+                                    currentStatus={order.deliveryStatus}
+                                    eta={order.deliveryStatus === 'delivered' || order.deliveryStatus === 'cancelled' ? null : etaDate(order.createdAt)}
+                                    courier={order.courier || {}}
+                                    reducedMotion={typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches}
+                                />
+                            </div>
+
+                            {/* Share & Safety */}
+                            <div className="p-4 rounded-card border border-slate-200 dark:border-white/10 bg-soft-white dark:bg-white/5">
+                                <h3 className="text-sm font-semibold text-charcoal dark:text-soft-white mb-3">Share & safety</h3>
+                                <div className="flex flex-wrap gap-2">
                                     <button
-                                        className="track-copy-link-btn"
+                                        type="button"
+                                        className="px-4 py-2.5 rounded-card font-medium text-sm bg-charcoal dark:bg-soft-white text-soft-white dark:text-charcoal hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 min-h-[44px]"
                                         onClick={handleCopyTrackLink}
                                         aria-label="Copy tracking link"
                                     >
-                                        🔗 Copy Tracking Link
+                                        Copy tracking link
                                     </button>
-                                )}
-                            </div>
-
-                            {/* Amazon/Flipkart-style progress bar */}
-                            <div className="track-section">
-                                <div className="track-section-title">📍 Shipment Progress</div>
-                                <ProgressBar deliveryStatus={order.deliveryStatus} />
-                            </div>
-
-                            {/* Courier Details */}
-                            {(order.courier?.name || order.courier?.trackingNumber) && (
-                                <div className="track-courier-card">
-                                    <div className="track-courier-header">🚚 Courier Details</div>
-                                    <div className="track-courier-grid">
-                                        {order.courier.name && (
-                                            <div className="track-courier-row">
-                                                <span className="track-label-sm">Carrier</span>
-                                                <strong>{order.courier.name}</strong>
-                                            </div>
-                                        )}
-                                        {order.courier.trackingNumber && (
-                                            <div className="track-courier-row">
-                                                <span className="track-label-sm">Tracking No.</span>
-                                                <code className="track-courier-code">{order.courier.trackingNumber}</code>
-                                            </div>
-                                        )}
-                                    </div>
-                                    {order.courier.url && (
+                                    <a
+                                        href={`https://wa.me/?text=${encodeURIComponent(`Track my Harlon order: ${order.trackLink || window.location.origin + '/t/' + (order.trackToken || '')}`)}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="inline-flex items-center justify-center px-4 py-2.5 rounded-card font-medium text-sm bg-[#25D366] text-white hover:opacity-90 min-h-[44px]"
+                                        aria-label="Send to WhatsApp"
+                                    >
+                                        Send to WhatsApp (one tap)
+                                    </a>
+                                    {emailLink && (
                                         <a
-                                            href={order.courier.url}
-                                            target="_blank" rel="noreferrer"
-                                            className="track-courier-link"
+                                            href={emailLink}
+                                            className="inline-flex items-center justify-center px-4 py-2.5 rounded-card font-medium text-sm border-2 border-slate-300 dark:border-white/30 text-charcoal dark:text-soft-white hover:bg-slate-100 dark:hover:bg-white/10 min-h-[44px]"
+                                            aria-label="Email me this link"
                                         >
-                                            Track on carrier website →
+                                            Email me this link
                                         </a>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Reaction CTA — Share your hype */}
+                            {order.deliveryStatus !== 'cancelled' && (
+                                <div className="flex items-center gap-3">
+                                    <span className="text-sm text-muted">Share your hype</span>
+                                    <motion.button
+                                        type="button"
+                                        onClick={handleCelebrate}
+                                        className="text-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-full p-1"
+                                        aria-label="Celebrate shipment"
+                                        whileTap={{ scale: 0.9 }}
+                                    >
+                                        🎉
+                                    </motion.button>
+                                    {celebrateCount > 0 && (
+                                        <span className="text-sm font-medium text-charcoal dark:text-soft-white">{celebrateCount}</span>
                                     )}
                                 </div>
                             )}
 
-                            {/* Full Event Timeline */}
-                            <div className="track-section">
-                                <div className="track-section-title">🗂️ Shipment History</div>
-                                <Timeline trackingEvents={order.trackingEvents} />
-                            </div>
-
-                            {/* Support */}
+                            {/* Need Help */}
                             <div className="track-support">
-                                <div className="track-section-title">💬 Need Help?</div>
-                                <div className="track-support-links">
+                                <div className="track-section-title text-charcoal dark:text-soft-white">Need help?</div>
+                                <div className="flex flex-wrap gap-2">
                                     <a
-                                        href={`https://wa.me/919998887776?text=${encodeURIComponent(`Hi! I need help with my order ${order.orderId}`)}`}
-                                        target="_blank" rel="noreferrer"
+                                        href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hi! I need help with my order ${order.orderId}`)}`}
+                                        target="_blank"
+                                        rel="noreferrer"
                                         className="track-support-btn whatsapp"
                                         aria-label="Contact us on WhatsApp"
                                     >
-                                        💬 WhatsApp Support
+                                        WhatsApp Support
                                     </a>
                                     <a
-                                        href={`mailto:support@harlon.shop?subject=Order ${order.orderId}&body=Hi, I need help with my order.`}
+                                        href={`mailto:support@harlon.shop?subject=Order ${order.orderId}`}
                                         className="track-support-btn email"
-                                        aria-label="Email us for support"
+                                        aria-label="Email us"
                                     >
-                                        ✉️ Email Support
+                                        Email Support
                                     </a>
                                 </div>
                             </div>

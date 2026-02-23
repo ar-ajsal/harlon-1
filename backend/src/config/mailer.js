@@ -1,21 +1,31 @@
 import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587', 10),
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER || '',
-    pass: process.env.SMTP_PASS || ''
+// Lazy transporter — created on first use so dotenv has already populated process.env
+let _transporter = null;
+function getTransporter() {
+  if (!_transporter) {
+    _transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: parseInt(process.env.SMTP_PORT || '587', 10),
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER || '',
+        pass: process.env.SMTP_PASS || ''
+      }
+    });
   }
-});
+  return _transporter;
+}
 
-const SITE_URL = process.env.SITE_URL || process.env.FRONTEND_URL || 'https://harlon.shop';
+function getSiteUrl() {
+  return process.env.SITE_URL || process.env.FRONTEND_URL || 'https://harlon.shop';
+}
 const BRAND = 'Harlon';
 
 function trackLink(order) {
-  if (order.trackToken) return `${SITE_URL}/track-order?token=${order.trackToken}`;
-  return `${SITE_URL}/track-order?orderId=${order.orderId}&email=${encodeURIComponent(order.customer?.email || '')}`;
+  const siteUrl = getSiteUrl();
+  if (order.trackToken) return `${siteUrl}/track-order?token=${order.trackToken}`;
+  return `${siteUrl}/track-order?orderId=${order.orderId}&email=${encodeURIComponent(order.customer?.email || '')}`;
 }
 
 function baseLayout(title, bodyHtml) {
@@ -153,7 +163,7 @@ export async function sendOrderEmail(type, order) {
   }
 
   try {
-    await transporter.sendMail({
+    await getTransporter().sendMail({
       from: `"${BRAND} Store" <${process.env.SMTP_USER}>`,
       to: order.customer?.email,
       subject,
@@ -166,4 +176,4 @@ export async function sendOrderEmail(type, order) {
   }
 }
 
-export default transporter;
+export default getTransporter;

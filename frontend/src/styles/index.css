@@ -132,6 +132,29 @@
     --border-radius-full: 9999px;
 }
 
+/* ===== Dark Mode ===== */
+[data-theme="dark"] {
+    --noir-100: hsl(240, 8%, 95%);
+    /* Light text on dark — headings */
+    --noir-80: hsl(240, 6%, 80%);
+    /* Body text */
+    --noir-60: hsl(240, 4%, 60%);
+    /* Secondary text */
+    --noir-40: hsl(240, 3%, 42%);
+    /* Muted text */
+    --noir-20: hsl(240, 3%, 25%);
+    /* Borders */
+    --noir-10: hsl(240, 4%, 16%);
+    /* Subtle backgrounds / inputs */
+    --white: hsl(240, 6%, 10%);
+    /* Page background (deep dark) */
+
+    --shadow-card: 0 2px 12px hsla(0, 0%, 0%, 0.3);
+    --shadow-hover: 0 8px 24px hsla(0, 0%, 0%, 0.4);
+    --shadow-elevated: 0 16px 48px hsla(0, 0%, 0%, 0.5);
+    --shadow-float: 0 24px 64px hsla(0, 0%, 0%, 0.6);
+}
+
 /* Mobile Type Scale Override */
 @media (max-width: 767px) {
     :root {
@@ -4447,6 +4470,10 @@ select.form-input {
 }
 
 @media (max-width: 480px) {
+    .related-products-slide {
+        flex: 0 0 180px;
+    }
+
     .delivery-timeline__icon {
         width: 30px;
         height: 30px;

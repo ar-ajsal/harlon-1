@@ -4,8 +4,31 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App.jsx'
 import { ProductProvider } from './context/ProductContext.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
+import { ThemeProvider } from './context/ThemeContext.jsx'
 import './styles/index.css'
 import './styles/coupon.css'
+
+async function bootstrap() {
+  if (import.meta.env.VITE_MSW === 'true') {
+    const { worker } = await import('./mocks/browser.js')
+    await worker.start({ onUnhandledRequest: 'bypass', quiet: true })
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    <React.StrictMode>
+      <ErrorBoundary>
+        <BrowserRouter>
+          <AuthProvider>
+            <ThemeProvider>
+              <ProductProvider>
+                <App />
+              </ProductProvider>
+            </ThemeProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </ErrorBoundary>
+    </React.StrictMode>,
+  )
+}
 
 class ErrorBoundary extends React.Component {
     constructor(props) {
@@ -34,16 +57,4 @@ class ErrorBoundary extends React.Component {
     }
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.StrictMode>
-        <ErrorBoundary>
-            <BrowserRouter>
-                <AuthProvider>
-                    <ProductProvider>
-                        <App />
-                    </ProductProvider>
-                </AuthProvider>
-            </BrowserRouter>
-        </ErrorBoundary>
-    </React.StrictMode>,
-)
+bootstrap()

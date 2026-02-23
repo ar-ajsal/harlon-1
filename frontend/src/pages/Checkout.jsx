@@ -7,6 +7,17 @@ import { createOrder } from '../api/guestOrder.api'
 
 const RAZORPAY_SCRIPT = 'https://checkout.razorpay.com/v1/checkout.js'
 
+/** Subtle CSS confetti burst (respects prefers-reduced-motion). */
+function ConfettiFallback() {
+  const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  if (reduced) return null
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
+      <div className="absolute inset-0 harlon-confetti" />
+    </div>
+  )
+}
+
 const INDIAN_STATES = [
     'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
     'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
@@ -173,84 +184,37 @@ function Checkout() {
 
     // ── Helpers for success screen ───────────────────────────────────────────
     const trackLink = success?.trackToken
-        ? `${window.location.origin}/track-order?token=${success.trackToken}`
+        ? `${window.location.origin}/t/${success.trackToken}`
         : success
             ? `${window.location.origin}/track-order?orderId=${success.orderId}&email=${encodeURIComponent(form.email)}`
             : ''
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(trackLink)
-            .then(() => toast.success('Tracking link copied!'))
-            .catch(() => toast.error('Copy failed — please copy manually'))
+            .then(() => toast.success('Copy tracking link'))
+            .catch(() => toast.error('Copy failed'))
     }
-
-    const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(`Track my Harlon order: ${trackLink}`)}`
 
     // ── Success screen ───────────────────────────────────────────────────────
     if (success) {
         return (
-            <div className="checkout-success">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.92, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ type: 'spring', stiffness: 280, damping: 24 }}
-                    className="success-card"
-                >
-                    {/* Icon + heading */}
-                    <div className="success-icon">🎉</div>
-                    <h2>Order Placed Successfully!</h2>
-                    <p style={{ color: '#6b7280', fontSize: '15px', maxWidth: '340px', margin: '0 auto 20px' }}>
-                        Your payment is being processed. We'll send a confirmation to <strong>{form.email}</strong>.
-                    </p>
-
-                    {/* Order ID */}
-                    <div className="success-order-id">
-                        Order ID: <strong>{success.orderId}</strong>
-                    </div>
-
-                    {/* Mini steps */}
-                    <div className="success-mini-timeline">
-                        {['Order Placed ✅', 'Payment Processing 💳', 'Being Prepared ⚙️'].map((step, i) => (
-                            <div key={i} className={`success-mini-step ${i === 0 ? 'done' : i === 1 ? 'active' : ''}`}>
-                                <div className="success-mini-dot" />
-                                <span>{step}</span>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Actions */}
-                    <div className="success-actions">
-                        <motion.button
-                            className="btn btn-primary"
-                            whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                            onClick={() => navigate(trackLink.replace(window.location.origin, ''))}
-                        >
-                            📦 Track My Order
-                        </motion.button>
-
-                        <div className="success-share-row">
-                            <button className="success-copy-btn" onClick={handleCopyLink} title="Copy tracking link">
-                                🔗 Copy Tracking Link
-                            </button>
-                            <a
-                                href={whatsappShareUrl}
-                                target="_blank" rel="noreferrer"
-                                className="success-wa-btn"
-                                title="Share via WhatsApp"
-                            >
-                                💬 Share via WhatsApp
-                            </a>
-                        </div>
-
-                        <button
-                            className="btn btn-secondary"
-                            style={{ width: '100%' }}
-                            onClick={() => navigate('/shop')}
-                        >
-                            Continue Shopping
-                        </button>
-                    </div>
-                </motion.div>
+            <div className="min-h-screen bg-off-white dark:bg-charcoal py-12 px-4">
+                <ConfettiFallback />
+                <div className="container max-w-lg mx-auto">
+                    <OrderSuccess
+                        order={{ orderId: success.orderId, trackToken: success.trackToken, productName: product?.name, product: product }}
+                        trackLink={trackLink}
+                        onCopyLink={handleCopyLink}
+                        whatsappNumber={WHATSAPP_NUMBER}
+                    />
+                    <motion.button
+                        type="button"
+                        className="w-full mt-4 btn btn-secondary min-h-[48px]"
+                        onClick={() => navigate('/shop')}
+                    >
+                        Continue Shopping
+                    </motion.button>
+                </div>
             </div>
         )
     }
@@ -315,6 +279,13 @@ function Checkout() {
                                     <span className="pay-method-sub">We'll confirm manually</span>
                                 </button>
                             </div>
+                            {paymentMethod === 'razorpay' && (
+                                <div className="flex items-center gap-2 mt-2 text-sm text-muted">
+                                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-100 dark:bg-white/10">
+                                        <span aria-hidden>🔒</span> Secure payment by Razorpay
+                                    </span>
+                                </div>
+                            )}
                             {paymentMethod === 'whatsapp' && (
                                 <div className="wa-notice-box">
                                     <strong>📲 How WhatsApp orders work</strong>

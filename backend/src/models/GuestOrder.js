@@ -13,15 +13,13 @@ const guestOrderSchema = new mongoose.Schema({
     orderId: {
         type: String,
         required: true,
-        unique: true,
-        index: true
+        unique: true
     },
 
     // Secure one-click tracking token (32 random bytes → 64 hex chars)
     trackToken: {
         type: String,
         unique: true,
-        index: true,
         default: () => crypto.randomBytes(32).toString('hex')
     },
 

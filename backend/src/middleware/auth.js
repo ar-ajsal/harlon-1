@@ -1,7 +1,5 @@
 import ApiError from '../utils/ApiError.js';
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
-
 export const authMiddleware = (req, res, next) => {
     const token = req.headers.authorization?.replace('Bearer ', '');
 
@@ -13,7 +11,9 @@ export const authMiddleware = (req, res, next) => {
 };
 
 export const loginAdmin = (password) => {
-    if (password === ADMIN_PASSWORD) {
+    // Read at call-time so dotenv has already populated process.env
+    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    if (password === adminPassword) {
         return { success: true, token: 'admin-authenticated' };
     }
     return { success: false };

@@ -8,7 +8,7 @@ const PRODUCTS_PER_PAGE = 12
 
 function Shop() {
     const [searchParams, setSearchParams] = useSearchParams()
-    const { products, categories, loading, pagination, loadingMore } = useProducts()
+    const { products, categories, loading, pagination, loadingMore, error } = useProducts()
     const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all')
     const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '')
     const [filteredProducts, setFilteredProducts] = useState([])
@@ -82,6 +82,16 @@ function Shop() {
         return (
             <div className="loading">
                 <div className="spinner"></div>
+            </div>
+        )
+    }
+
+    if (error) {
+        return (
+            <div style={{ textAlign: 'center', padding: '80px 20px' }}>
+                <h2 style={{ marginBottom: '12px', color: 'var(--noir-80)' }}>Cannot reach server</h2>
+                <p style={{ color: 'var(--noir-50)', marginBottom: '20px' }}>{error}</p>
+                <button className="btn btn-primary" onClick={() => window.location.reload()}>Retry</button>
             </div>
         )
     }

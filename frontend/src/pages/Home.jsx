@@ -30,7 +30,7 @@ const staggerContainer = {
 }
 
 function Home() {
-    const { products, categories, loading } = useProducts()
+    const { products, categories, loading, error } = useProducts()
 
     const visibleProducts = products.filter(p => p.isVisible !== false)
     const featuredProducts = visibleProducts.filter(p => p.featured).slice(0, 4)
@@ -39,6 +39,16 @@ function Home() {
         return (
             <div className="loading">
                 <div className="spinner"></div>
+            </div>
+        )
+    }
+
+    if (error) {
+        return (
+            <div style={{ textAlign: 'center', padding: '80px 20px' }}>
+                <h2 style={{ marginBottom: '12px', color: 'var(--noir-80)' }}>Cannot reach server</h2>
+                <p style={{ color: 'var(--noir-50)', marginBottom: '20px' }}>{error}</p>
+                <button className="btn btn-primary" onClick={() => window.location.reload()}>Retry</button>
             </div>
         )
     }

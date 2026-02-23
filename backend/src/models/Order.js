@@ -50,7 +50,4 @@ const orderSchema = new mongoose.Schema({
     notes: { type: String }
 }, { timestamps: true });
 
-// Ensure invoiceNumber is unique
-orderSchema.index({ invoiceNumber: 1 }, { unique: true });
-
 export default mongoose.model('Order', orderSchema);

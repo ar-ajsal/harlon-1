@@ -4,16 +4,6 @@ import asyncHandler from '../utils/asyncHandler.js';
 
 export const login = asyncHandler(async (req, res) => {
     const { password } = req.body;
-    console.log('Login attempt:', {
-        receivedPassword: password,
-        body: req.body,
-        contentType: req.headers['content-type']
-    });
-
-    // Check against both env and default for debugging
-    const adminPass = process.env.ADMIN_PASSWORD || 'admin123';
-    console.log('Expected:', adminPass);
-    console.log('Match?', password === adminPass);
 
     const result = loginAdmin(password);
 
