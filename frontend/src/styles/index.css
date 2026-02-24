@@ -5163,3 +5163,295 @@ select.form-input {
         min-width: 100px;
     }
 }
+
+/* ============================================================
+   PRODUCT DETAIL PAGE
+   ============================================================ */
+
+.product-detail {
+    padding: var(--space-8) 0 var(--space-16);
+    min-height: 60vh;
+}
+
+.product-not-found {
+    padding: var(--space-16) 0;
+    text-align: center;
+}
+
+/* Back button */
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--noir-20);
+    border-radius: var(--border-radius);
+    background: transparent;
+    color: var(--noir-80);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    cursor: pointer;
+    transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.back-button:hover {
+    background: var(--noir-10);
+    color: var(--noir-100);
+}
+
+/* Two-column grid */
+.pd-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+    margin-bottom: var(--space-12);
+    align-items: start;
+}
+
+/* Sticky sidebar */
+.pd-sidebar {
+    position: sticky;
+    top: 90px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+/* Countdown card */
+.pd-countdown-card {
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--noir-20);
+    border-radius: var(--border-radius);
+    background: var(--white);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+}
+
+.pd-muted {
+    color: var(--noir-60);
+}
+
+.pd-timer {
+    font-family: monospace;
+    font-weight: var(--weight-semibold);
+    color: var(--noir-100);
+}
+
+.pd-date {
+    font-weight: var(--weight-medium);
+    color: var(--noir-100);
+}
+
+/* Delivery timeline row */
+.pd-timeline-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--noir-60);
+    flex-wrap: wrap;
+}
+
+/* Coupon section */
+.coupon-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.coupon-label {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--noir-80);
+    margin-bottom: var(--space-2);
+}
+
+.pd-coupon-row {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.pd-coupon-input {
+    flex: 1;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--noir-20);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    background: var(--white);
+    color: var(--noir-100);
+    outline: none;
+    transition: border-color var(--duration-normal) var(--ease-smooth);
+}
+
+.pd-coupon-input:focus {
+    border-color: var(--noir-60);
+}
+
+.pd-coupon-success {
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--success);
+}
+
+/* Full-width button variant */
+.pd-full-width {
+    width: 100%;
+    min-height: 48px;
+}
+
+/* ── Description / Size Chart Tabs ── */
+.pd-tabs {
+    margin-top: var(--space-10);
+}
+
+.pd-tabs__nav {
+    display: flex;
+    border-bottom: 2px solid var(--noir-20);
+    margin-bottom: var(--space-6);
+    gap: var(--space-1);
+}
+
+.pd-tabs__btn {
+    padding: var(--space-3) var(--space-6);
+    border: none;
+    background: transparent;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    color: var(--noir-60);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.pd-tabs__btn:hover {
+    color: var(--noir-100);
+}
+
+.pd-tabs__btn.active {
+    color: var(--noir-100);
+    border-bottom-color: var(--noir-100);
+}
+
+.pd-tabs__content {
+    padding: var(--space-2) 0;
+}
+
+.pd-description {
+    font-size: var(--text-base);
+    color: var(--noir-80);
+    line-height: var(--leading-relaxed);
+    white-space: pre-line;
+}
+
+/* ── Size Chart ── */
+.size-chart-diagram {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-6);
+}
+
+.size-chart-tshirt {
+    width: 180px;
+    height: auto;
+}
+
+.size-chart-table-wrap {
+    overflow-x: auto;
+}
+
+.size-chart-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+}
+
+.size-chart-table th,
+.size-chart-table td {
+    padding: var(--space-3) var(--space-4);
+    text-align: center;
+    border: 1px solid var(--noir-20);
+}
+
+.size-chart-table th {
+    background: var(--noir-10);
+    font-weight: var(--weight-semibold);
+    color: var(--noir-100);
+}
+
+.size-chart-table td {
+    color: var(--noir-80);
+}
+
+.size-chart-note {
+    margin-top: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--noir-60);
+    font-style: italic;
+}
+
+/* ── Related Products Slider ── */
+.related-products {
+    margin-top: var(--space-12);
+}
+
+.related-products__title {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    color: var(--noir-100);
+    margin-bottom: var(--space-6);
+}
+
+.related-products-slider {
+    overflow: hidden;
+    width: 100%;
+}
+
+.related-products-track {
+    display: flex;
+    gap: var(--space-4);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: var(--space-2);
+}
+
+.related-products-track::-webkit-scrollbar {
+    display: none;
+}
+
+.related-products-slide {
+    flex: 0 0 240px;
+    scroll-snap-align: start;
+}
+
+/* ── Responsive ── */
+@media (max-width: 968px) {
+    .pd-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+    }
+
+    .pd-sidebar {
+        position: static;
+    }
+
+    .related-products-slide {
+        flex: 0 0 200px;
+    }
+}
+
+@media (max-width: 640px) {
+    .related-products-slide {
+        flex: 0 0 160px;
+    }
+
+    .pd-tabs__btn {
+        padding: var(--space-2) var(--space-4);
+        font-size: var(--text-xs);
+    }
+}

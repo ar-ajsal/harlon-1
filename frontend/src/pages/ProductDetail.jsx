@@ -205,7 +205,7 @@ function ProductDetail() {
                     <FaArrowLeft /> Back
                 </motion.button>
 
-                <div className="product-detail-grid grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                <div className="pd-grid">
                     {/* Image Gallery */}
                     <motion.div
                         initial={{ opacity: 0, y: 40 }}
@@ -221,7 +221,7 @@ function ProductDetail() {
                     </motion.div>
 
                     {/* Sticky Product Summary + extras */}
-                    <div className="lg:sticky lg:top-24 lg:self-start space-y-6">
+                    <div className="pd-sidebar">
                         <ProductSummary
                             product={product}
                             selectedSize={selectedSize}
@@ -236,15 +236,15 @@ function ProductDetail() {
                         />
 
                         {/* Delivery countdown */}
-                        <div className="rounded-card border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 text-sm">
-                            <span className="text-muted">Order within </span>
-                            <span className="font-mono font-semibold text-charcoal dark:text-off-white">{h}:{m}:{s}</span>
-                            <span className="text-muted"> for delivery between </span>
-                            <span className="font-medium text-charcoal dark:text-off-white">{dates.rangeLabel}</span>
+                        <div className="pd-countdown-card">
+                            <span className="pd-muted">Order within </span>
+                            <span className="pd-timer">{h}:{m}:{s}</span>
+                            <span className="pd-muted"> for delivery between </span>
+                            <span className="pd-date">{dates.rangeLabel}</span>
                         </div>
 
                         {/* Delivery timeline (compact) */}
-                        <div className="flex items-center gap-2 text-sm text-muted">
+                        <div className="pd-timeline-row">
                             <FaShoppingBag className="w-4 h-4 flex-shrink-0" />
                             <span>{dates.purchasedLabel}</span>
                             <span className="mx-1">→</span>
@@ -257,13 +257,13 @@ function ProductDetail() {
 
                         {/* Coupon */}
                         <div className="coupon-section">
-                            <label className="coupon-label block text-sm font-semibold text-charcoal dark:text-off-white mb-2">
+                            <label className="coupon-label">
                                 <FaTags className="inline mr-1" /> Have a Coupon Code?
                             </label>
-                            <div className="flex gap-2">
+                            <div className="pd-coupon-row">
                                 <input
                                     type="text"
-                                    className="form-input flex-1 rounded-card border border-slate-200 dark:border-white/20 px-3 py-2"
+                                    className="form-input pd-coupon-input"
                                     placeholder="e.g. FRIEND123"
                                     value={couponCode}
                                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
@@ -284,7 +284,7 @@ function ProductDetail() {
                                 <motion.p
                                     initial={{ opacity: 0, y: -4 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="mt-2 text-sm text-success font-medium"
+                                    className="pd-coupon-success"
                                 >
                                     ✓ {validatedCoupon.code} applied
                                     {validatedCoupon.discountValue > 0 && (
@@ -298,7 +298,7 @@ function ProductDetail() {
 
                         <motion.button
                             type="button"
-                            className="w-full btn btn-outline min-h-[48px]"
+                            className="btn btn-outline pd-full-width"
                             onClick={() => setShowInquiry(true)}
                             whileTap={{ scale: 0.98 }}
                         >
