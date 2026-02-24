@@ -108,6 +108,16 @@ function ProductDetail() {
         }
     }, [id, products])
 
+    // Reset UI state and scroll to top when navigating between products
+    useEffect(() => {
+        setSelectedImage(0)
+        setCouponCode('')
+        setValidatedCoupon(null)
+        setShowInquiry(false)
+        setActiveTab('description')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, [id])
+
     // Related products: same category, exclude current, limit 12
     const relatedProducts = useMemo(() => {
         if (!product || !products.length) return []
