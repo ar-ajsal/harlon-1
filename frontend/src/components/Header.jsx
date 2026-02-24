@@ -124,7 +124,7 @@ function Header() {
                     </NavLink>
                     <button
                         type="button"
-                        className="p-2 rounded-lg text-[var(--noir-80)] hover:bg-[var(--noir-10)] focus:outline-none focus-visible:ring-2 focus-visible:ring-success ml-2"
+                        className="theme-toggle-btn"
                         onClick={toggleTheme}
                         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
                     >

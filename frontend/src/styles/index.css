@@ -155,6 +155,62 @@
     --shadow-float: 0 24px 64px hsla(0, 0%, 0%, 0.6);
 }
 
+/* Dark mode footer — force it to stay dark since its text uses hardcoded rgba whites */
+[data-theme="dark"] .footer {
+    background: hsl(240, 8%, 7%);
+}
+
+[data-theme="dark"] .footer-section h3,
+[data-theme="dark"] .footer-section h4 {
+    color: hsl(0, 0%, 90%);
+}
+
+[data-theme="dark"] .footer-section p,
+[data-theme="dark"] .footer-links a,
+[data-theme="dark"] .footer-section a {
+    color: hsla(0, 0%, 90%, 0.65);
+}
+
+[data-theme="dark"] .footer-links a:hover,
+[data-theme="dark"] .footer-section a:hover {
+    color: hsl(0, 0%, 95%);
+}
+
+[data-theme="dark"] .footer-bottom {
+    color: hsla(0, 0%, 90%, 0.45);
+    border-color: hsla(0, 0%, 90%, 0.12);
+}
+
+[data-theme="dark"] .social-link {
+    background: hsla(0, 0%, 100%, 0.08);
+    color: hsl(0, 0%, 85%);
+}
+
+[data-theme="dark"] .social-link:hover {
+    background: hsla(0, 0%, 100%, 0.15);
+}
+
+/* ===== Theme Toggle Button ===== */
+.theme-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    margin-left: 8px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--noir-80);
+    cursor: pointer;
+    transition: background var(--duration-normal) var(--ease-smooth),
+        color var(--duration-normal) var(--ease-smooth);
+}
+
+.theme-toggle-btn:hover {
+    background: var(--noir-10);
+    color: var(--noir-100);
+}
+
 /* Mobile Type Scale Override */
 @media (max-width: 767px) {
     :root {
