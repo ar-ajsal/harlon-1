@@ -1,11 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag, FiFileText, FiTrendingUp, FiMenu, FiGift, FiBriefcase, FiEye, FiX, FiSearch } from 'react-icons/fi'
+import { FiShoppingBag, FiEye, FiX, FiSearch } from 'react-icons/fi'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'react-toastify'
-import { useAuth } from '../../context/AuthContext'
 import api from '../../api/axios'
-import AdminBottomNav from '../../components/AdminBottomNav'
+import AdminLayout from '../../components/AdminLayout'
 import '../../styles/admin-responsive.css'
 
 const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET || ''
@@ -330,8 +328,6 @@ function InfoRow({ label, value, mono }) {
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 function GuestOrders() {
-    const navigate = useNavigate()
-    const { logout } = useAuth()
     const [orders, setOrders] = useState([])
     const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(1)
@@ -339,10 +335,7 @@ function GuestOrders() {
     const [filter, setFilter] = useState({ status: '', paymentStatus: '', q: '' })
     const [searchInput, setSearchInput] = useState('')
     const [updating, setUpdating] = useState(false)
-    const [sidebarOpen, setSidebarOpen] = useState(false)
     const [detailOrder, setDetailOrder] = useState(null)
-
-    const handleLogout = () => { logout(); navigate('/admin') }
 
     const fetchOrders = useCallback(async () => {
         setLoading(true)
@@ -415,182 +408,149 @@ function GuestOrders() {
     }
 
     return (
-        <div className="admin-layout">
-            <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="Toggle Sidebar">
-                <FiMenu size={24} />
-            </button>
+        <AdminLayout
+            title="Guest Orders"
+            subtitle="Manage online guest orders"
+            headerRight={<span className="date-badge">{pagination.total || 0} total</span>}
+        >
 
-            <div className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`} onClick={() => setSidebarOpen(false)} />
-
-            <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
-                <div className="admin-logo">harlon</div>
-                <div className="sidebar-scroll">
-                    <nav className="admin-nav">
-                        <NavLink to="/admin/dashboard" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}><FiHome /> Dashboard</NavLink>
-                        <NavLink to="/admin/products" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}><FiPackage /> Products</NavLink>
-                        <NavLink to="/admin/categories" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}><FiLayers /> Categories</NavLink>
-                        <NavLink to="/admin/coupons" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}><FiGift /> Coupons</NavLink>
-                        <NavLink to="/admin/orders" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}><FiFileText /> Invoices</NavLink>
-                        <NavLink to="/admin/reports" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}><FiTrendingUp /> Reports</NavLink>
-                        <NavLink to="/admin/stock" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}><FiPackage /> Stock</NavLink>
-                        <NavLink to="/admin/guest-orders" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}><FiShoppingBag /> Guest Orders</NavLink>
-                        <NavLink to="/admin/guest-inquiries" className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`} onClick={() => setSidebarOpen(false)}><FiBriefcase /> Inquiries</NavLink>
-                        <div className="nav-divider" />
-                        <Link to="/" className="admin-nav-link" target="_blank"><FiShoppingBag /> View Store</Link>
-                        <button onClick={handleLogout} className="admin-nav-link logout-btn"><FiLogOut /> Logout</button>
-                    </nav>
-                </div>
-            </aside>
-
-            <main className="admin-content">
-                <header className="dashboard-header">
-                    <div>
-                        <h1 className="admin-title">Guest Orders</h1>
-                        <p className="admin-subtitle">Manage online guest orders</p>
-                    </div>
-                    <span className="date-badge">{pagination.total || 0} total</span>
-                </header>
-
-                {/* Filters + Search */}
-                <div className="orders-filters" style={{ marginBottom: '16px' }}>
-                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
-                        {/* Search */}
-                        <form onSubmit={handleSearch} style={{ display: 'flex', gap: '6px', flex: '1', minWidth: '200px' }}>
-                            <input
-                                className="form-input"
-                                placeholder="Search by Order ID, email, name…"
-                                value={searchInput}
-                                onChange={e => setSearchInput(e.target.value)}
-                                style={{ flex: 1 }}
-                            />
-                            <button type="submit" className="btn btn-secondary" style={{ padding: '0 12px' }}>
-                                <FiSearch size={16} />
-                            </button>
-                            {filter.q && (
-                                <button type="button" className="btn btn-secondary" style={{ padding: '0 10px' }}
-                                    onClick={() => { setSearchInput(''); setFilter(f => ({ ...f, q: '' })); setPage(1) }}>
-                                    <FiX size={14} />
-                                </button>
-                            )}
-                        </form>
-
-                        <select className="form-input" style={{ width: 'auto' }} value={filter.status}
-                            onChange={e => { setFilter(f => ({ ...f, status: e.target.value })); setPage(1) }}>
-                            <option value="">All Delivery</option>
-                            {DELIVERY_STATUSES.map(s => <option key={s} value={s}>{s.replace(/-/g, ' ')}</option>)}
-                        </select>
-
-                        <select className="form-input" style={{ width: 'auto' }} value={filter.paymentStatus}
-                            onChange={e => { setFilter(f => ({ ...f, paymentStatus: e.target.value })); setPage(1) }}>
-                            <option value="">All Payment</option>
-                            <option value="pending">Pending</option>
-                            <option value="paid">Paid</option>
-                            <option value="cod_pending">COD Pending</option>
-                            <option value="cod_confirmed">COD Confirmed</option>
-                            <option value="failed">Failed</option>
-                        </select>
-
-                        <button className="btn btn-secondary" onClick={fetchOrders} style={{ padding: '8px 16px' }}>
-                            🔄 Refresh
+            {/* Filters + Search */}
+            <div className="orders-filters" style={{ marginBottom: '16px' }}>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    {/* Search */}
+                    <form onSubmit={handleSearch} style={{ display: 'flex', gap: '6px', flex: '1', minWidth: '200px' }}>
+                        <input
+                            className="form-input"
+                            placeholder="Search by Order ID, email, name…"
+                            value={searchInput}
+                            onChange={e => setSearchInput(e.target.value)}
+                            style={{ flex: 1 }}
+                        />
+                        <button type="submit" className="btn btn-secondary" style={{ padding: '0 12px' }}>
+                            <FiSearch size={16} />
                         </button>
-                    </div>
+                        {filter.q && (
+                            <button type="button" className="btn btn-secondary" style={{ padding: '0 10px' }}
+                                onClick={() => { setSearchInput(''); setFilter(f => ({ ...f, q: '' })); setPage(1) }}>
+                                <FiX size={14} />
+                            </button>
+                        )}
+                    </form>
+
+                    <select className="form-input" style={{ width: 'auto' }} value={filter.status}
+                        onChange={e => { setFilter(f => ({ ...f, status: e.target.value })); setPage(1) }}>
+                        <option value="">All Delivery</option>
+                        {DELIVERY_STATUSES.map(s => <option key={s} value={s}>{s.replace(/-/g, ' ')}</option>)}
+                    </select>
+
+                    <select className="form-input" style={{ width: 'auto' }} value={filter.paymentStatus}
+                        onChange={e => { setFilter(f => ({ ...f, paymentStatus: e.target.value })); setPage(1) }}>
+                        <option value="">All Payment</option>
+                        <option value="pending">Pending</option>
+                        <option value="paid">Paid</option>
+                        <option value="cod_pending">COD Pending</option>
+                        <option value="cod_confirmed">COD Confirmed</option>
+                        <option value="failed">Failed</option>
+                    </select>
+
+                    <button className="btn btn-secondary" onClick={fetchOrders} style={{ padding: '8px 16px' }}>
+                        🔄 Refresh
+                    </button>
                 </div>
+            </div>
 
-                {loading ? (
-                    <div className="loading-state">Loading orders...</div>
-                ) : orders.length === 0 ? (
-                    <div className="empty-state">
-                        <FiShoppingBag className="empty-icon" />
-                        <h3>No orders found</h3>
-                        <p>Guest orders will appear here once customers place them.</p>
-                    </div>
-                ) : (
-                    <div className="orders-table-container table-responsive">
-                        <table className="orders-table">
-                            <thead>
-                                <tr>
-                                    <th>Order ID</th>
-                                    <th>Product</th>
-                                    <th>Size</th>
-                                    <th>Customer</th>
-                                    <th>Payment</th>
-                                    <th>Delivery</th>
-                                    <th>Date</th>
-                                    <th>Actions</th>
+            {loading ? (
+                <div className="loading-state">Loading orders...</div>
+            ) : orders.length === 0 ? (
+                <div className="empty-state">
+                    <FiShoppingBag className="empty-icon" />
+                    <h3>No orders found</h3>
+                    <p>Guest orders will appear here once customers place them.</p>
+                </div>
+            ) : (
+                <div className="orders-table-container table-responsive">
+                    <table className="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Product</th>
+                                <th>Size</th>
+                                <th>Customer</th>
+                                <th>Payment</th>
+                                <th>Delivery</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {orders.map(order => (
+                                <tr key={order._id}>
+                                    <td>
+                                        <code style={{ fontSize: '12px', background: '#f3f4f6', padding: '2px 6px', borderRadius: '4px' }}>
+                                            {order.orderId}
+                                        </code>
+                                    </td>
+                                    <td>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            {order.product?.image && (
+                                                <img src={order.product.image} alt="" style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '4px' }} />
+                                            )}
+                                            <span style={{ fontSize: '13px' }}>{order.product?.name}</span>
+                                        </div>
+                                    </td>
+                                    <td><strong>{order.product?.size}</strong></td>
+                                    <td>
+                                        <div style={{ fontSize: '13px' }}>
+                                            <div><strong>{customerName(order.customer)}</strong></div>
+                                            <div style={{ color: '#6b7280' }}>{order.customer?.email}</div>
+                                            <div style={{ color: '#6b7280' }}>{order.customer?.phone}</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                            <Badge value={order.payment?.payment_status} colors={PAYMENT_COLORS} />
+                                            <span style={{ fontSize: '11px', color: '#9ca3af' }}>{order.payment?.method}</span>
+                                        </div>
+                                    </td>
+                                    <td><Badge value={order.deliveryStatus} colors={DELIVERY_COLORS} /></td>
+                                    <td style={{ fontSize: '12px', color: '#6b7280' }}>
+                                        {new Date(order.createdAt).toLocaleDateString('en-IN')}
+                                    </td>
+                                    <td>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                            <motion.button
+                                                className="btn btn-secondary"
+                                                style={{ fontSize: '12px', padding: '4px 10px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                                onClick={() => setDetailOrder(order)}
+                                                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                                            >
+                                                <FiEye size={13} /> Manage
+                                            </motion.button>
+                                            <motion.button
+                                                className="btn btn-secondary"
+                                                style={{ fontSize: '12px', padding: '4px 10px', background: '#f0fdf4', color: '#166534', borderColor: '#bbf7d0' }}
+                                                onClick={() => handleWhatsAppNotify(order.orderId)}
+                                                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                                            >
+                                                💬 WA
+                                            </motion.button>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {orders.map(order => (
-                                    <tr key={order._id}>
-                                        <td>
-                                            <code style={{ fontSize: '12px', background: '#f3f4f6', padding: '2px 6px', borderRadius: '4px' }}>
-                                                {order.orderId}
-                                            </code>
-                                        </td>
-                                        <td>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                {order.product?.image && (
-                                                    <img src={order.product.image} alt="" style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '4px' }} />
-                                                )}
-                                                <span style={{ fontSize: '13px' }}>{order.product?.name}</span>
-                                            </div>
-                                        </td>
-                                        <td><strong>{order.product?.size}</strong></td>
-                                        <td>
-                                            <div style={{ fontSize: '13px' }}>
-                                                <div><strong>{customerName(order.customer)}</strong></div>
-                                                <div style={{ color: '#6b7280' }}>{order.customer?.email}</div>
-                                                <div style={{ color: '#6b7280' }}>{order.customer?.phone}</div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                <Badge value={order.payment?.payment_status} colors={PAYMENT_COLORS} />
-                                                <span style={{ fontSize: '11px', color: '#9ca3af' }}>{order.payment?.method}</span>
-                                            </div>
-                                        </td>
-                                        <td><Badge value={order.deliveryStatus} colors={DELIVERY_COLORS} /></td>
-                                        <td style={{ fontSize: '12px', color: '#6b7280' }}>
-                                            {new Date(order.createdAt).toLocaleDateString('en-IN')}
-                                        </td>
-                                        <td>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                                <motion.button
-                                                    className="btn btn-secondary"
-                                                    style={{ fontSize: '12px', padding: '4px 10px', display: 'flex', alignItems: 'center', gap: '4px' }}
-                                                    onClick={() => setDetailOrder(order)}
-                                                    whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                                                >
-                                                    <FiEye size={13} /> Manage
-                                                </motion.button>
-                                                <motion.button
-                                                    className="btn btn-secondary"
-                                                    style={{ fontSize: '12px', padding: '4px 10px', background: '#f0fdf4', color: '#166534', borderColor: '#bbf7d0' }}
-                                                    onClick={() => handleWhatsAppNotify(order.orderId)}
-                                                    whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                                                >
-                                                    💬 WA
-                                                </motion.button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
-                {/* Pagination */}
-                {pagination.pages > 1 && (
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '20px' }}>
-                        <button className="btn btn-secondary" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>← Prev</button>
-                        <span style={{ lineHeight: '38px', color: '#6b7280' }}>Page {page} of {pagination.pages}</span>
-                        <button className="btn btn-secondary" disabled={page >= pagination.pages} onClick={() => setPage(p => p + 1)}>Next →</button>
-                    </div>
-                )}
-            </main>
-
-            <AdminBottomNav />
+            {/* Pagination */}
+            {pagination.pages > 1 && (
+                <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '20px' }}>
+                    <button className="btn btn-secondary" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>← Prev</button>
+                    <span style={{ lineHeight: '38px', color: '#6b7280' }}>Page {page} of {pagination.pages}</span>
+                    <button className="btn btn-secondary" disabled={page >= pagination.pages} onClick={() => setPage(p => p + 1)}>Next →</button>
+                </div>
+            )}
 
             {/* Detail Modal */}
             {detailOrder && (
@@ -602,7 +562,7 @@ function GuestOrders() {
                     updating={updating}
                 />
             )}
-        </div>
+        </AdminLayout>
     )
 }
 

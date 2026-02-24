@@ -1,48 +1,160 @@
-/* Admin Bottom Navigation */
+/* ============================================================
+   HARLON ADMIN — BOTTOM NAV (Mobile)
+   ============================================================ */
+
 .admin-bottom-nav {
     display: none;
+    /* shown only on mobile via media query */
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    background: var(--white);
-    border-top: 1px solid var(--noir-20);
-    padding: var(--space-2) var(--space-4);
+    height: 64px;
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid #f0f0f0;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.07);
+    z-index: 500;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    align-items: stretch;
     justify-content: space-around;
-    align-items: center;
-    z-index: 1000;
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
-    height: 60px;
 }
 
-.admin-bottom-nav .nav-item {
+.nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    color: var(--noir-60);
+    gap: 3px;
+    flex: 1;
+    padding: 0;
+    color: #9ca3af;
     font-size: 10px;
-    font-weight: 500;
-    width: 60px;
-    padding: 4px 0;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.admin-bottom-nav .nav-item svg {
-    font-size: 20px;
-    margin-bottom: 2px;
-}
-
-.admin-bottom-nav .nav-item.active {
-    color: var(--noir-100);
-    background-color: var(--noir-10);
     font-weight: 600;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.12s ease;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 48px;
+    position: relative;
 }
 
-/* Mobile adjustments for nav */
-@media (max-width: 768px) {
+.nav-item:active {
+    transform: scale(0.9);
+}
+
+.nav-item.active {
+    color: #111827;
+}
+
+.nav-item.active .nav-item-icon::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 28px;
+    height: 3px;
+    background: #111827;
+    border-radius: 0 0 3px 3px;
+}
+
+.nav-item-icon {
+    position: relative;
+    font-size: 20px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-item-label {
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+/* ── More Drawer ──────────────────────────────────────────── */
+.admin-bn-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(2px);
+    z-index: 490;
+}
+
+.admin-bn-more-drawer {
+    position: fixed;
+    bottom: 64px;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-top: 1px solid #f0f0f0;
+    border-radius: 24px 24px 0 0;
+    padding: 12px 20px 20px;
+    z-index: 495;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.1);
+    animation: slideUpDrawer 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpDrawer {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.admin-bn-more-handle {
+    width: 36px;
+    height: 4px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    margin: 0 auto 16px;
+}
+
+.admin-bn-more-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.admin-bn-more-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    background: #f9fafb;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.admin-bn-more-item:active {
+    background: #f0f0f0;
+}
+
+.admin-bn-more-item.active {
+    background: #111827;
+    color: #fff;
+}
+
+/* ── Show on Mobile ─────────────────────────────────────── */
+@media (max-width: 968px) {
     .admin-bottom-nav {
         display: flex;
     }

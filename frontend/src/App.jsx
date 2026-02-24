@@ -1,34 +1,48 @@
-import { Suspense } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
 import { Routes, Route, useParams } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+
+// ── Always-loaded: layout shells only (tiny) ────────────────────────────────
 import Header from './components/Header'
 import Footer from './components/Footer'
 import MobileNav from './components/MobileNav'
-import Home from './pages/Home'
-import Shop from './pages/Shop'
-import ProductDetail from './pages/ProductDetail'
-import Checkout from './pages/Checkout'
-import TrackOrder from './pages/TrackOrder'
-import AdminLogin from './pages/admin/AdminLogin'
-import Dashboard from './pages/admin/Dashboard'
-import ProductsManager from './pages/admin/ProductsManager'
-import CategoriesManager from './pages/admin/CategoriesManager'
-import OrdersManager from './pages/admin/OrdersManager'
-import CreateOrder from './pages/admin/CreateOrder'
-import EditOrder from './pages/admin/EditOrder'
-import OrderDetail from './pages/admin/OrderDetail'
-import Reports from './pages/admin/Reports'
-import CouponsManager from './pages/admin/CouponsManager'
-import CouponDetails from './pages/admin/CouponDetails'
-import GuestOrders from './pages/admin/GuestOrders'
-import InquiriesManager from './pages/admin/InquiriesManager'
-import StockManager from './pages/admin/StockManager'
 import ProtectedRoute from './components/ProtectedRoute'
+
+// ── Customer pages — lazy (route-split) ─────────────────────────────────────
+const Home = lazy(() => import('./pages/Home'))
+const Shop = lazy(() => import('./pages/Shop'))
+const ProductDetail = lazy(() => import('./pages/ProductDetail'))
+const Checkout = lazy(() => import('./pages/Checkout'))
+const TrackOrder = lazy(() => import('./pages/TrackOrder'))
+
+// ── Admin pages — lazy, separate chunk group ─────────────────────────────────
+const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'))
+const Dashboard = lazy(() => import('./pages/admin/Dashboard'))
+const ProductsManager = lazy(() => import('./pages/admin/ProductsManager'))
+const CategoriesManager = lazy(() => import('./pages/admin/CategoriesManager'))
+const OrdersManager = lazy(() => import('./pages/admin/OrdersManager'))
+const CreateOrder = lazy(() => import('./pages/admin/CreateOrder'))
+const EditOrder = lazy(() => import('./pages/admin/EditOrder'))
+const OrderDetail = lazy(() => import('./pages/admin/OrderDetail'))
+const Reports = lazy(() => import('./pages/admin/Reports'))
+const CouponsManager = lazy(() => import('./pages/admin/CouponsManager'))
+const CouponDetails = lazy(() => import('./pages/admin/CouponDetails'))
+const GuestOrders = lazy(() => import('./pages/admin/GuestOrders'))
+const InquiriesManager = lazy(() => import('./pages/admin/InquiriesManager'))
+const StockManager = lazy(() => import('./pages/admin/StockManager'))
 
 function AdminFallback() {
     return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+            <div className="spinner" />
+        </div>
+    )
+}
+
+function CustomerFallback() {
+    return (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '40vh' }}>
             <div className="spinner" />
         </div>
     )
@@ -40,13 +54,28 @@ function ProductDetailPage() {
     return <ProductDetail key={id} />
 }
 
+// Warm up Render backend on app load (mitigates cold start delay)
+function useBackendWarmup() {
+    useEffect(() => {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+        fetch(`${apiUrl.replace('/api', '')}/health`, {
+            signal: AbortSignal.timeout(5000),
+        }).catch(() => { }) // silently ignore
+    }, [])
+}
 
 function App() {
+    useBackendWarmup()
+
     return (
         <div className="app">
             <Routes>
-                {/* Admin Routes */}
-                <Route path="/admin" element={<AdminLogin />} />
+                {/* ── Admin Routes ─────────────────────────────────────── */}
+                <Route path="/admin" element={
+                    <Suspense fallback={<AdminFallback />}>
+                        <AdminLogin />
+                    </Suspense>
+                } />
                 <Route path="/admin/dashboard" element={
                     <ProtectedRoute>
                         <Suspense fallback={<AdminFallback />}>
@@ -139,18 +168,30 @@ function App() {
                     </ProtectedRoute>
                 } />
 
-                {/* Customer Routes */}
+                {/* ── Customer Routes ───────────────────────────────────── */}
                 <Route path="/*" element={
                     <>
                         <Header />
                         <main className="main-content">
                             <Routes>
-                                <Route path="/" element={<Home />} />
-                                <Route path="/shop" element={<Shop />} />
-                                <Route path="/product/:id" element={<ProductDetailPage />} />
-                                <Route path="/checkout" element={<Checkout />} />
-                                <Route path="/track-order" element={<TrackOrder />} />
-                                <Route path="/t/:token" element={<TrackOrder />} />
+                                <Route path="/" element={
+                                    <Suspense fallback={<CustomerFallback />}><Home /></Suspense>
+                                } />
+                                <Route path="/shop" element={
+                                    <Suspense fallback={<CustomerFallback />}><Shop /></Suspense>
+                                } />
+                                <Route path="/product/:id" element={
+                                    <Suspense fallback={<CustomerFallback />}><ProductDetailPage /></Suspense>
+                                } />
+                                <Route path="/checkout" element={
+                                    <Suspense fallback={<CustomerFallback />}><Checkout /></Suspense>
+                                } />
+                                <Route path="/track-order" element={
+                                    <Suspense fallback={<CustomerFallback />}><TrackOrder /></Suspense>
+                                } />
+                                <Route path="/t/:token" element={
+                                    <Suspense fallback={<CustomerFallback />}><TrackOrder /></Suspense>
+                                } />
                             </Routes>
                         </main>
                         <Footer />
@@ -175,4 +216,3 @@ function App() {
 }
 
 export default App
-

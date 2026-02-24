@@ -11,6 +11,8 @@ import guestOrderRoutes from './guestOrder.routes.js';
 import paymentRoutes from './payment.routes.js';
 import inquiryRoutes from './inquiry.routes.js';
 import guestAdminRoutes from './guestAdmin.routes.js';
+// ── Monitoring ─────────────────────────────────────────────────────────────────
+import vitalsRoutes from './vitals.routes.js';
 
 const router = Router();
 
@@ -26,5 +28,8 @@ router.use('/guest-orders', guestOrderRoutes);
 router.use('/payment', paymentRoutes);
 router.use('/inquiries', inquiryRoutes);
 router.use('/guest-admin', guestAdminRoutes);
+// ── Monitoring ─────────────────────────────────────────────────────────────────
+router.use('/vitals', vitalsRoutes);
 
 export default router;
+

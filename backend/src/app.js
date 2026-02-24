@@ -1,9 +1,20 @@
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import routes from './routes/index.js';
 import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
+
+// Gzip compression — reduces API payloads 60-80%
+app.use(compression({
+  threshold: 1024, // only compress responses > 1KB
+  filter: (req, res) => {
+    if (req.headers['x-no-compression']) return false;
+    return compression.filter(req, res);
+  },
+}));
+
 
 // CORS - Allow your Vercel frontend and local development
 const corsOptions = {
@@ -29,11 +40,11 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Health check endpoint (useful for Render)
 app.get('/health', (req, res) => {
-    res.status(200).json({
-        status: 'ok',
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime()
-    });
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
 });
 
 // API Routes
@@ -41,7 +52,7 @@ app.use('/api', routes);
 
 // 404 handler
 app.use((req, res) => {
-    res.status(404).json({ success: false, message: 'Route not found' });
+  res.status(404).json({ success: false, message: 'Route not found' });
 });
 
 // Global Error Handler

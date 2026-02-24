@@ -1,6 +1,14 @@
-import { motion } from 'framer-motion'
+import { useRef, useCallback } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { FaWhatsapp } from 'react-icons/fa'
-import { FiShoppingCart } from 'react-icons/fi'
+import { FiShoppingBag, FiZap } from 'react-icons/fi'
+
+const TRUST_ITEMS = [
+    { icon: '🔒', label: 'Secure Payment' },
+    { icon: '🚚', label: 'Ships in 24h' },
+    { icon: '↩️', label: '7-Day Returns' },
+    { icon: '✅', label: '100% Authentic' },
+]
 
 function ProductSummary({
     product,
@@ -10,70 +18,94 @@ function ProductSummary({
     onWhatsApp,
     soldOut = false,
     deliveryEstimate = '',
+    onSizeGuideClick,
 }) {
     if (!product) return null
 
+    const prefersReduced = useReducedMotion()
+    const sizesRef = useRef(null)
+
     const discountedPrice = product.discountedPrice || product.price
     const hasDiscount = product.discountedPrice && product.discountedPrice < product.price
+    const discountPct = hasDiscount
+        ? Math.round(((product.price - discountedPrice) / product.price) * 100)
+        : 0
+
+    const handleBuyClick = useCallback(() => {
+        if (!selectedSize && product.sizes?.length > 0) {
+            // Shake the size selector
+            const el = sizesRef.current
+            if (el) {
+                el.classList.remove('shake')
+                void el.offsetWidth // reflow to restart animation
+                el.classList.add('shake')
+                setTimeout(() => el.classList.remove('shake'), 400)
+            }
+            return
+        }
+        onBuy?.()
+    }, [selectedSize, product.sizes, onBuy])
+
+    const tap = prefersReduced ? {} : { scale: 0.97 }
+    const hover = prefersReduced ? {} : { scale: 1.02 }
+
+    // Indian number format
+    const fmt = (n) => new Intl.NumberFormat('en-IN').format(n)
 
     return (
-        <div className="product-summary">
-            {/* Title */}
-            <h1 className="product-name" style={{ fontSize: '1.6rem', fontWeight: 700, lineHeight: 1.25, marginBottom: 8 }}>
-                {product.name}
-            </h1>
+        <div className="pd-sidebar-inner">
+            {/* Category label */}
+            <span className="pd-category">{product.category}</span>
+
+            {/* Product name */}
+            <h1 className="pd-name">{product.name}</h1>
 
             {/* Price row */}
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 16 }}>
-                <span style={{ fontSize: '1.5rem', fontWeight: 700, color: '#1a1a2e' }}>
-                    ₹{discountedPrice}
-                </span>
+            <div className="pd-price-row">
+                <span className="pd-price">₹{fmt(discountedPrice)}</span>
                 {hasDiscount && (
                     <>
-                        <span style={{ fontSize: '1rem', textDecoration: 'line-through', color: '#9ca3af' }}>
-                            ₹{product.price}
-                        </span>
-                        <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#16a34a', background: '#dcfce7', borderRadius: 4, padding: '1px 8px' }}>
-                            {Math.round(((product.price - discountedPrice) / product.price) * 100)}% OFF
-                        </span>
+                        <span className="pd-price-orig">₹{fmt(product.price)}</span>
+                        <span className="pd-price-off">{discountPct}% OFF</span>
                     </>
                 )}
             </div>
 
-            {/* Sold Out badge */}
+            {/* Sold-out badge */}
             {soldOut && (
-                <div style={{
-                    display: 'inline-flex', alignItems: 'center', gap: 6,
-                    background: '#fef2f2', color: '#991b1b', border: '1px solid #fecaca',
-                    borderRadius: 6, padding: '6px 14px', fontWeight: 600, fontSize: 14, marginBottom: 16
-                }}>
-                    ❌ Sold Out
+                <div className="pd-sold-badge">
+                    <span>❌</span> Sold Out — Check back soon
                 </div>
             )}
 
             {/* Size selector */}
             {product.sizes?.length > 0 && (
                 <div style={{ marginBottom: 20 }}>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: '#6b7280', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <p className="pd-size-label">
                         Size
-                        {selectedSize && <span style={{ marginLeft: 8, color: '#1a1a2e', textTransform: 'none', fontWeight: 700 }}>{selectedSize}</span>}
+                        {selectedSize && (
+                            <span className="pd-size-selected" style={{ marginLeft: 8 }}>
+                                — {selectedSize}
+                            </span>
+                        )}
+                        <button
+                            type="button"
+                            className="pd-size-guide-link"
+                            onClick={onSizeGuideClick}
+                            tabIndex={0}
+                        >
+                            Size Guide →
+                        </button>
                     </p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                    <div className="pd-sizes" ref={sizesRef}>
                         {product.sizes.map(size => (
                             <motion.button
                                 key={size}
                                 type="button"
-                                onClick={() => onSizeSelect?.(size)}
+                                className={`pd-size-btn${selectedSize === size ? ' active' : ''}`}
+                                onClick={() => !soldOut && onSizeSelect?.(size)}
                                 disabled={soldOut}
-                                whileTap={{ scale: 0.95 }}
-                                style={{
-                                    width: 48, height: 48, borderRadius: 8,
-                                    border: selectedSize === size ? '2px solid #1a1a2e' : '2px solid #e5e7eb',
-                                    background: selectedSize === size ? '#1a1a2e' : '#fff',
-                                    color: selectedSize === size ? '#fff' : '#374151',
-                                    fontWeight: 600, fontSize: 14, cursor: soldOut ? 'not-allowed' : 'pointer',
-                                    opacity: soldOut ? 0.5 : 1, transition: 'all 0.15s'
-                                }}
+                                whileTap={soldOut ? {} : tap}
                                 aria-pressed={selectedSize === size}
                                 aria-label={`Size ${size}`}
                             >
@@ -84,41 +116,56 @@ function ProductSummary({
                 </div>
             )}
 
-            {/* CTA buttons */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {/* CTA block */}
+            <div className="pd-cta-block">
                 <motion.button
                     type="button"
-                    className="btn btn-primary"
-                    onClick={onBuy}
+                    className="pd-btn-buy"
+                    onClick={handleBuyClick}
                     disabled={soldOut}
-                    whileHover={soldOut ? {} : { scale: 1.02 }}
-                    whileTap={soldOut ? {} : { scale: 0.98 }}
-                    style={{ minHeight: 52, fontSize: 16, fontWeight: 700, opacity: soldOut ? 0.5 : 1, cursor: soldOut ? 'not-allowed' : 'pointer' }}
+                    whileHover={soldOut ? {} : hover}
+                    whileTap={soldOut ? {} : tap}
                     aria-label="Buy now"
                 >
-                    <FiShoppingCart style={{ marginRight: 8 }} />
-                    {soldOut ? 'Sold Out' : 'Buy Now'}
+                    <FiShoppingBag style={{ fontSize: 18 }} />
+                    {soldOut ? 'Sold Out' : `Buy Now — ₹${fmt(discountedPrice)}`}
                 </motion.button>
 
                 <motion.button
                     type="button"
-                    className="btn btn-whatsapp"
+                    className="pd-btn-wa"
                     onClick={onWhatsApp}
                     disabled={soldOut}
-                    whileHover={soldOut ? {} : { scale: 1.02 }}
-                    whileTap={soldOut ? {} : { scale: 0.98 }}
-                    style={{ minHeight: 52, fontSize: 15, fontWeight: 600, opacity: soldOut ? 0.5 : 1, cursor: soldOut ? 'not-allowed' : 'pointer' }}
+                    whileHover={soldOut ? {} : hover}
+                    whileTap={soldOut ? {} : tap}
                     aria-label="Order on WhatsApp"
                 >
-                    <FaWhatsapp style={{ marginRight: 8, fontSize: 18 }} />
-                    {soldOut ? 'Sold Out' : 'WhatsApp Order'}
+                    <FaWhatsapp style={{ fontSize: 20 }} />
+                    {soldOut ? 'Sold Out' : 'Order via WhatsApp'}
                 </motion.button>
+
+                {soldOut && (
+                    <button type="button" className="pd-btn-waitlist">
+                        <FiZap style={{ fontSize: 14 }} />
+                        Notify me when back
+                    </button>
+                )}
+            </div>
+
+            {/* Trust grid */}
+            <div className="pd-trust-grid">
+                {TRUST_ITEMS.map(({ icon, label }) => (
+                    <div key={label} className="pd-trust-item">
+                        <span className="pd-trust-icon" aria-hidden>{icon}</span>
+                        <span>{label}</span>
+                    </div>
+                ))}
             </div>
 
             {/* Delivery estimate */}
             {deliveryEstimate && (
-                <p style={{ marginTop: 12, fontSize: 13, color: '#6b7280' }}>
-                    🚚 Estimated delivery: <strong style={{ color: '#374151' }}>{deliveryEstimate}</strong>
+                <p style={{ fontSize: 12, color: '#888', fontFamily: 'Inter, sans-serif', marginBottom: 4 }}>
+                    🚚 {deliveryEstimate}
                 </p>
             )}
         </div>

@@ -70,7 +70,19 @@ const productSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Text search index
+// ─── Indexes ─────────────────────────────────────────────────────────────────
+// Text search: name + description
 productSchema.index({ name: 'text', description: 'text' });
+
+// Shop listing — most common query: visible products sorted by priority
+productSchema.index({ isVisible: 1, priority: -1 });
+
+// Category filter in shop
+productSchema.index({ isVisible: 1, category: 1, priority: -1 });
+
+// Homepage featured / best-seller rails
+productSchema.index({ featured: 1, isVisible: 1 });
+productSchema.index({ bestSeller: 1, isVisible: 1 });
+
 
 export default mongoose.model('Product', productSchema);

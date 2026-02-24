@@ -1,22 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { toast } from 'react-toastify'
+import { FaWhatsapp } from 'react-icons/fa'
+import { FiChevronDown, FiChevronUp } from 'react-icons/fi'
 import { useProducts } from '../context/ProductContext'
 import { createOrder } from '../api/guestOrder.api'
+import { WHATSAPP_NUMBER } from '../config/constants'
+import OrderSuccess from '../components/order/OrderSuccess'
+import '../styles/checkout.css'
 
 const RAZORPAY_SCRIPT = 'https://checkout.razorpay.com/v1/checkout.js'
-
-/** Subtle CSS confetti burst (respects prefers-reduced-motion). */
-function ConfettiFallback() {
-  const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (reduced) return null
-  return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
-      <div className="absolute inset-0 harlon-confetti" />
-    </div>
-  )
-}
 
 const INDIAN_STATES = [
     'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
@@ -25,7 +19,7 @@ const INDIAN_STATES = [
     'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana',
     'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
     'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu',
-    'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry'
+    'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry',
 ]
 
 function loadRazorpayScript() {
@@ -40,18 +34,53 @@ function loadRazorpayScript() {
     })
 }
 
+// ── Inline validation helpers ─────────────────────────────────────────────
+const VALIDATORS = {
+    fullName: v => v.trim().length >= 2 ? null : 'Enter your full name',
+    phone: v => /^\d{10}$/.test(v.replace(/\s/g, '')) ? null : 'Enter 10-digit phone number',
+    email: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? null : 'Enter a valid email',
+    streetAddress: v => v.trim().length >= 5 ? null : 'Enter your street address',
+    city: v => v.trim().length >= 2 ? null : 'Enter city / town',
+    pinCode: v => /^\d{6}$/.test(v) ? null : '6-digit PIN code required',
+    state: v => v.trim().length > 0 ? null : 'Select a state',
+}
+
+function Field({ label, error, touched, valid, optional, children }) {
+    return (
+        <div className="co-field">
+            {label && (
+                <label className="co-label">
+                    {label}{optional && <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, color: '#bbb' }}> (optional)</span>}
+                </label>
+            )}
+            {children}
+            {touched && error && (
+                <div className="co-field-error">
+                    <span>✗</span> {error}
+                </div>
+            )}
+            {touched && !error && valid && (
+                <div className="co-validation-icon" aria-hidden>✅</div>
+            )}
+        </div>
+    )
+}
+
 function Checkout() {
     const [searchParams] = useSearchParams()
     const navigate = useNavigate()
     const { products } = useProducts()
+    const prefersReduced = useReducedMotion()
 
     const productId = searchParams.get('productId')
     const prefilledSize = searchParams.get('size') || ''
 
     const [product, setProduct] = useState(null)
+    const [summaryOpen, setSummaryOpen] = useState(false)
+    const [showNotes, setShowNotes] = useState(false)
+
     const [form, setForm] = useState({
-        firstName: '', lastName: '',
-        company: '',
+        fullName: '',
         country: 'India',
         streetAddress: '', apartment: '',
         city: '', state: 'Delhi', pinCode: '',
@@ -59,10 +88,15 @@ function Checkout() {
         orderNotes: '',
         size: prefilledSize,
     })
+
+    const [touched, setTouched] = useState({})
+    const [fieldErrors, setFieldErrors] = useState({})
+
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState(null)
     const [paymentMethod, setPaymentMethod] = useState('razorpay')
 
+    // ── Load product ────────────────────────────────────────────────────────
     useEffect(() => {
         if (products.length > 0 && productId) {
             const found = products.find(p => p._id === productId)
@@ -73,39 +107,60 @@ function Checkout() {
         }
     }, [products, productId, prefilledSize])
 
-    const handleChange = (e) => {
-        setForm(f => ({ ...f, [e.target.name]: e.target.value }))
-    }
+    // ── Form handlers ────────────────────────────────────────────────────────
+    const handleChange = useCallback((e) => {
+        const { name, value } = e.target
+        setForm(f => ({ ...f, [name]: value }))
+        // Live validate on change once touched
+        if (touched[name] && VALIDATORS[name]) {
+            setFieldErrors(fe => ({ ...fe, [name]: VALIDATORS[name](value) }))
+        }
+    }, [touched])
 
-    const validateForm = () => {
-        if (!form.firstName.trim()) { toast.error('First name is required'); return false }
-        if (!form.lastName.trim()) { toast.error('Last name is required'); return false }
-        if (!form.streetAddress.trim()) { toast.error('Street address is required'); return false }
-        if (!form.city.trim()) { toast.error('Town / City is required'); return false }
-        if (!form.state.trim()) { toast.error('State is required'); return false }
-        if (!form.pinCode.trim()) { toast.error('PIN Code is required'); return false }
-        if (!/^\d{6}$/.test(form.pinCode)) { toast.error('PIN Code must be 6 digits'); return false }
-        if (!form.phone.trim()) { toast.error('Phone is required'); return false }
-        if (!form.email.trim()) { toast.error('Email is required'); return false }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) { toast.error('Invalid email'); return false }
+    const handleBlur = useCallback((e) => {
+        const { name, value } = e.target
+        setTouched(t => ({ ...t, [name]: true }))
+        if (VALIDATORS[name]) {
+            setFieldErrors(fe => ({ ...fe, [name]: VALIDATORS[name](value) }))
+        }
+    }, [])
+
+    // ── Validation ───────────────────────────────────────────────────────────
+    const validateAll = useCallback(() => {
+        const fields = ['fullName', 'phone', 'email', 'streetAddress', 'city', 'pinCode', 'state']
+        const errors = {}
+        const newTouched = {}
+        fields.forEach(f => {
+            newTouched[f] = true
+            errors[f] = VALIDATORS[f]?.(form[f]) || null
+        })
+        setTouched(t => ({ ...t, ...newTouched }))
+        setFieldErrors(errors)
+
         if (!form.size) { toast.error('Please select a size'); return false }
-        return true
-    }
 
+        const firstErr = Object.values(errors).find(Boolean)
+        if (firstErr) { toast.error(firstErr); return false }
+        return true
+    }, [form])
+
+    // ── Submit ───────────────────────────────────────────────────────────────
     const handleSubmit = async (e) => {
         e.preventDefault()
-        if (!validateForm()) return
+        if (!validateAll()) return
 
         setLoading(true)
         try {
+            const [firstName, ...rest] = form.fullName.trim().split(' ')
+            const lastName = rest.join(' ') || firstName
+
             const response = await createOrder({
                 productId,
                 size: form.size,
                 paymentMethod,
                 customer: {
-                    firstName: form.firstName,
-                    lastName: form.lastName,
-                    company: form.company,
+                    firstName, lastName,
+                    company: '',
                     country: form.country,
                     streetAddress: form.streetAddress,
                     apartment: form.apartment,
@@ -115,20 +170,15 @@ function Checkout() {
                     phone: form.phone,
                     email: form.email,
                     orderNotes: form.orderNotes,
-                }
+                },
             })
 
             if (paymentMethod === 'whatsapp') {
-                // WhatsApp order — show success immediately and offer WA redirect
-                setSuccess({
-                    orderId: response.orderId,
-                    trackToken: response.trackToken,
-                    isWhatsapp: true
-                })
+                setSuccess({ orderId: response.orderId, trackToken: response.trackToken, isWhatsapp: true })
                 return
             }
 
-            if (!response || !response.razorpayOrderId || !response.keyId) {
+            if (!response?.razorpayOrderId || !response?.keyId) {
                 toast.error('Payment gateway error. Please try again.')
                 return
             }
@@ -143,10 +193,7 @@ function Checkout() {
 
     const handleRazorpay = async (data) => {
         const loaded = await loadRazorpayScript()
-        if (!loaded) {
-            toast.error('Failed to load payment gateway. Please try again.')
-            return
-        }
+        if (!loaded) { toast.error('Failed to load payment gateway. Please try again.'); return }
 
         return new Promise((resolve) => {
             const options = {
@@ -156,22 +203,10 @@ function Checkout() {
                 name: 'Harlon Jersey Store',
                 description: product?.name || 'Jersey Order',
                 order_id: data.razorpayOrderId,
-                prefill: {
-                    name: `${form.firstName} ${form.lastName}`,
-                    email: form.email,
-                    contact: form.phone
-                },
-                theme: { color: '#1a1a2e' },
-                handler: () => {
-                    setSuccess({ orderId: data.orderId, trackToken: data.trackToken })
-                    resolve()
-                },
-                modal: {
-                    ondismiss: () => {
-                        toast.info('Payment cancelled. Your order is saved.')
-                        resolve()
-                    }
-                }
+                prefill: { name: form.fullName, email: form.email, contact: form.phone },
+                theme: { color: '#C8962B' }, // gold
+                handler: () => { setSuccess({ orderId: data.orderId, trackToken: data.trackToken }); resolve() },
+                modal: { ondismiss: () => { toast.info('Payment cancelled. Your order is saved.'); resolve() } },
             }
             const rzp = new window.Razorpay(options)
             rzp.on('payment.failed', (resp) => {
@@ -182,7 +217,7 @@ function Checkout() {
         })
     }
 
-    // ── Helpers for success screen ───────────────────────────────────────────
+    // ── Track link ───────────────────────────────────────────────────────────
     const trackLink = success?.trackToken
         ? `${window.location.origin}/t/${success.trackToken}`
         : success
@@ -191,273 +226,408 @@ function Checkout() {
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(trackLink)
-            .then(() => toast.success('Copy tracking link'))
+            .then(() => toast.success('Tracking link copied!'))
             .catch(() => toast.error('Copy failed'))
     }
 
-    // ── Success screen ───────────────────────────────────────────────────────
+    // ── Indian price format ──────────────────────────────────────────────────
+    const fmt = (n) => new Intl.NumberFormat('en-IN').format(n)
+
+    // ── Success ──────────────────────────────────────────────────────────────
     if (success) {
         return (
-            <div className="min-h-screen bg-off-white dark:bg-charcoal py-12 px-4">
-                <ConfettiFallback />
-                <div className="container max-w-lg mx-auto">
-                    <OrderSuccess
-                        order={{ orderId: success.orderId, trackToken: success.trackToken, productName: product?.name, product: product }}
-                        trackLink={trackLink}
-                        onCopyLink={handleCopyLink}
-                        whatsappNumber={WHATSAPP_NUMBER}
-                    />
-                    <motion.button
-                        type="button"
-                        className="w-full mt-4 btn btn-secondary min-h-[48px]"
-                        onClick={() => navigate('/shop')}
-                    >
-                        Continue Shopping
-                    </motion.button>
-                </div>
-            </div>
+            <OrderSuccess
+                order={{ ...success, productName: product?.name, product }}
+                trackLink={trackLink}
+                onCopyLink={handleCopyLink}
+                whatsappNumber={WHATSAPP_NUMBER}
+            />
         )
     }
 
+    // ── Not found ─────────────────────────────────────────────────────────────
     if (!product) {
         return (
-            <div className="checkout-error">
-                <div className="container">
-                    <h2>Product not found</h2>
-                    <button className="btn btn-primary" onClick={() => navigate('/shop')}>Go to Shop</button>
+            <div className="co-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ textAlign: 'center', padding: 32 }}>
+                    <div style={{ fontSize: 48, marginBottom: 12 }}>🛒</div>
+                    <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, marginBottom: 12, fontSize: 24 }}>
+                        No product selected
+                    </h2>
+                    <button className="co-submit" style={{ width: 'auto', padding: '14px 32px', display: 'inline-flex' }} onClick={() => navigate('/shop')}>
+                        Go to Shop
+                    </button>
                 </div>
             </div>
         )
     }
 
+    const price = product.discountedPrice || product.price
+    const submitLabel = loading
+        ? 'Processing…'
+        : paymentMethod === 'whatsapp'
+            ? '💬 Place WhatsApp Order'
+            : `🔒 Pay Securely — ₹${fmt(price)}`
+
+    const tap = prefersReduced ? {} : { scale: 0.97 }
+    const hover = prefersReduced ? {} : { scale: 1.01 }
+
     return (
-        <div className="checkout-page">
-            <div className="container">
-                <motion.h1
-                    initial={{ opacity: 0, y: -20 }}
+        <div className="co-page">
+            <div className="co-container">
+                {/* ── Header ── */}
+                <motion.div
+                    className="co-header"
+                    initial={prefersReduced ? {} : { opacity: 0, y: -12 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="checkout-title"
+                    transition={{ duration: 0.35 }}
                 >
-                    Checkout
-                </motion.h1>
+                    <span className="co-eyebrow">Harlon Jerseys</span>
+                    <h1 className="co-title">Checkout</h1>
+                </motion.div>
 
-                <div className="checkout-grid">
+                {/* ── Collapsible summary (mobile only) ── */}
+                <div className="co-summary-toggle" onClick={() => setSummaryOpen(o => !o)}>
+                    {product.images?.[0] && (
+                        <img src={product.images[0]} alt={product.name} className="co-summary-toggle-img" />
+                    )}
+                    <span className="co-summary-toggle-label">
+                        {summaryOpen ? 'Hide' : 'Show'} order summary
+                        {summaryOpen ? <FiChevronUp /> : <FiChevronDown />}
+                    </span>
+                    <span className="co-summary-toggle-price">₹{fmt(price)}</span>
+                </div>
 
-                    {/* ── Billing Form ── */}
+                <AnimatePresence>
+                    {summaryOpen && (
+                        <motion.div
+                            initial={prefersReduced ? {} : { height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={prefersReduced ? {} : { height: 0, opacity: 0 }}
+                            transition={{ duration: 0.22 }}
+                            style={{ overflow: 'hidden', marginBottom: 12 }}
+                        >
+                            <SummaryPanel product={product} form={form} setForm={setForm} fmt={fmt} prefersReduced={prefersReduced} />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* ── Main grid ── */}
+                <div className="co-grid">
+                    {/* ── Form ── */}
                     <motion.form
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="checkout-form"
+                        className="co-card"
                         onSubmit={handleSubmit}
+                        noValidate
+                        initial={prefersReduced ? {} : { opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.38, delay: 0.05 }}
                     >
-                        <h3 style={{ marginBottom: '1rem' }}>Billing Details</h3>
+                        <h2 className="co-card-title">Billing Details</h2>
 
-                        {/* ── Payment Method Selector ─────────────────── */}
-                        <div style={{ marginBottom: '20px' }}>
-                            <label style={{ fontSize: 13, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10, display: 'block' }}>
-                                How would you like to pay?
-                            </label>
-                            <div className="checkout-pay-method">
-                                <button
-                                    type="button"
-                                    className={`pay-method-btn ${paymentMethod === 'razorpay' ? 'selected' : ''}`}
-                                    onClick={() => setPaymentMethod('razorpay')}
-                                    aria-pressed={paymentMethod === 'razorpay'}
-                                >
-                                    <span className="pay-method-icon">💳</span>
-                                    <span className="pay-method-label">Pay Online</span>
-                                    <span className="pay-method-sub">Razorpay · UPI · Cards</span>
-                                </button>
-                                <button
-                                    type="button"
-                                    className={`pay-method-btn wa ${paymentMethod === 'whatsapp' ? 'selected' : ''}`}
-                                    onClick={() => setPaymentMethod('whatsapp')}
-                                    aria-pressed={paymentMethod === 'whatsapp'}
-                                >
-                                    <span className="pay-method-icon">💬</span>
-                                    <span className="pay-method-label">WhatsApp Order</span>
-                                    <span className="pay-method-sub">We'll confirm manually</span>
-                                </button>
-                            </div>
+                        {/* ── Payment method (FIRST) ── */}
+                        <p className="co-section-label">Payment Method</p>
+                        <div className="co-pay-grid">
+                            <button
+                                type="button"
+                                className={`co-pay-card${paymentMethod === 'razorpay' ? ' selected' : ''}`}
+                                onClick={() => setPaymentMethod('razorpay')}
+                                aria-pressed={paymentMethod === 'razorpay'}
+                            >
+                                <span className="co-pay-icon">💳</span>
+                                <span className="co-pay-label">Pay Online</span>
+                                <span className="co-pay-sub">UPI · Cards · Netbanking</span>
+                                <span className="co-pay-badge">⚡ Recommended</span>
+                            </button>
+                            <button
+                                type="button"
+                                className={`co-pay-card${paymentMethod === 'whatsapp' ? ' selected' : ''}`}
+                                onClick={() => setPaymentMethod('whatsapp')}
+                                aria-pressed={paymentMethod === 'whatsapp'}
+                            >
+                                <span className="co-pay-icon"><FaWhatsapp style={{ color: '#25D366' }} /></span>
+                                <span className="co-pay-label">WhatsApp</span>
+                                <span className="co-pay-sub">Confirm manually</span>
+                            </button>
+                        </div>
+
+                        <AnimatePresence mode="wait">
                             {paymentMethod === 'razorpay' && (
-                                <div className="flex items-center gap-2 mt-2 text-sm text-muted">
-                                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-100 dark:bg-white/10">
-                                        <span aria-hidden>🔒</span> Secure payment by Razorpay
-                                    </span>
-                                </div>
+                                <motion.div
+                                    key="rp-notice"
+                                    initial={prefersReduced ? {} : { opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    style={{ overflow: 'hidden', marginBottom: 16 }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#666', fontFamily: 'Inter, sans-serif' }}>
+                                        🔒 <span>100% secure payment powered by <strong>Razorpay</strong></span>
+                                    </div>
+                                </motion.div>
                             )}
                             {paymentMethod === 'whatsapp' && (
-                                <div className="wa-notice-box">
-                                    <strong>📲 How WhatsApp orders work</strong>
-                                    Place your order here and our team will contact you on WhatsApp to confirm availability and arrange payment.
-                                </div>
+                                <motion.div
+                                    key="wa-notice"
+                                    className="co-wa-notice"
+                                    initial={prefersReduced ? {} : { opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    style={{ overflow: 'hidden', marginBottom: 16 }}
+                                >
+                                    📲 <strong>WhatsApp orders:</strong> Fill your address below, place the order, and our team will WhatsApp you to confirm availability and arrange COD/UPI payment.
+                                </motion.div>
                             )}
-                        </div>
+                        </AnimatePresence>
 
-                        {/* First / Last name */}
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label>First Name *</label>
+                        {/* ── Contact ── */}
+                        <p className="co-section-label">Contact</p>
+
+                        <div className="co-row">
+                            <Field
+                                label="Full Name *"
+                                error={fieldErrors.fullName}
+                                touched={touched.fullName}
+                                valid={!fieldErrors.fullName}
+                            >
                                 <input
-                                    type="text" name="firstName" value={form.firstName}
-                                    onChange={handleChange} placeholder="First name"
-                                    required className="form-input"
+                                    className={`co-input${touched.fullName ? (fieldErrors.fullName ? ' invalid' : ' valid') : ''}`}
+                                    type="text" name="fullName" value={form.fullName}
+                                    onChange={handleChange} onBlur={handleBlur}
+                                    placeholder="First Last" autoComplete="name"
                                 />
-                            </div>
-                            <div className="form-group">
-                                <label>Last Name *</label>
-                                <input
-                                    type="text" name="lastName" value={form.lastName}
-                                    onChange={handleChange} placeholder="Last name"
-                                    required className="form-input"
-                                />
-                            </div>
+                            </Field>
+
+                            <Field
+                                label="Phone *"
+                                error={fieldErrors.phone}
+                                touched={touched.phone}
+                                valid={!fieldErrors.phone}
+                            >
+                                <div className="co-phone-wrap">
+                                    <span className="co-phone-prefix">+91</span>
+                                    <input
+                                        className={`co-input co-input--phone${touched.phone ? (fieldErrors.phone ? ' invalid' : ' valid') : ''}`}
+                                        type="tel" name="phone" value={form.phone}
+                                        onChange={handleChange} onBlur={handleBlur}
+                                        placeholder="98765 43210"
+                                        inputMode="tel" autoComplete="tel"
+                                        maxLength={11}
+                                    />
+                                </div>
+                            </Field>
                         </div>
 
-                        <div className="form-group">
-                            <label>Company Name <span className="optional">(optional)</span></label>
+                        <Field
+                            label="Email *"
+                            error={fieldErrors.email}
+                            touched={touched.email}
+                            valid={!fieldErrors.email}
+                        >
                             <input
-                                type="text" name="company" value={form.company}
-                                onChange={handleChange} placeholder="Company name"
-                                className="form-input"
+                                className={`co-input${touched.email ? (fieldErrors.email ? ' invalid' : ' valid') : ''}`}
+                                type="email" name="email" value={form.email}
+                                onChange={handleChange} onBlur={handleBlur}
+                                placeholder="you@example.com" autoComplete="email"
                             />
-                        </div>
+                        </Field>
 
-                        <div className="form-group">
-                            <label>Country / Region *</label>
-                            <input
-                                type="text" name="country" value={form.country}
-                                className="form-input" readOnly
-                            />
-                        </div>
+                        {/* ── Address ── */}
+                        <p className="co-section-label" style={{ marginTop: 8 }}>Delivery Address</p>
 
-                        <div className="form-group">
-                            <label>Street Address *</label>
+                        <Field
+                            label="Street Address *"
+                            error={fieldErrors.streetAddress}
+                            touched={touched.streetAddress}
+                            valid={!fieldErrors.streetAddress}
+                        >
                             <input
+                                className={`co-input${touched.streetAddress ? (fieldErrors.streetAddress ? ' invalid' : ' valid') : ''}`}
                                 type="text" name="streetAddress" value={form.streetAddress}
-                                onChange={handleChange} placeholder="House number and street name"
-                                required className="form-input"
+                                onChange={handleChange} onBlur={handleBlur}
+                                placeholder="House number and street name"
+                                autoComplete="street-address"
                             />
+                        </Field>
+
+                        <Field label="Apartment / Flat / Landmark" optional>
                             <input
+                                className="co-input"
                                 type="text" name="apartment" value={form.apartment}
                                 onChange={handleChange}
-                                placeholder="Apartment, suite, unit, etc. (optional)"
-                                className="form-input" style={{ marginTop: '0.5rem' }}
+                                placeholder="Flat 4B, Near ABC Mall…"
+                                autoComplete="address-line2"
                             />
-                        </div>
+                        </Field>
 
-                        <div className="form-group">
-                            <label>Town / City *</label>
-                            <input
-                                type="text" name="city" value={form.city}
-                                onChange={handleChange} placeholder="Town / City"
-                                required className="form-input"
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label>State *</label>
-                            <select
-                                name="state" value={form.state}
-                                onChange={handleChange} required className="form-input"
+                        <div className="co-row">
+                            <Field
+                                label="City / Town *"
+                                error={fieldErrors.city}
+                                touched={touched.city}
+                                valid={!fieldErrors.city}
                             >
-                                {INDIAN_STATES.map(s => (
-                                    <option key={s} value={s}>{s}</option>
-                                ))}
-                            </select>
+                                <input
+                                    className={`co-input${touched.city ? (fieldErrors.city ? ' invalid' : ' valid') : ''}`}
+                                    type="text" name="city" value={form.city}
+                                    onChange={handleChange} onBlur={handleBlur}
+                                    placeholder="Mumbai" autoComplete="address-level2"
+                                />
+                            </Field>
+
+                            <Field
+                                label="PIN Code *"
+                                error={fieldErrors.pinCode}
+                                touched={touched.pinCode}
+                                valid={!fieldErrors.pinCode}
+                            >
+                                <input
+                                    className={`co-input${touched.pinCode ? (fieldErrors.pinCode ? ' invalid' : ' valid') : ''}`}
+                                    type="text" name="pinCode" value={form.pinCode}
+                                    onChange={handleChange} onBlur={handleBlur}
+                                    placeholder="400001"
+                                    inputMode="numeric" autoComplete="postal-code"
+                                    maxLength={6}
+                                />
+                            </Field>
                         </div>
 
-                        <div className="form-group">
-                            <label>PIN Code *</label>
-                            <input
-                                type="text" name="pinCode" value={form.pinCode}
-                                onChange={handleChange} placeholder="6-digit PIN code"
-                                maxLength={6} required className="form-input"
-                            />
-                        </div>
+                        <Field label="State *" error={fieldErrors.state} touched={touched.state} valid={!fieldErrors.state}>
+                            <div className="co-select-wrap">
+                                <select
+                                    className={`co-select${touched.state ? (fieldErrors.state ? ' invalid' : ' valid') : ''}`}
+                                    name="state" value={form.state}
+                                    onChange={handleChange} onBlur={handleBlur}
+                                    autoComplete="address-level1"
+                                >
+                                    {INDIAN_STATES.map(st => <option key={st} value={st}>{st}</option>)}
+                                </select>
+                            </div>
+                        </Field>
 
-                        <div className="form-group">
-                            <label>Phone *</label>
-                            <input
-                                type="tel" name="phone" value={form.phone}
-                                onChange={handleChange} placeholder="+91 98765 43210"
-                                required className="form-input"
-                            />
-                        </div>
+                        {/* ── Order notes toggle ── */}
+                        <button
+                            type="button"
+                            className="co-notes-toggle"
+                            onClick={() => setShowNotes(n => !n)}
+                        >
+                            {showNotes ? <FiChevronUp /> : <FiChevronDown />}
+                            {showNotes ? 'Hide' : 'Add'} order notes
+                        </button>
 
-                        <div className="form-group">
-                            <label>Email Address *</label>
-                            <input
-                                type="email" name="email" value={form.email}
-                                onChange={handleChange} placeholder="you@example.com"
-                                required className="form-input"
-                            />
-                        </div>
+                        <AnimatePresence>
+                            {showNotes && (
+                                <motion.div
+                                    initial={prefersReduced ? {} : { height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={prefersReduced ? {} : { height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    style={{ overflow: 'hidden' }}
+                                >
+                                    <Field>
+                                        <textarea
+                                            className="co-textarea"
+                                            name="orderNotes" value={form.orderNotes}
+                                            onChange={handleChange}
+                                            placeholder="Special instructions, colour preferences, gifting notes…"
+                                            rows={3}
+                                        />
+                                    </Field>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
 
-                        <div className="form-group">
-                            <label>Additional Information</label>
-                            <textarea
-                                name="orderNotes" value={form.orderNotes}
-                                onChange={handleChange}
-                                placeholder="Order notes (optional)"
-                                className="form-input" rows={3}
-                            />
-                        </div>
-
+                        {/* ── Submit ── */}
                         <motion.button
                             type="submit"
-                            className="btn btn-primary checkout-submit"
+                            className={`co-submit${paymentMethod === 'whatsapp' ? ' co-submit-wa' : ''}`}
                             disabled={loading}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
+                            whileHover={loading ? {} : hover}
+                            whileTap={loading ? {} : tap}
                         >
-                            {loading ? 'Processing...' : '💳 Pay Now'}
+                            {submitLabel}
                         </motion.button>
+
+                        <div className="co-submit-trust">
+                            🔒 No hidden charges · Free shipping · 7-day returns
+                        </div>
                     </motion.form>
 
-                    {/* ── Order Summary ── */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="order-summary"
-                    >
-                        <h3>Order Summary</h3>
-                        <div className="summary-product">
-                            {product.images?.[0] && (
-                                <img src={product.images[0]} alt={product.name} className="summary-img" />
-                            )}
-                            <div className="summary-details">
-                                <p className="summary-name">{product.name}</p>
-                                <p className="summary-price">₹{product.price}</p>
-                            </div>
-                        </div>
-
-                        {/* Size Selection */}
-                        {product.sizes && product.sizes.length > 0 && (
-                            <div className="form-group" style={{ marginTop: '1rem' }}>
-                                <label>Size *</label>
-                                <div className="size-options">
-                                    {product.sizes.map(s => (
-                                        <button
-                                            key={s} type="button"
-                                            className={`size-button ${form.size === s ? 'selected' : ''}`}
-                                            onClick={() => setForm(f => ({ ...f, size: s }))}
-                                        >
-                                            {s}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Price Summary */}
-                        <div className="checkout-total" style={{ marginTop: '1rem' }}>
-                            <span>Total</span>
-                            <span className="total-price">₹{product.price}</span>
-                        </div>
-                    </motion.div>
-
+                    {/* ── Order summary (desktop sticky) ── */}
+                    <div className="co-summary-card-wrap">
+                        <SummaryPanel product={product} form={form} setForm={setForm} fmt={fmt} prefersReduced={prefersReduced} />
+                    </div>
                 </div>
+            </div>
+        </div>
+    )
+}
+
+// ── Order summary panel (shared: mobile collapsible + desktop sticky) ─────────
+function SummaryPanel({ product, form, setForm, fmt, prefersReduced }) {
+    const price = product.discountedPrice || product.price
+    const hasDiscount = product.discountedPrice && product.discountedPrice < product.price
+
+    return (
+        <div className="co-summary-card">
+            <h3 className="co-card-title">Order Summary</h3>
+
+            <div className="co-summary-product">
+                {product.images?.[0] && (
+                    <img src={product.images[0]} alt={product.name} className="co-summary-img" />
+                )}
+                <div className="co-summary-info">
+                    <div className="co-summary-cat">{product.category}</div>
+                    <p className="co-summary-name">{product.name}</p>
+                    <div className="co-summary-price">₹{fmt(price)}</div>
+                </div>
+            </div>
+
+            {/* Size selector in summary */}
+            {product.sizes?.length > 0 && (
+                <div>
+                    <span className="co-size-label">Size *</span>
+                    <div className="co-sizes">
+                        {product.sizes.map(s => (
+                            <motion.button
+                                key={s}
+                                type="button"
+                                className={`co-size-btn${form.size === s ? ' selected' : ''}`}
+                                onClick={() => setForm(f => ({ ...f, size: s }))}
+                                whileTap={prefersReduced ? {} : { scale: 0.94 }}
+                            >
+                                {s}
+                            </motion.button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            <div className="co-summary-divider" />
+
+            <div className="co-price-row">
+                <span>Subtotal</span>
+                <span>₹{fmt(price)}</span>
+            </div>
+            {hasDiscount && (
+                <div className="co-price-row free">
+                    <span>Discount</span>
+                    <span>−₹{fmt(product.price - price)}</span>
+                </div>
+            )}
+            <div className="co-price-row free">
+                <span>Delivery</span>
+                <span>FREE 🎉</span>
+            </div>
+
+            <div className="co-summary-divider" />
+
+            <div className="co-price-total">
+                <span>Total</span>
+                <span className="co-price-total-num">₹{fmt(price)}</span>
+            </div>
+
+            <div style={{ marginTop: 12, fontSize: 11, color: '#aaa', fontFamily: 'Inter, sans-serif', textAlign: 'center' }}>
+                🇮🇳 Made in India · Ships within 24h
             </div>
         </div>
     )

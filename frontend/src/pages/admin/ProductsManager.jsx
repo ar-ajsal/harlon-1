@@ -1,14 +1,11 @@
 import { useState } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
-
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiSearch, FiFilter, FiMenu, FiFileText, FiTrendingUp, FiMove, FiGift, FiBriefcase } from 'react-icons/fi'
-import { useAuth } from '../../context/AuthContext'
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiSearch, FiMove } from 'react-icons/fi'
 import { useProducts } from '../../context/ProductContext'
 import ImageUploader from '../../components/ImageUploader'
-import AdminBottomNav from '../../components/AdminBottomNav'
+import AdminLayout from '../../components/AdminLayout'
 import { toast } from 'react-toastify'
 import '../../styles/admin-responsive.css'
 
@@ -152,13 +149,10 @@ function SortableMobileCard({ product, onEdit, onVisibilityToggle }) {
 
 
 function ProductsManager() {
-    const navigate = useNavigate()
-    const { logout } = useAuth()
     const { products, categories, addProduct, updateProduct, deleteProduct, reorderProducts } = useProducts()
 
     const [showModal, setShowModal] = useState(false)
     const [editingProduct, setEditingProduct] = useState(null)
-    const [sidebarOpen, setSidebarOpen] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
     const [formData, setFormData] = useState({
         name: '',
@@ -174,11 +168,6 @@ function ProductsManager() {
         isVisible: true,
         soldOut: false
     })
-
-    const handleLogout = () => {
-        logout()
-        navigate('/admin')
-    }
 
     const openAddModal = () => {
         setEditingProduct(null)
@@ -328,218 +317,119 @@ function ProductsManager() {
     };
 
     return (
-        <div className="admin-layout">
-            <button
-                className="sidebar-toggle"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                aria-label="Toggle Sidebar"
-            >
-                <FiMenu size={24} />
-            </button>
+        <AdminLayout
+            title="Products"
+            subtitle="Manage your inventory and catalog"
+            headerRight={
+                <button className="btn btn-primary" onClick={openAddModal}>
+                    <FiPlus /> Add New Product
+                </button>
+            }
+        >
 
-            {/* Mobile Sidebar Overlay */}
-            <div
-                className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`}
-                onClick={() => setSidebarOpen(false)}
-            />
-
-            <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
-                <div className="admin-logo">harlon</div>
-                <div className="sidebar-scroll">
-                    <nav className="admin-nav">
-                        <NavLink
-                            to="/admin/dashboard"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiHome /> Dashboard
-                        </NavLink>
-                        <NavLink
-                            to="/admin/products"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiPackage /> Products
-                        </NavLink>
-                        <NavLink
-                            to="/admin/categories"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiLayers /> Categories
-                        </NavLink>
-                        <NavLink
-                            to="/admin/coupons"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiGift /> Coupons
-                        </NavLink>
-                        <NavLink
-                            to="/admin/orders"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiFileText /> Invoices
-                        </NavLink>
-                        <NavLink
-                            to="/admin/reports"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiTrendingUp /> Reports
-                        </NavLink>
-                        <NavLink
-                            to="/admin/stock"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiPackage /> Stock
-                        </NavLink>
-                        <NavLink
-                            to="/admin/guest-orders"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiShoppingBag /> Guest Orders
-                        </NavLink>
-                        <NavLink
-                            to="/admin/guest-inquiries"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiBriefcase /> Inquiries
-                        </NavLink>
-
-                        <div className="nav-divider" />
-
-                        <Link to="/" className="admin-nav-link" target="_blank">
-                            <FiShoppingBag /> View Store
-                        </Link>
-                        <button onClick={handleLogout} className="admin-nav-link logout-btn">
-                            <FiLogOut /> Logout
-                        </button>
-                    </nav>
-                </div>
-            </aside>
-
-            <main className="admin-content">
-                <header className="page-header">
-                    <div>
-                        <h1 className="admin-title">Products</h1>
-                        <p className="admin-subtitle">Manage your inventory and catalog</p>
-                    </div>
-                    <button className="btn btn-primary" onClick={openAddModal}>
-                        <FiPlus /> Add New Product
-                    </button>
-                </header>
-
-                <div className="content-card">
-                    <div className="table-actions">
-                        <div className="search-bar">
-                            <FiSearch />
-                            <input
-                                type="text"
-                                placeholder="Search products..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
-                        <button className="btn btn-outline" style={{ display: 'none' }}>
-                            <FiFilter /> Filter
-                        </button>
-                    </div>
-
-                    {/* Mobile Search Bar */}
-                    <div className="mobile-search-container">
-                        <FiSearch className="mobile-search-icon" />
+            <div className="content-card">
+                <div className="table-actions">
+                    <div className="search-bar">
+                        <FiSearch />
                         <input
                             type="text"
                             placeholder="Search products..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="mobile-search-input"
                         />
                     </div>
-
-                    {/* Mobile Floating Action Button */}
-                    <button className="fab-btn" onClick={openAddModal} aria-label="Add Product">
-                        <FiPlus />
+                    <button className="btn btn-outline" style={{ display: 'none' }}>
+                        <FiFilter /> Filter
                     </button>
-
-                    {filteredProducts.length === 0 ? (
-                        <div className="empty-state">
-                            <FiPackage />
-                            <h3>No products found</h3>
-                            <p>Try adjusting your search or add a new product.</p>
-                        </div>
-                    ) : (
-                        <div className="products-list-container">
-                            {/* Mobile Card View */}
-                            <div className="mobile-card-list">
-                                <DndContext
-                                    sensors={sensors}
-                                    collisionDetection={closestCenter}
-                                    onDragEnd={handleDragEnd}
-                                >
-                                    <SortableContext
-                                        items={filteredProducts.map(p => p._id)}
-                                        strategy={verticalListSortingStrategy}
-                                    >
-                                        {filteredProducts.map(product => (
-                                            <SortableMobileCard
-                                                key={product._id}
-                                                product={product}
-                                                onEdit={openEditModal}
-                                                onVisibilityToggle={handleVisibilityToggle}
-                                            />
-                                        ))}
-                                    </SortableContext>
-                                </DndContext>
-                            </div>
-
-                            {/* Desktop Table View */}
-                            <div className="table-responsive desktop-only">
-                                <table className="admin-table desktop-only">
-                                    <thead>
-                                        <tr>
-                                            <th>Product</th>
-                                            <th>Category</th>
-                                            <th>Price</th>
-                                            <th>Visibility</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <DndContext
-                                            sensors={sensors}
-                                            collisionDetection={closestCenter}
-                                            onDragEnd={handleDragEnd}
-                                        >
-                                            <SortableContext
-                                                items={products.map(p => p._id)}
-                                                strategy={verticalListSortingStrategy}
-                                            >
-                                                {filteredProducts.map(product => (
-                                                    <SortableRow
-                                                        key={product._id}
-                                                        product={product}
-                                                        onEdit={openEditModal}
-                                                        onDelete={handleDelete}
-                                                        onVisibilityToggle={handleVisibilityToggle}
-                                                    />
-                                                ))}
-                                            </SortableContext>
-                                        </DndContext>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    )}
                 </div>
-            </main>
 
-            <AdminBottomNav />
+                {/* Mobile Search Bar */}
+                <div className="mobile-search-container">
+                    <FiSearch className="mobile-search-icon" />
+                    <input
+                        type="text"
+                        placeholder="Search products..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="mobile-search-input"
+                    />
+                </div>
+
+                {/* Mobile Floating Action Button */}
+                <button className="fab-btn" onClick={openAddModal} aria-label="Add Product">
+                    <FiPlus />
+                </button>
+
+                {filteredProducts.length === 0 ? (
+                    <div className="empty-state">
+                        <FiPackage />
+                        <h3>No products found</h3>
+                        <p>Try adjusting your search or add a new product.</p>
+                    </div>
+                ) : (
+                    <div className="products-list-container">
+                        {/* Mobile Card View */}
+                        <div className="mobile-card-list">
+                            <DndContext
+                                sensors={sensors}
+                                collisionDetection={closestCenter}
+                                onDragEnd={handleDragEnd}
+                            >
+                                <SortableContext
+                                    items={filteredProducts.map(p => p._id)}
+                                    strategy={verticalListSortingStrategy}
+                                >
+                                    {filteredProducts.map(product => (
+                                        <SortableMobileCard
+                                            key={product._id}
+                                            product={product}
+                                            onEdit={openEditModal}
+                                            onVisibilityToggle={handleVisibilityToggle}
+                                        />
+                                    ))}
+                                </SortableContext>
+                            </DndContext>
+                        </div>
+
+                        {/* Desktop Table View */}
+                        <div className="table-responsive desktop-only">
+                            <table className="admin-table desktop-only">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Category</th>
+                                        <th>Price</th>
+                                        <th>Visibility</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <DndContext
+                                        sensors={sensors}
+                                        collisionDetection={closestCenter}
+                                        onDragEnd={handleDragEnd}
+                                    >
+                                        <SortableContext
+                                            items={products.map(p => p._id)}
+                                            strategy={verticalListSortingStrategy}
+                                        >
+                                            {filteredProducts.map(product => (
+                                                <SortableRow
+                                                    key={product._id}
+                                                    product={product}
+                                                    onEdit={openEditModal}
+                                                    onDelete={handleDelete}
+                                                    onVisibilityToggle={handleVisibilityToggle}
+                                                />
+                                            ))}
+                                        </SortableContext>
+                                    </DndContext>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+            </div>
 
             {/* Premium Modal */}
             {showModal && (
@@ -776,7 +666,7 @@ function ProductsManager() {
                     </div>
                 </div>
             )}
-        </div>
+        </AdminLayout>
     )
 }
 

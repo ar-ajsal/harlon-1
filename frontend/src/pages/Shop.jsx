@@ -1,252 +1,409 @@
-import { useState, useEffect } from 'react'
+/**
+ * Harlon — Shop Page
+ * Premium mobile-first product browser
+ * Features: animated header, category pill rail, result count, premium grid,
+ *           staggered card entrance, load-more, empty state
+ */
+import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { FiSearch, FiX, FiShoppingBag } from 'react-icons/fi'
 import { useProducts } from '../context/ProductContext'
-import ProductCard from '../components/ProductCard'
+import Skeleton from '../components/ui/Skeleton'
 
+/* Premium home-page card re-used here */
+import '../styles/home.css'
+
+/* ─────────────────────────────────── helpers ── */
 const PRODUCTS_PER_PAGE = 12
+const fmt = (n) => `₹${Number(n).toLocaleString('en-IN')}`
+const disc = (p, o) => o && p < o ? Math.round((1 - p / o) * 100) : 0
 
-function Shop() {
+const cardV = {
+    hidden: { opacity: 0, y: 20, scale: 0.97 },
+    visible: {
+        opacity: 1, y: 0, scale: 1,
+        transition: { duration: 0.38, ease: [0.16, 1, 0.3, 1] }
+    },
+}
+const gridV = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.06, delayChildren: 0.04 } },
+}
+
+/* ─── Premium product card (shop variant) ──── */
+function ShopCard({ product }) {
+    const d = disc(product.price, product.originalPrice)
+    const sold = !!product.soldOut
+
+    return (
+        <Link
+            to={`/product/${product._id}`}
+            className="hh-product-card"
+            aria-label={`${product.name}${sold ? ' — Sold Out' : ''}, ${fmt(product.price)}`}
+        >
+            <div className="hh-product-img-wrap">
+                <img
+                    src={product.images?.[0] || '/images/placeholder.jpg'}
+                    alt={product.name}
+                    loading="lazy"
+                    width={300} height={400}
+                    style={sold ? { opacity: 0.48, filter: 'grayscale(50%)' } : undefined}
+                />
+                {sold
+                    ? <span className="hh-product-badge hh-product-badge--sold">Sold Out</span>
+                    : product.bestSeller
+                        ? <span className="hh-product-badge hh-product-badge--best">⭐ Best</span>
+                        : d >= 8
+                            ? <span className="hh-product-badge hh-product-badge--sale">{d}% OFF</span>
+                            : null
+                }
+                {sold && <div className="hh-sold-ribbon" aria-hidden="true">⛔ Sold Out</div>}
+                {!sold && (
+                    <span className="hh-quick-btn" aria-hidden="true">
+                        <FiShoppingBag size={14} />
+                    </span>
+                )}
+            </div>
+            <div className="hh-product-info">
+                <p className="hh-product-cat">{product.category}</p>
+                <h3 className="hh-product-name">{product.name}</h3>
+                <div className="hh-product-price-row">
+                    <span className="hh-price">{fmt(product.price)}</span>
+                    {product.originalPrice > product.price && (
+                        <span className="hh-price-orig">{fmt(product.originalPrice)}</span>
+                    )}
+                    {d >= 5 && !sold && (
+                        <span className="hh-price-off">{d}% off</span>
+                    )}
+                </div>
+            </div>
+        </Link>
+    )
+}
+
+/* ─── Main page ──────────────────────────────── */
+export default function Shop() {
+    const shouldReduceMotion = useReducedMotion()
     const [searchParams, setSearchParams] = useSearchParams()
-    const { products, categories, loading, pagination, loadingMore, error } = useProducts()
-    const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all')
+    const { products, categories, loading, loadingMore, error } = useProducts()
+
+    const [selectedCat, setSelectedCat] = useState(searchParams.get('category') || 'all')
     const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '')
-    const [filteredProducts, setFilteredProducts] = useState([])
     const [displayCount, setDisplayCount] = useState(PRODUCTS_PER_PAGE)
 
+    /* Keep state in sync with URL */
     useEffect(() => {
-        const visibleProducts = products.filter(p => p.isVisible !== false)
-
-        let result = visibleProducts
-
-        // Filter by Category
-        if (selectedCategory !== 'all') {
-            result = result.filter(p =>
-                p.category.toLowerCase() === selectedCategory.toLowerCase()
-            )
-        }
-
-        // Filter by Search Term
-        if (searchTerm) {
-            const term = searchTerm.toLowerCase()
-            result = result.filter(p =>
-                p.name.toLowerCase().includes(term) ||
-                p.category.toLowerCase().includes(term) ||
-                (p.description && p.description.toLowerCase().includes(term))
-            )
-        }
-
-        setFilteredProducts(result)
-        // Reset display count when filters change
-        setDisplayCount(PRODUCTS_PER_PAGE)
-    }, [selectedCategory, searchTerm, products])
-
-    useEffect(() => {
-        const categoryParam = searchParams.get('category')
-        if (categoryParam) {
-            setSelectedCategory(categoryParam)
-        }
-
-        const searchParam = searchParams.get('search')
-        if (searchParam) {
-            setSearchTerm(searchParam)
-        } else if (!categoryParam) { // Only clear if no params at all, or preserve if just switching cat
-            // Actually better to keep sync with URL. 
-            // If URL has no search, but we have state, we should probably respect URL?
-            // But typing in input should update state.
-        }
+        const c = searchParams.get('category')
+        const s = searchParams.get('search')
+        if (c) setSelectedCat(c)
+        if (s !== null) setSearchTerm(s)
     }, [searchParams])
 
-    const handleSearchChange = (e) => {
-        const term = e.target.value
-        setSearchTerm(term)
-
-        // Update URL
-        const newParams = new URLSearchParams(searchParams)
-        if (term) {
-            newParams.set('search', term)
-        } else {
-            newParams.delete('search')
+    /* Filtered list */
+    const filtered = (() => {
+        let r = products.filter(p => p.isVisible !== false)
+        if (selectedCat !== 'all') {
+            r = r.filter(p => p.category.toLowerCase() === selectedCat.toLowerCase())
         }
-        setSearchParams(newParams, { replace: true })
-    }
+        if (searchTerm.trim()) {
+            const t = searchTerm.toLowerCase()
+            r = r.filter(p =>
+                p.name.toLowerCase().includes(t) ||
+                p.category.toLowerCase().includes(t) ||
+                p.description?.toLowerCase().includes(t)
+            )
+        }
+        return r
+    })()
 
-    const handleLoadMore = () => {
-        setDisplayCount(prev => prev + PRODUCTS_PER_PAGE)
-    }
+    const displayed = filtered.slice(0, displayCount)
+    const hasMore = displayCount < filtered.length
+    const remaining = filtered.length - displayCount
 
-    const displayedProducts = filteredProducts.slice(0, displayCount)
-    const hasMoreToShow = displayCount < filteredProducts.length
+    /* Handlers */
+    const setCategory = useCallback((cat) => {
+        setSelectedCat(cat)
+        setDisplayCount(PRODUCTS_PER_PAGE)
+        const p = new URLSearchParams(searchParams)
+        p.set('category', cat)
+        setSearchParams(p, { replace: true })
+    }, [searchParams, setSearchParams])
 
+    const handleSearchChange = useCallback((e) => {
+        const val = e.target.value
+        setSearchTerm(val)
+        setDisplayCount(PRODUCTS_PER_PAGE)
+        const p = new URLSearchParams(searchParams)
+        val ? p.set('search', val) : p.delete('search')
+        setSearchParams(p, { replace: true })
+    }, [searchParams, setSearchParams])
+
+    const clearSearch = () => handleSearchChange({ target: { value: '' } })
+
+    /* ── Loading ── */
     if (loading) {
         return (
-            <div className="loading">
-                <div className="spinner"></div>
+            <div className="shop-page">
+                <div style={{ padding: '120px 20px 40px', maxWidth: 1280, margin: '0 auto' }}>
+                    <div className="hl-shimmer" style={{ height: 44, width: 280, borderRadius: 8, marginBottom: 12 }} />
+                    <div className="hl-shimmer" style={{ height: 20, width: 420, borderRadius: 6, marginBottom: 32 }} />
+                    <div style={{ display: 'flex', gap: 8, marginBottom: 32, flexWrap: 'wrap' }}>
+                        {[90, 120, 100, 140, 110].map((w, i) => (
+                            <div key={i} className="hl-shimmer" style={{ height: 38, width: w, borderRadius: 99 }} />
+                        ))}
+                    </div>
+                    <Skeleton.ProductGrid count={8} />
+                </div>
             </div>
         )
     }
 
+    /* ── Error ── */
     if (error) {
         return (
-            <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-                <h2 style={{ marginBottom: '12px', color: 'var(--noir-80)' }}>Cannot reach server</h2>
-                <p style={{ color: 'var(--noir-50)', marginBottom: '20px' }}>{error}</p>
-                <button className="btn btn-primary" onClick={() => window.location.reload()}>Retry</button>
+            <div style={{ textAlign: 'center', padding: '100px 20px' }}>
+                <p style={{ fontSize: 40, marginBottom: 12 }}>⚠️</p>
+                <h2 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 28, marginBottom: 8 }}>
+                    Cannot connect
+                </h2>
+                <p style={{ color: '#777', marginBottom: 28 }}>{error}</p>
+                <button className="hh-btn-primary" onClick={() => window.location.reload()}>
+                    Retry
+                </button>
             </div>
         )
     }
 
     return (
         <div className="shop-page">
-            <section className="section">
-                <div className="container">
-                    {/* Page Header */}
+            <section style={{ paddingTop: '100px', paddingBottom: '60px' }}>
+                <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
+
+                    {/* ── Page header ── */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={shouldReduceMotion ? {} : { opacity: 0, y: 24 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="shop-header"
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        style={{ marginBottom: 32 }}
                     >
-                        <h1 className="shop-title">Premium Jersey Collection</h1>
-                        <p className="shop-subtitle">
-                            Authentic retro football jerseys crafted with quality and passion
+                        <p className="hh-section-eyebrow" style={{ marginBottom: 6 }}>
+                            The Collection
+                        </p>
+                        <h1 style={{
+                            fontFamily: "'Syne', sans-serif",
+                            fontWeight: 800,
+                            fontSize: 'clamp(32px, 7vw, 52px)',
+                            letterSpacing: '-0.03em',
+                            lineHeight: 1.05,
+                            color: '#0A0A0A',
+                            margin: '0 0 10px',
+                        }}>
+                            All Jerseys
+                        </h1>
+                        <p style={{
+                            fontFamily: "'Inter', sans-serif",
+                            fontSize: 15,
+                            color: '#777',
+                            margin: 0,
+                        }}>
+                            Authentic retro football jerseys — handpicked for Indian fans
                         </p>
                     </motion.div>
 
-                    {/* Search & Filter Section */}
-                    <div className="shop-controls">
-                        {/* Search Input */}
-                        <div className="shop-search">
+                    {/* ── Search bar ── */}
+                    <motion.div
+                        initial={shouldReduceMotion ? {} : { opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.45, delay: 0.1 }}
+                        style={{ marginBottom: 20 }}
+                    >
+                        <div style={{
+                            position: 'relative',
+                            maxWidth: 480,
+                        }}>
+                            <FiSearch
+                                size={16}
+                                style={{
+                                    position: 'absolute', left: 16, top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    color: '#999', pointerEvents: 'none',
+                                }}
+                                aria-hidden="true"
+                            />
                             <input
-                                type="text"
-                                placeholder="Search jerseys..."
+                                type="search"
                                 value={searchTerm}
                                 onChange={handleSearchChange}
-                                className="shop-search-input"
-                            />
-                        </div>
-
-                        {/* Category Filters */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.2, duration: 0.5 }}
-                            className="category-filters"
-                        >
-                            <button
-                                className={`filter-pill ${selectedCategory === 'all' ? 'active' : ''}`}
-                                onClick={() => {
-                                    setSelectedCategory('all')
-                                    const newParams = new URLSearchParams(searchParams)
-                                    newParams.set('category', 'all')
-                                    setSearchParams(newParams)
+                                placeholder="Search jerseys, clubs, nations…"
+                                aria-label="Search products"
+                                style={{
+                                    width: '100%',
+                                    padding: '13px 44px 13px 44px',
+                                    borderRadius: 99,
+                                    border: '1.5px solid #E5E5E5',
+                                    background: '#fff',
+                                    fontFamily: "'Inter', sans-serif",
+                                    fontSize: 14,
+                                    color: '#0A0A0A',
+                                    outline: 'none',
+                                    transition: 'border-color 0.2s',
+                                    boxSizing: 'border-box',
                                 }}
-                            >
-                                All Products
-                            </button>
-                            {Array.isArray(categories) && categories.map((category) => (
-                                <button
-                                    key={category._id}
-                                    className={`filter-pill ${selectedCategory === category.slug ||
-                                        selectedCategory === category.name.toLowerCase()
-                                        ? 'active'
-                                        : ''
-                                        }`}
-                                    onClick={() => {
-                                        const cat = category.name.toLowerCase()
-                                        setSelectedCategory(cat)
-                                        const newParams = new URLSearchParams(searchParams)
-                                        newParams.set('category', cat)
-                                        setSearchParams(newParams)
-                                    }}
-                                >
-                                    {category.name}
-                                </button>
-                            ))}
-                        </motion.div>
-                    </div>
-
-                    {/* Product Count */}
-                    <div className="product-count">
-                        <span>
-                            Showing {displayedProducts.length} of {filteredProducts.length}
-                            {filteredProducts.length === 1 ? ' Product' : ' Products'}
-                            {searchTerm && ` for "${searchTerm}"`}
-                        </span>
-                    </div>
-
-                    {/* Products Grid */}
-                    {displayedProducts.length > 0 ? (
-                        <>
-                            <div className="products-grid">
-                                {displayedProducts.map((product, index) => (
-                                    <motion.div
-                                        key={product._id}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.3) }}
-                                    >
-                                        <ProductCard product={product} />
-                                    </motion.div>
-                                ))}
-                            </div>
-
-                            {/* Load More Button */}
-                            {hasMoreToShow && (
-                                <div className="pagination-controls" style={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    marginTop: '3rem',
-                                    marginBottom: '2rem'
-                                }}>
-                                    <button
-                                        className="btn btn-primary btn-load-more"
-                                        onClick={handleLoadMore}
-                                        disabled={loadingMore}
+                                onFocus={e => e.target.style.borderColor = 'hsl(38,65%,55%)'}
+                                onBlur={e => e.target.style.borderColor = '#E5E5E5'}
+                            />
+                            <AnimatePresence>
+                                {searchTerm && (
+                                    <motion.button
+                                        key="clear"
+                                        initial={{ opacity: 0, scale: 0.7 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.7 }}
+                                        onClick={clearSearch}
+                                        aria-label="Clear search"
                                         style={{
-                                            padding: '1rem 3rem',
-                                            fontSize: '1rem',
-                                            borderRadius: '50px',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.5rem'
+                                            position: 'absolute', right: 14, top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            background: '#EEE',
+                                            border: 'none', cursor: 'pointer',
+                                            borderRadius: '50%',
+                                            width: 24, height: 24,
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
                                         }}
                                     >
-                                        {loadingMore ? (
-                                            <>
-                                                <span className="spinner-small" style={{
-                                                    width: '16px',
-                                                    height: '16px',
-                                                    border: '2px solid rgba(255,255,255,0.3)',
-                                                    borderTopColor: '#fff',
-                                                    borderRadius: '50%',
-                                                    animation: 'spin 0.8s linear infinite'
-                                                }}></span>
-                                                Loading...
-                                            </>
-                                        ) : (
-                                            `Load More (${filteredProducts.length - displayCount} remaining)`
-                                        )}
-                                    </button>
-                                </div>
-                            )}
-                        </>
-                    ) : (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="no-products"
-                        >
-                            <p>No products found in this category.</p>
-                            <Link to="/shop" onClick={() => setSelectedCategory('all')} className="btn btn-primary">
-                                View All Products
-                            </Link>
-                        </motion.div>
+                                        <FiX size={13} />
+                                    </motion.button>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    </motion.div>
+
+                    {/* ── Category pill rail ── */}
+                    <motion.div
+                        initial={shouldReduceMotion ? {} : { opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.45, delay: 0.15 }}
+                        style={{
+                            display: 'flex',
+                            gap: 8,
+                            flexWrap: 'wrap',
+                            marginBottom: 28,
+                        }}
+                        role="group"
+                        aria-label="Filter by category"
+                    >
+                        {['all', ...(categories || []).map(c => c.name.toLowerCase())].map((cat, i) => {
+                            const label = cat === 'all' ? 'All Products' :
+                                (categories.find(c => c.name.toLowerCase() === cat)?.name || cat)
+                            const isActive = selectedCat === cat
+                            return (
+                                <button
+                                    key={cat}
+                                    onClick={() => setCategory(cat)}
+                                    aria-pressed={isActive}
+                                    style={{
+                                        fontFamily: "'Inter', sans-serif",
+                                        fontSize: 13,
+                                        fontWeight: isActive ? 700 : 500,
+                                        padding: '9px 18px',
+                                        borderRadius: 99,
+                                        border: `1.5px solid ${isActive ? 'hsl(38,65%,55%)' : '#E5E5E5'}`,
+                                        background: isActive ? 'hsl(38,65%,55%)' : '#fff',
+                                        color: isActive ? '#0A0A0A' : '#555',
+                                        cursor: 'pointer',
+                                        minHeight: 40,
+                                        transition: 'all 0.18s ease',
+                                        whiteSpace: 'nowrap',
+                                        boxShadow: isActive ? '0 2px 12px hsl(38,65%,55%,0.28)' : 'none',
+                                    }}
+                                >
+                                    {label}
+                                </button>
+                            )
+                        })}
+                    </motion.div>
+
+                    {/* ── Result count ── */}
+                    <p style={{
+                        fontFamily: "'Inter', sans-serif",
+                        fontSize: 13,
+                        color: '#999',
+                        marginBottom: 24,
+                        minHeight: 20,
+                    }}>
+                        {filtered.length
+                            ? `${displayed.length} of ${filtered.length} ${filtered.length === 1 ? 'jersey' : 'jerseys'}${searchTerm ? ` for "${searchTerm}"` : ''}`
+                            : searchTerm ? `No jerseys found for "${searchTerm}"` : 'No jerseys in this category'
+                        }
+                    </p>
+
+                    {/* ── Grid ── */}
+                    <AnimatePresence mode="wait">
+                        {displayed.length > 0 ? (
+                            <motion.div
+                                key={`${selectedCat}-${searchTerm}`}
+                                className="hh-product-grid"
+                                initial="hidden"
+                                animate="visible"
+                                variants={shouldReduceMotion ? {} : gridV}
+                            >
+                                {displayed.map(p => (
+                                    <motion.div key={p._id} variants={shouldReduceMotion ? {} : cardV}>
+                                        <ShopCard product={p} />
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="empty"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                style={{ textAlign: 'center', padding: '80px 20px' }}
+                            >
+                                <p style={{ fontSize: 36, marginBottom: 12 }}>🔍</p>
+                                <h3 style={{
+                                    fontFamily: "'Syne', sans-serif",
+                                    fontWeight: 800,
+                                    fontSize: 22,
+                                    marginBottom: 8,
+                                    color: '#0A0A0A',
+                                }}>
+                                    Nothing found
+                                </h3>
+                                <p style={{ color: '#999', marginBottom: 24, fontSize: 14 }}>
+                                    Try a different search or category
+                                </p>
+                                <button
+                                    className="hh-btn-primary"
+                                    onClick={() => { setCategory('all'); clearSearch() }}
+                                >
+                                    Clear filters
+                                </button>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    {/* ── Load More ── */}
+                    {hasMore && (
+                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 40 }}>
+                            <motion.button
+                                className="hh-btn-primary"
+                                onClick={() => setDisplayCount(c => c + PRODUCTS_PER_PAGE)}
+                                disabled={loadingMore}
+                                whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+                                whileTap={shouldReduceMotion ? {} : { scale: 0.97 }}
+                                style={{ minWidth: 200 }}
+                            >
+                                {loadingMore
+                                    ? 'Loading…'
+                                    : `Load More — ${remaining} left`}
+                            </motion.button>
+                        </div>
                     )}
                 </div>
             </section>
         </div>
     )
 }
-
-export default Shop

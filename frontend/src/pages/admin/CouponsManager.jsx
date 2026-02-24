@@ -1,21 +1,16 @@
 import { useState, useEffect } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { FiHome, FiPackage, FiLogOut, FiPlus, FiEdit2, FiTrash2, FiX, FiShoppingBag, FiLayers, FiMenu, FiTrendingUp, FiFileText, FiGift, FiToggleLeft, FiToggleRight, FiBriefcase } from 'react-icons/fi'
+import { Link } from 'react-router-dom'
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiFileText, FiToggleLeft, FiToggleRight } from 'react-icons/fi'
 import { toast } from 'react-toastify'
-import { useAuth } from '../../context/AuthContext'
 import { couponsApi } from '../../api/coupons.api'
-import AdminBottomNav from '../../components/AdminBottomNav'
+import AdminLayout from '../../components/AdminLayout'
 import '../../styles/admin-responsive.css'
 
 function CouponsManager() {
-    const navigate = useNavigate()
-    const { logout } = useAuth()
-
     const [coupons, setCoupons] = useState([])
     const [loading, setLoading] = useState(true)
     const [showModal, setShowModal] = useState(false)
     const [editingCoupon, setEditingCoupon] = useState(null)
-    const [sidebarOpen, setSidebarOpen] = useState(false)
     const [formData, setFormData] = useState({
         code: '',
         name: '',
@@ -27,11 +22,6 @@ function CouponsManager() {
         expiryDate: '',
         isActive: true
     })
-
-    const handleLogout = () => {
-        logout()
-        navigate('/admin')
-    }
 
     useEffect(() => {
         fetchCoupons()
@@ -139,318 +129,219 @@ function CouponsManager() {
     }
 
     return (
-        <div className="admin-layout">
-            <button
-                className="sidebar-toggle"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                aria-label="Toggle Sidebar"
-            >
-                <FiMenu size={24} />
-            </button>
+        <AdminLayout
+            title="Coupon Codes"
+            subtitle="Manage referral & affiliate coupons"
+            headerRight={
+                <button className="btn btn-primary" onClick={openAddModal}>
+                    <FiPlus /> Create Coupon
+                </button>
+            }
+        >
 
-            <div
-                className={`sidebar-overlay ${sidebarOpen ? 'visible' : ''}`}
-                onClick={() => setSidebarOpen(false)}
-            />
-
-            <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
-                <div className="admin-logo">harlon</div>
-                <div className="sidebar-scroll">
-                    <nav className="admin-nav">
-                        <NavLink
-                            to="/admin/dashboard"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiHome /> Dashboard
-                        </NavLink>
-                        <NavLink
-                            to="/admin/products"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiPackage /> Products
-                        </NavLink>
-                        <NavLink
-                            to="/admin/categories"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiLayers /> Categories
-                        </NavLink>
-                        <NavLink
-                            to="/admin/coupons"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiGift /> Coupons
-                        </NavLink>
-                        <NavLink
-                            to="/admin/orders"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiFileText /> Invoices
-                        </NavLink>
-                        <NavLink
-                            to="/admin/reports"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiTrendingUp /> Reports
-                        </NavLink>
-                        <NavLink
-                            to="/admin/stock"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiPackage /> Stock
-                        </NavLink>
-                        <NavLink
-                            to="/admin/guest-orders"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiShoppingBag /> Guest Orders
-                        </NavLink>
-                        <NavLink
-                            to="/admin/guest-inquiries"
-                            className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            <FiBriefcase /> Inquiries
-                        </NavLink>
-
-                        <div className="nav-divider" />
-
-                        <Link to="/" className="admin-nav-link" target="_blank">
-                            <FiShoppingBag /> View Store
-                        </Link>
-                        <button onClick={handleLogout} className="admin-nav-link logout-btn">
-                            <FiLogOut /> Logout
-                        </button>
-                    </nav>
+            {loading ? (
+                <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-secondary)' }}>
+                    Loading coupons...
                 </div>
-            </aside>
+            ) : (
+                <div className="content-card">
+                    {/* Mobile Card View */}
+                    <div className="mobile-card-list">
+                        {coupons.map(coupon => {
+                            const progress = Math.min(100, Math.round((coupon.currentSales / coupon.targetSales) * 100))
+                            const isExpired = new Date() > new Date(coupon.expiryDate)
 
-            <main className="admin-content">
-                <div className="page-header">
-                    <div>
-                        <h1 className="admin-title">Coupon Codes</h1>
-                        <p className="admin-subtitle">Manage referral & affiliate coupons</p>
-                    </div>
-                    <button className="btn btn-primary" onClick={openAddModal}>
-                        <FiPlus />
-                        Create Coupon
-                    </button>
-                </div>
-
-                {loading ? (
-                    <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-secondary)' }}>
-                        Loading coupons...
-                    </div>
-                ) : (
-                    <div className="content-card">
-                        {/* Mobile Card View */}
-                        <div className="mobile-card-list">
-                            {coupons.map(coupon => {
-                                const progress = Math.min(100, Math.round((coupon.currentSales / coupon.targetSales) * 100))
-                                const isExpired = new Date() > new Date(coupon.expiryDate)
-
-                                return (
-                                    <div key={coupon._id} className="mobile-card" onClick={() => openEditModal(coupon)}>
-                                        <div className="mobile-card-content">
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                                                <div className="mobile-card-title" style={{ fontFamily: 'monospace', fontSize: '16px' }}>
-                                                    {coupon.code}
-                                                </div>
-                                                <div className={`mobile-card-status ${coupon.isActive ? 'active' : 'inactive'}`}
-                                                    style={{
-                                                        background: coupon.isActive ? 'var(--success-light)' : 'var(--noir-10)',
-                                                        color: coupon.isActive ? 'var(--success)' : 'var(--noir-60)'
-                                                    }}>
-                                                    {coupon.isActive ? 'Active' : 'Inactive'}
-                                                </div>
+                            return (
+                                <div key={coupon._id} className="mobile-card" onClick={() => openEditModal(coupon)}>
+                                    <div className="mobile-card-content">
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                            <div className="mobile-card-title" style={{ fontFamily: 'monospace', fontSize: '16px' }}>
+                                                {coupon.code}
                                             </div>
-
-                                            <div className="mobile-card-subtitle">{coupon.name}</div>
-
-                                            <div style={{ marginTop: '8px', marginBottom: '8px' }}>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-                                                    <span>Progress: {coupon.currentSales}/{coupon.targetSales}</span>
-                                                    <span style={{ color: getProgressColor(progress) }}>{progress}%</span>
-                                                </div>
-                                                <div style={{ height: '4px', background: 'var(--surface-light)', borderRadius: '2px', overflow: 'hidden' }}>
-                                                    <div style={{ width: `${progress}%`, height: '100%', background: getProgressColor(progress) }} />
-                                                </div>
-                                            </div>
-
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--text-muted)' }}>
-                                                <span>Exp: {new Date(coupon.expiryDate).toLocaleDateString()}</span>
-                                                {isExpired && <span style={{ color: 'var(--error)' }}>Expired</span>}
+                                            <div className={`mobile-card-status ${coupon.isActive ? 'active' : 'inactive'}`}
+                                                style={{
+                                                    background: coupon.isActive ? 'var(--success-light)' : 'var(--noir-10)',
+                                                    color: coupon.isActive ? 'var(--success)' : 'var(--noir-60)'
+                                                }}>
+                                                {coupon.isActive ? 'Active' : 'Inactive'}
                                             </div>
                                         </div>
 
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', justifyContent: 'center' }}>
-                                            <button
-                                                className="btn-icon"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    toggleActive(coupon);
-                                                }}
-                                                style={{ color: coupon.isActive ? 'var(--success)' : 'var(--text-muted)' }}
-                                            >
-                                                {coupon.isActive ? <FiToggleRight size={20} /> : <FiToggleLeft size={20} />}
-                                            </button>
-                                            <button
-                                                className="btn-icon delete-btn"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDelete(coupon._id);
-                                                }}
-                                                style={{ color: 'var(--error)' }}
-                                            >
-                                                <FiTrash2 size={18} />
-                                            </button>
+                                        <div className="mobile-card-subtitle">{coupon.name}</div>
+
+                                        <div style={{ marginTop: '8px', marginBottom: '8px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
+                                                <span>Progress: {coupon.currentSales}/{coupon.targetSales}</span>
+                                                <span style={{ color: getProgressColor(progress) }}>{progress}%</span>
+                                            </div>
+                                            <div style={{ height: '4px', background: 'var(--surface-light)', borderRadius: '2px', overflow: 'hidden' }}>
+                                                <div style={{ width: `${progress}%`, height: '100%', background: getProgressColor(progress) }} />
+                                            </div>
+                                        </div>
+
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--text-muted)' }}>
+                                            <span>Exp: {new Date(coupon.expiryDate).toLocaleDateString()}</span>
+                                            {isExpired && <span style={{ color: 'var(--error)' }}>Expired</span>}
                                         </div>
                                     </div>
-                                )
-                            })}
-                        </div>
 
-                        <div className="table-responsive desktop-only">
-                            <table className="admin-table">
-                                <thead>
-                                    <tr>
-                                        <th>Code</th>
-                                        <th>Name</th>
-                                        <th>Progress</th>
-                                        <th>Reward</th>
-                                        <th>Expiry</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {coupons.map(coupon => {
-                                        const progress = Math.min(100, Math.round((coupon.currentSales / coupon.targetSales) * 100))
-                                        const isExpired = new Date() > new Date(coupon.expiryDate)
-                                        const isComplete = coupon.currentSales >= coupon.targetSales
-
-                                        return (
-                                            <tr key={coupon._id}>
-                                                <td style={{ fontWeight: '600', fontFamily: 'monospace' }}>
-                                                    {coupon.code}
-                                                </td>
-                                                <td>{coupon.name}</td>
-                                                <td>
-                                                    <div style={{ minWidth: '180px' }}>
-                                                        <div style={{
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: '8px',
-                                                            marginBottom: '4px'
-                                                        }}>
-                                                            <span style={{ fontSize: '13px', fontWeight: '500' }}>
-                                                                {coupon.currentSales}/{coupon.targetSales}
-                                                            </span>
-                                                            <span style={{
-                                                                fontSize: '11px',
-                                                                color: getProgressColor(progress)
-                                                            }}>
-                                                                {progress}%
-                                                            </span>
-                                                        </div>
-                                                        <div style={{
-                                                            height: '6px',
-                                                            background: 'var(--surface-light)',
-                                                            borderRadius: '3px',
-                                                            overflow: 'hidden'
-                                                        }}>
-                                                            <div style={{
-                                                                width: `${progress}%`,
-                                                                height: '100%',
-                                                                background: getProgressColor(progress),
-                                                                transition: 'width 0.3s ease'
-                                                            }} />
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>{coupon.rewardDescription}</td>
-                                                <td>
-                                                    {new Date(coupon.expiryDate).toLocaleDateString()}
-                                                    {isExpired && (
-                                                        <span style={{
-                                                            marginLeft: '8px',
-                                                            color: 'var(--error)',
-                                                            fontSize: '11px'
-                                                        }}>
-                                                            Expired
-                                                        </span>
-                                                    )}
-                                                </td>
-                                                <td>
-                                                    <button
-                                                        onClick={() => toggleActive(coupon)}
-                                                        style={{
-                                                            border: 'none',
-                                                            cursor: 'pointer',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: '6px',
-                                                            padding: '4px 10px',
-                                                            borderRadius: '16px',
-                                                            fontSize: '13px',
-                                                            color: coupon.isActive ? 'var(--success)' : 'var(--text-muted)',
-                                                            background: coupon.isActive ? 'var(--success)15' : 'var(--surface-light)'
-                                                        }}
-                                                    >
-                                                        {coupon.isActive ? <FiToggleRight size={18} /> : <FiToggleLeft size={18} />}
-                                                        {coupon.isActive ? 'Active' : 'Inactive'}
-                                                    </button>
-                                                </td>
-                                                <td>
-                                                    <div className="actions-cell">
-                                                        <Link
-                                                            to={`/admin/coupons/${coupon._id}`}
-                                                            className="action-btn edit"
-                                                            title="View Details"
-                                                        >
-                                                            <FiFileText />
-                                                        </Link>
-                                                        <button
-                                                            className="action-btn edit"
-                                                            onClick={() => openEditModal(coupon)}
-                                                            title="Edit"
-                                                        >
-                                                            <FiEdit2 />
-                                                        </button>
-                                                        <button
-                                                            className="action-btn delete"
-                                                            onClick={() => handleDelete(coupon._id)}
-                                                            title="Delete"
-                                                        >
-                                                            <FiTrash2 />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        )
-                                    })}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {coupons.length === 0 && (
-                            <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-secondary)' }}>
-                                No coupons found. Click "Create Coupon" to add one.
-                            </div>
-                        )}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', justifyContent: 'center' }}>
+                                        <button
+                                            className="btn-icon"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleActive(coupon);
+                                            }}
+                                            style={{ color: coupon.isActive ? 'var(--success)' : 'var(--text-muted)' }}
+                                        >
+                                            {coupon.isActive ? <FiToggleRight size={20} /> : <FiToggleLeft size={20} />}
+                                        </button>
+                                        <button
+                                            className="btn-icon delete-btn"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDelete(coupon._id);
+                                            }}
+                                            style={{ color: 'var(--error)' }}
+                                        >
+                                            <FiTrash2 size={18} />
+                                        </button>
+                                    </div>
+                                </div>
+                            )
+                        })}
                     </div>
-                )}
-            </main>
 
-            <AdminBottomNav />
+                    <div className="table-responsive desktop-only">
+                        <table className="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Progress</th>
+                                    <th>Reward</th>
+                                    <th>Expiry</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {coupons.map(coupon => {
+                                    const progress = Math.min(100, Math.round((coupon.currentSales / coupon.targetSales) * 100))
+                                    const isExpired = new Date() > new Date(coupon.expiryDate)
+                                    const isComplete = coupon.currentSales >= coupon.targetSales
+
+                                    return (
+                                        <tr key={coupon._id}>
+                                            <td style={{ fontWeight: '600', fontFamily: 'monospace' }}>
+                                                {coupon.code}
+                                            </td>
+                                            <td>{coupon.name}</td>
+                                            <td>
+                                                <div style={{ minWidth: '180px' }}>
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '8px',
+                                                        marginBottom: '4px'
+                                                    }}>
+                                                        <span style={{ fontSize: '13px', fontWeight: '500' }}>
+                                                            {coupon.currentSales}/{coupon.targetSales}
+                                                        </span>
+                                                        <span style={{
+                                                            fontSize: '11px',
+                                                            color: getProgressColor(progress)
+                                                        }}>
+                                                            {progress}%
+                                                        </span>
+                                                    </div>
+                                                    <div style={{
+                                                        height: '6px',
+                                                        background: 'var(--surface-light)',
+                                                        borderRadius: '3px',
+                                                        overflow: 'hidden'
+                                                    }}>
+                                                        <div style={{
+                                                            width: `${progress}%`,
+                                                            height: '100%',
+                                                            background: getProgressColor(progress),
+                                                            transition: 'width 0.3s ease'
+                                                        }} />
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{coupon.rewardDescription}</td>
+                                            <td>
+                                                {new Date(coupon.expiryDate).toLocaleDateString()}
+                                                {isExpired && (
+                                                    <span style={{
+                                                        marginLeft: '8px',
+                                                        color: 'var(--error)',
+                                                        fontSize: '11px'
+                                                    }}>
+                                                        Expired
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td>
+                                                <button
+                                                    onClick={() => toggleActive(coupon)}
+                                                    style={{
+                                                        border: 'none',
+                                                        cursor: 'pointer',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '6px',
+                                                        padding: '4px 10px',
+                                                        borderRadius: '16px',
+                                                        fontSize: '13px',
+                                                        color: coupon.isActive ? 'var(--success)' : 'var(--text-muted)',
+                                                        background: coupon.isActive ? 'var(--success)15' : 'var(--surface-light)'
+                                                    }}
+                                                >
+                                                    {coupon.isActive ? <FiToggleRight size={18} /> : <FiToggleLeft size={18} />}
+                                                    {coupon.isActive ? 'Active' : 'Inactive'}
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <div className="actions-cell">
+                                                    <Link
+                                                        to={`/admin/coupons/${coupon._id}`}
+                                                        className="action-btn edit"
+                                                        title="View Details"
+                                                    >
+                                                        <FiFileText />
+                                                    </Link>
+                                                    <button
+                                                        className="action-btn edit"
+                                                        onClick={() => openEditModal(coupon)}
+                                                        title="Edit"
+                                                    >
+                                                        <FiEdit2 />
+                                                    </button>
+                                                    <button
+                                                        className="action-btn delete"
+                                                        onClick={() => handleDelete(coupon._id)}
+                                                        title="Delete"
+                                                    >
+                                                        <FiTrash2 />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {coupons.length === 0 && (
+                        <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-secondary)' }}>
+                            No coupons found. Click "Create Coupon" to add one.
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Modal */}
             {showModal && (
@@ -540,7 +431,6 @@ function CouponsManager() {
                                     />
                                 </div>
 
-                                {/* Discount Fields */}
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                                     <div className="form-group">
                                         <label className="form-label">Discount Type</label>
@@ -610,7 +500,7 @@ function CouponsManager() {
                     </div>
                 </div>
             )}
-        </div>
+        </AdminLayout>
     )
 }
 
