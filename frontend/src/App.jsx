@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useParams } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Header from './components/Header'
@@ -32,6 +32,12 @@ function AdminFallback() {
             <div className="spinner" />
         </div>
     )
+}
+
+// Wrapper that forces full remount when product ID changes
+function ProductDetailPage() {
+    const { id } = useParams()
+    return <ProductDetail key={id} />
 }
 
 
@@ -141,7 +147,7 @@ function App() {
                             <Routes>
                                 <Route path="/" element={<Home />} />
                                 <Route path="/shop" element={<Shop />} />
-                                <Route path="/product/:id" element={<ProductDetail />} />
+                                <Route path="/product/:id" element={<ProductDetailPage />} />
                                 <Route path="/checkout" element={<Checkout />} />
                                 <Route path="/track-order" element={<TrackOrder />} />
                                 <Route path="/t/:token" element={<TrackOrder />} />
