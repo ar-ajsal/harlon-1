@@ -132,6 +132,16 @@ function Header() {
                     </button>
                 </nav>
 
+                {/* Mobile Theme Toggle — always visible */}
+                <button
+                    type="button"
+                    className="theme-toggle-btn mobile-theme-btn"
+                    onClick={toggleTheme}
+                    aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                >
+                    {theme === 'dark' ? <FiSun size={20} /> : <FiMoon size={20} />}
+                </button>
+
                 {/* Mobile Menu Button */}
                 <button
                     className="mobile-menu-btn"

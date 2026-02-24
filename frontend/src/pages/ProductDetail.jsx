@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaWhatsapp, FaArrowLeft, FaCheck, FaTags, FaCreditCard, FaEnvelope, FaShoppingBag, FaCog, FaMapMarkerAlt } from 'react-icons/fa'
@@ -9,6 +9,7 @@ import { toast } from 'react-toastify'
 import InquiryModal from '../components/InquiryModal'
 import ProductGallery from '../components/product/ProductGallery'
 import ProductSummary from '../components/product/ProductSummary'
+import ProductCard from '../components/ProductCard'
 
 // ─── Delivery helpers ────────────────────────────────────────────────────────
 function getDeliveryDates() {
