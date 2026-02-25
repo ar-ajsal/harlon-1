@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiSearch, FiMove } from 'react-icons/fi'
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiSearch, FiMove, FiFilter } from 'react-icons/fi'
 import { useProducts } from '../../context/ProductContext'
 import ImageUploader from '../../components/ImageUploader'
 import AdminLayout from '../../components/AdminLayout'
