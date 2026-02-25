@@ -58,9 +58,12 @@ function ProductDetailPage() {
 function useBackendWarmup() {
     useEffect(() => {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+        // Use AbortController for broad browser compatibility (AbortSignal.timeout needs Chrome 103+)
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), 5000)
         fetch(`${apiUrl.replace('/api', '')}/health`, {
-            signal: AbortSignal.timeout(5000),
-        }).catch(() => { }) // silently ignore
+            signal: controller.signal,
+        }).catch(() => { }).finally(() => clearTimeout(timer))
     }, [])
 }
 
