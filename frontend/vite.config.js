@@ -61,46 +61,10 @@ export default defineConfig({
   build: {
     target: 'es2020',
     cssCodeSplit: true,
-    // Raise limit so we see accurate warnings without noise
-    chunkSizeWarningLimit: 200,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          // NOTE: React must NOT be split into its own chunk — it causes a
-          // "cannot read createContext of undefined" crash because the router
-          // chunk loads before react-core initialises. React stays in vendor.
-
-          // ── Router ──
-          if (id.includes('react-router-dom') || id.includes('@remix-run')) {
-            return 'router'
-          }
-          // ── Framer Motion — customer pages only (not admin) ──
-          if (id.includes('framer-motion')) {
-            return 'motion'
-          }
-          // ── Recharts + D3 — Admin Dashboard ONLY ──
-          if (id.includes('recharts') || id.includes('d3-') || id.includes('victory-')) {
-            return 'charts'
-          }
-          // ── DnD Kit — Admin Products ONLY ──
-          if (id.includes('@dnd-kit')) {
-            return 'dnd'
-          }
-          // ── React Icons ──
-          if (id.includes('react-icons')) {
-            return 'icons'
-          }
-          // ── Image tools — Admin only ──
-          if (id.includes('react-image-crop')) {
-            return 'image-tools'
-          }
-          // ── Everything else in node_modules ──
-          if (id.includes('node_modules')) {
-            return 'vendor'
-          }
-        },
-      },
-    },
+    // Lazy page imports already split every page into its own async chunk.
+    // manualChunks was removed — it caused "Circular chunk: router -> vendor"
+    // which silently breaks module initialization in production (blank page).
+    chunkSizeWarningLimit: 1000,
   },
 
   server: {
