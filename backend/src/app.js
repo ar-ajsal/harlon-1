@@ -6,6 +6,9 @@ import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
 
+// Trust Render's proxy so rate-limit and IP detection work correctly
+app.set('trust proxy', 1);
+
 // Gzip compression — reduces API payloads 60-80%
 app.use(compression({
   threshold: 1024, // only compress responses > 1KB
