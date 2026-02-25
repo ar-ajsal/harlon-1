@@ -203,6 +203,34 @@
     background: hsla(0, 0%, 100%, 0.15);
 }
 
+/* Dark mode — product cards: bg-removed images need a dark surface, not white */
+[data-theme="dark"] .product-image-wrapper {
+    background: hsl(240, 6%, 18%);
+}
+
+[data-theme="dark"] .product-card {
+    background: hsl(240, 5%, 13%);
+    border-color: hsl(240, 4%, 22%);
+}
+
+[data-theme="dark"] .product-card:hover {
+    border-color: hsl(240, 4%, 32%);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] .product-name {
+    color: hsl(240, 8%, 92%);
+}
+
+[data-theme="dark"] .price-current {
+    color: hsl(240, 8%, 92%);
+}
+
+[data-theme="dark"] .product-category {
+    color: hsl(240, 4%, 56%);
+}
+
+
 /* ===== Theme Toggle Button ===== */
 .theme-toggle-btn {
     display: flex;
@@ -1110,8 +1138,10 @@ h6 {
     position: relative;
     aspect-ratio: 3 / 4;
     overflow: hidden;
-    background: var(--noir-10);
+    /* White canvas in light mode — bg-removed images look clean */
+    background: #ffffff;
 }
+
 
 .product-image {
     width: 100%;

@@ -490,7 +490,7 @@ function ProductsManager() {
                                                 onChange={e => setFormData({ ...formData, costPrice: e.target.value })}
                                                 placeholder="Buying Price"
                                             />
-                                            <small style={{ color: '#666', fontSize: '11px' }}>What you pay (Buying Price)</small>
+                                            <small style={{ color: 'var(--noir-60)', fontSize: '11px' }}>What you pay (Buying Price)</small>
                                         </div>
                                         <div className="form-group">
                                             <label className="form-label">Selling Price (₹) *</label>
@@ -502,16 +502,16 @@ function ProductsManager() {
                                                 placeholder="Selling Price"
                                                 required
                                             />
-                                            <small style={{ color: '#666', fontSize: '11px' }}>What customers pay</small>
+                                            <small style={{ color: 'var(--noir-60)', fontSize: '11px' }}>What customers pay</small>
                                         </div>
                                     </div>
 
                                     {/* Profit Calculator Display */}
                                     {formData.price && formData.costPrice && (
                                         <div style={{
-                                            padding: '12px',
-                                            background: 'var(--success-light)',
-                                            border: '1px solid var(--success)',
+                                            padding: '12px 16px',
+                                            background: 'rgba(22, 163, 74, 0.08)',
+                                            border: '1px solid rgba(22, 163, 74, 0.25)',
                                             borderRadius: '8px',
                                             marginBottom: '16px',
                                             display: 'flex',
@@ -519,13 +519,13 @@ function ProductsManager() {
                                             alignItems: 'center'
                                         }}>
                                             <div>
-                                                <div style={{ fontSize: '12px', color: '#666' }}>Estimated Profit</div>
+                                                <div style={{ fontSize: '12px', color: 'var(--noir-60)' }}>Estimated Profit</div>
                                                 <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'var(--success)' }}>
                                                     ₹{(parseFloat(formData.price) - parseFloat(formData.costPrice)).toLocaleString()}
                                                 </div>
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
-                                                <div style={{ fontSize: '12px', color: '#666' }}>Margin</div>
+                                                <div style={{ fontSize: '12px', color: 'var(--noir-60)' }}>Margin</div>
                                                 <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--noir-80)' }}>
                                                     {Math.round(((parseFloat(formData.price) - parseFloat(formData.costPrice)) / parseFloat(formData.price)) * 100)}%
                                                 </div>
@@ -589,15 +589,8 @@ function ProductsManager() {
                                         </div>
                                     </div>
 
-                                    <div className="switches-container" style={{
-                                        display: 'grid',
-                                        gap: '16px',
-                                        background: '#f8f9fa',
-                                        padding: '20px',
-                                        borderRadius: '12px',
-                                        marginTop: '24px'
-                                    }}>
-                                        <label className="switch-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
+                                    <div className="switches-container">
+                                        <label className="switch-label">
                                             <input
                                                 type="checkbox"
                                                 checked={formData.featured}
@@ -605,12 +598,12 @@ function ProductsManager() {
                                                 style={{ marginTop: '4px', width: '18px', height: '18px', cursor: 'pointer' }}
                                             />
                                             <span className="switch-text">
-                                                <span className="switch-title" style={{ display: 'block', fontWeight: '600', color: '#1a1a1a' }}>Featured</span>
-                                                <span className="switch-desc" style={{ display: 'block', fontSize: '13px', color: '#666', marginTop: '2px' }}>Show on homepage hero/featured</span>
+                                                <span className="switch-title">Featured</span>
+                                                <span className="switch-desc">Show on homepage hero/featured</span>
                                             </span>
                                         </label>
 
-                                        <label className="switch-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
+                                        <label className="switch-label">
                                             <input
                                                 type="checkbox"
                                                 checked={formData.bestSeller}
@@ -618,14 +611,14 @@ function ProductsManager() {
                                                 style={{ marginTop: '4px', width: '18px', height: '18px', cursor: 'pointer' }}
                                             />
                                             <span className="switch-text">
-                                                <span className="switch-title" style={{ display: 'block', fontWeight: '600', color: '#1a1a1a' }}>Best Seller</span>
-                                                <span className="switch-desc" style={{ display: 'block', fontSize: '13px', color: '#666', marginTop: '2px' }}>Mark with gold badge</span>
+                                                <span className="switch-title">Best Seller</span>
+                                                <span className="switch-desc">Mark with gold badge</span>
                                             </span>
                                         </label>
 
-                                        <div style={{ borderTop: '1px solid #e1e1e1', margin: '8px 0' }}></div>
+                                        <div className="switch-divider"></div>
 
-                                        <label className="switch-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
+                                        <label className="switch-label">
                                             <input
                                                 type="checkbox"
                                                 checked={formData.isVisible}
@@ -633,12 +626,12 @@ function ProductsManager() {
                                                 style={{ marginTop: '4px', width: '18px', height: '18px', cursor: 'pointer', accentColor: '#2563eb' }}
                                             />
                                             <span className="switch-text">
-                                                <span className="switch-title" style={{ display: 'block', fontWeight: '600', color: '#1a1a1a' }}>Visible to User</span>
-                                                <span className="switch-desc" style={{ display: 'block', fontSize: '13px', color: '#666', marginTop: '2px' }}>Show this product in store</span>
+                                                <span className="switch-title">Visible to User</span>
+                                                <span className="switch-desc">Show this product in store</span>
                                             </span>
                                         </label>
 
-                                        <label className="switch-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
+                                        <label className="switch-label">
                                             <input
                                                 type="checkbox"
                                                 checked={formData.soldOut}
@@ -646,8 +639,8 @@ function ProductsManager() {
                                                 style={{ marginTop: '4px', width: '18px', height: '18px', cursor: 'pointer', accentColor: '#dc2626' }}
                                             />
                                             <span className="switch-text">
-                                                <span className="switch-title" style={{ display: 'block', fontWeight: '600', color: formData.soldOut ? '#dc2626' : '#1a1a1a' }}>Sold Out</span>
-                                                <span className="switch-desc" style={{ display: 'block', fontSize: '13px', color: '#666', marginTop: '2px' }}>Block purchases — shows "Sold Out" badge to customers</span>
+                                                <span className="switch-title" style={{ color: formData.soldOut ? 'var(--error)' : 'var(--noir-100)' }}>Sold Out</span>
+                                                <span className="switch-desc">Block purchases — shows "Sold Out" badge to customers</span>
                                             </span>
                                         </label>
                                     </div>
