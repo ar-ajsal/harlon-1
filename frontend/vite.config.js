@@ -8,6 +8,26 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      // Force immediate SW activation — prevents old SW from serving stale chunks
+      workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+        // Use NetworkFirst for JS/CSS so new deploys are never blocked by cached chunks
+        runtimeCaching: [
+          {
+            urlPattern: /\/assets\/.+\.(js|css)$/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'harlon-assets-v2',
+              networkTimeoutSeconds: 10,
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+            },
+          },
+        ],
+      },
       manifest: {
         name: 'Harlon',
         short_name: 'Harlon',
