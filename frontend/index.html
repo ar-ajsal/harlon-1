@@ -18,6 +18,20 @@
 </head>
 
 <body>
+    <!-- Force-clear any stale service worker caches from old deployments -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
+                regs.forEach(function (reg) { reg.unregister(); });
+            });
+            // Clear caches that might be serving old JS chunks
+            if (window.caches) {
+                caches.keys().then(function (names) {
+                    names.forEach(function (name) { caches.delete(name); });
+                });
+            }
+        }
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
 </body>
