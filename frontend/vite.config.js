@@ -66,10 +66,10 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // ── Core React (tiny, always cached) ──
-          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-            return 'react-core'
-          }
+          // NOTE: React must NOT be split into its own chunk — it causes a
+          // "cannot read createContext of undefined" crash because the router
+          // chunk loads before react-core initialises. React stays in vendor.
+
           // ── Router ──
           if (id.includes('react-router-dom') || id.includes('@remix-run')) {
             return 'router'
