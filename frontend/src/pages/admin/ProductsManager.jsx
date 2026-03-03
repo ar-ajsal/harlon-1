@@ -618,18 +618,20 @@ function ProductsManager() {
 
                                         <div className="switch-divider"></div>
 
-                                        <label className="switch-label">
-                                            <input
-                                                type="checkbox"
-                                                checked={formData.isVisible}
-                                                onChange={e => setFormData({ ...formData, isVisible: e.target.checked })}
-                                                style={{ marginTop: '4px', width: '18px', height: '18px', cursor: 'pointer', accentColor: '#2563eb' }}
-                                            />
+                                        <div className="switch-label" style={{ alignItems: 'center', cursor: 'default' }}>
+                                            <label className="toggle-switch" style={{ marginTop: 0 }}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.isVisible}
+                                                    onChange={e => setFormData({ ...formData, isVisible: e.target.checked })}
+                                                />
+                                                <span className="toggle-slider"></span>
+                                            </label>
                                             <span className="switch-text">
                                                 <span className="switch-title">Visible to User</span>
                                                 <span className="switch-desc">Show this product in store</span>
                                             </span>
-                                        </label>
+                                        </div>
 
                                         <label className="switch-label">
                                             <input

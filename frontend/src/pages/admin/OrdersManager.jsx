@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { FiSearch, FiPlus, FiEye, FiTrash2, FiTrendingUp } from 'react-icons/fi'
+import { Link, useNavigate } from 'react-router-dom'
+import { FiSearch, FiPlus, FiEye, FiTrash2, FiTrendingUp, FiEdit2, FiDownload, FiFileText } from 'react-icons/fi'
 import { toast } from 'react-toastify'
 import { ordersAPI } from '../../api/orders.api'
 import Pagination from '../../components/Pagination'
@@ -8,6 +8,7 @@ import AdminLayout from '../../components/AdminLayout'
 import '../../styles/admin-responsive.css'
 
 function OrdersManager() {
+    const navigate = useNavigate()
     const [orders, setOrders] = useState([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
