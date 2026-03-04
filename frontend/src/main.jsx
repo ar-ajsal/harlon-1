@@ -5,9 +5,11 @@ import App from './App.jsx'
 import { ProductProvider } from './context/ProductContext.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
+import { WishlistProvider } from './context/WishlistContext.jsx'
 import './styles/index.css'
 import './styles/design-system.css'
 import './styles/coupon.css'
+import './styles/features.css'
 
 async function bootstrap() {
   if (import.meta.env.VITE_MSW === 'true') {
@@ -21,7 +23,9 @@ async function bootstrap() {
           <AuthProvider>
             <ThemeProvider>
               <ProductProvider>
-                <App />
+                <WishlistProvider>
+                  <App />
+                </WishlistProvider>
               </ProductProvider>
             </ThemeProvider>
           </AuthProvider>

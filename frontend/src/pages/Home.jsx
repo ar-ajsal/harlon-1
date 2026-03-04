@@ -17,10 +17,13 @@ import { useRef, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { FaWhatsapp } from 'react-icons/fa'
-import { FiArrowRight, FiShoppingBag } from 'react-icons/fi'
+import { FiArrowRight, FiShoppingBag, FiHeart } from 'react-icons/fi'
 import { useProducts } from '../context/ProductContext'
+import { useWishlist } from '../context/WishlistContext'
 import { WHATSAPP_NUMBER, buildWhatsAppUrl } from '../config/constants'
 import Skeleton from '../components/ui/Skeleton'
+import CategoryStories from '../components/CategoryStories'
+import JerseyOfTheDay from '../components/JerseyOfTheDay'
 import '../styles/home.css'
 
 /* ─── Animation helpers ────────────────────────────────────── */
@@ -281,6 +284,8 @@ function CategoryStrip({ categories, products, shouldReduceMotion }) {
 function ProductCard({ product, shouldReduceMotion }) {
     const disc = discount(product.price, product.originalPrice)
     const isSoldOut = !!product.soldOut
+    const { isWishlisted, toggleWishlist } = useWishlist()
+    const wishlisted = isWishlisted(product._id)
 
     return (
         <Link
@@ -308,6 +313,15 @@ function ProductCard({ product, shouldReduceMotion }) {
                             ? <span className="hh-product-badge hh-product-badge--sale">{disc}% OFF</span>
                             : null
                 }
+
+                {/* Wishlist heart */}
+                <button
+                    className={`hh-wish-btn${wishlisted ? ' wishlisted' : ''}`}
+                    onClick={(e) => { e.preventDefault(); toggleWishlist(product) }}
+                    aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+                >
+                    <FiHeart size={14} />
+                </button>
 
                 {/* Sold-out bottom strip */}
                 {isSoldOut && (
@@ -615,6 +629,9 @@ export default function Home() {
             {/* 2 ── Trust Marquee */}
             <TrustMarquee />
 
+            {/* 🆕 Stories — category circles */}
+            <CategoryStories categories={categories} products={visible} />
+
             {/* 3 ── Categories */}
             <CategoryStrip
                 categories={categories}
@@ -632,6 +649,9 @@ export default function Home() {
                     shouldReduceMotion={shouldReduceMotion}
                 />
             )}
+
+            {/* 🆕 Jersey of the Day */}
+            <JerseyOfTheDay products={visible} />
 
             {/* 5 ── Social Proof */}
             <SocialProof

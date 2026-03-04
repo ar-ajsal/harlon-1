@@ -2,11 +2,14 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { FaArrowLeft, FaTags, FaShoppingBag, FaCog, FaMapMarkerAlt, FaEnvelope } from 'react-icons/fa'
+import { FiHeart } from 'react-icons/fi'
 import { useProducts } from '../context/ProductContext'
+import { useWishlist } from '../context/WishlistContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 import { couponsApi, couponSalesApi } from '../api/coupons.api'
 import { toast } from 'react-toastify'
 import InquiryModal from '../components/InquiryModal'
+import SizeQuiz from '../components/SizeQuiz'
 import ProductGallery from '../components/product/ProductGallery'
 import ProductSummary from '../components/product/ProductSummary'
 import ProductCard from '../components/ProductCard'
@@ -89,8 +92,11 @@ function ProductDetail() {
     const [couponLoading, setCouponLoading] = useState(false)
     const [couponOpen, setCouponOpen] = useState(false)
     const [showInquiry, setShowInquiry] = useState(false)
+    const [showSizeQuiz, setShowSizeQuiz] = useState(false)
     const [activeTab, setActiveTab] = useState('description')
     const [stickyVisible, setStickyVisible] = useState(false)
+    const { isWishlisted, toggleWishlist } = useWishlist()
+    const wishlisted = product ? isWishlisted(product._id) : false
 
     const { h, m, s } = useCountdown()
     const dates = getDeliveryDates()
@@ -364,6 +370,26 @@ function ProductDetail() {
                             </AnimatePresence>
                         </div>
 
+                        {/* Size Quiz link */}
+                        <button
+                            type="button"
+                            className="pd-inquiry-link"
+                            onClick={() => setShowSizeQuiz(true)}
+                            style={{ marginBottom: 6 }}
+                        >
+                            📏 Not sure about your size? Take the quiz
+                        </button>
+
+                        {/* Wishlist heart */}
+                        <button
+                            type="button"
+                            className={`pd-wish-link${wishlisted ? ' wishlisted' : ''}`}
+                            onClick={() => product && toggleWishlist(product)}
+                        >
+                            <FiHeart size={14} />
+                            {wishlisted ? 'Saved to Jersey Wall' : 'Save to Jersey Wall'}
+                        </button>
+
                         {/* Inquiry link */}
                         <button
                             type="button"
@@ -506,6 +532,13 @@ function ProductDetail() {
             {showInquiry && (
                 <InquiryModal product={product} onClose={() => setShowInquiry(false)} />
             )}
+
+            {/* ── Size Quiz modal ── */}
+            <AnimatePresence>
+                {showSizeQuiz && (
+                    <SizeQuiz onClose={() => setShowSizeQuiz(false)} />
+                )}
+            </AnimatePresence>
         </div>
     )
 }

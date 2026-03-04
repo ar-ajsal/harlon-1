@@ -14,6 +14,22 @@ function Dashboard() {
     })
     const [graphData, setGraphData] = useState([])
 
+    // Flash Sale admin state
+    const [flashSale, setFlashSale] = useState(() => {
+        try { return JSON.parse(localStorage.getItem('harlon_flash_sale') || 'null') } catch { return null }
+    })
+    const [saleText, setSaleText] = useState(flashSale?.text || '')
+    const [saleDiscount, setSaleDiscount] = useState(flashSale?.discount || '')
+    const [saleEnd, setSaleEnd] = useState(flashSale?.endTime ? new Date(flashSale.endTime).toISOString().slice(0, 16) : '')
+
+    // Jersey of the Day admin state
+    const [jotdId, setJotdId] = useState(() => {
+        try {
+            const d = JSON.parse(localStorage.getItem('harlon_jotd') || 'null')
+            return d?.setAt === new Date().toDateString() ? d.productId : ''
+        } catch { return '' }
+    })
+
     useEffect(() => {
         const fetchStats = async () => {
             try {
@@ -173,6 +189,107 @@ function Dashboard() {
                                 No products yet
                             </div>
                         )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Admin Controls: Flash Sale + JOTD */}
+            <div className="dashboard-grid-2" style={{ marginTop: 24 }}>
+                {/* Flash Sale Control */}
+                <div className="dashboard-card">
+                    <h3 style={{ marginBottom: 16 }}>⚡ Flash Sale Banner</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <div>
+                            <label style={{ fontSize: 12, color: '#6b7280', fontWeight: 600, display: 'block', marginBottom: 4 }}>Sale Label</label>
+                            <input
+                                type="text"
+                                value={saleText}
+                                onChange={e => setSaleText(e.target.value)}
+                                placeholder="e.g. Weekend Flash Sale"
+                                style={{ width: '100%', padding: '8px 12px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, boxSizing: 'border-box' }}
+                            />
+                        </div>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                            <div style={{ flex: 1 }}>
+                                <label style={{ fontSize: 12, color: '#6b7280', fontWeight: 600, display: 'block', marginBottom: 4 }}>Discount %</label>
+                                <input
+                                    type="number"
+                                    value={saleDiscount}
+                                    onChange={e => setSaleDiscount(e.target.value)}
+                                    placeholder="20"
+                                    style={{ width: '100%', padding: '8px 12px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, boxSizing: 'border-box' }}
+                                />
+                            </div>
+                            <div style={{ flex: 2 }}>
+                                <label style={{ fontSize: 12, color: '#6b7280', fontWeight: 600, display: 'block', marginBottom: 4 }}>Ends At</label>
+                                <input
+                                    type="datetime-local"
+                                    value={saleEnd}
+                                    onChange={e => setSaleEnd(e.target.value)}
+                                    style={{ width: '100%', padding: '8px 12px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, boxSizing: 'border-box' }}
+                                />
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                            <button
+                                onClick={() => {
+                                    if (!saleEnd) return
+                                    const data = { text: saleText, discount: saleDiscount, endTime: new Date(saleEnd).toISOString() }
+                                    localStorage.setItem('harlon_flash_sale', JSON.stringify(data))
+                                    setFlashSale(data)
+                                    window.dispatchEvent(new Event('storage'))
+                                    alert('Flash sale activated!')
+                                }}
+                                className="btn btn-primary"
+                                style={{ flex: 1, padding: '9px 0', fontSize: 13 }}
+                            >
+                                Activate 🚀
+                            </button>
+                            <button
+                                onClick={() => {
+                                    localStorage.removeItem('harlon_flash_sale')
+                                    setFlashSale(null); setSaleText(''); setSaleDiscount(''); setSaleEnd('')
+                                    window.dispatchEvent(new Event('storage'))
+                                }}
+                                className="btn btn-outline"
+                                style={{ flex: 1, padding: '9px 0', fontSize: 13 }}
+                            >
+                                Clear
+                            </button>
+                        </div>
+                        {flashSale && <div style={{ fontSize: 12, color: '#16a34a', fontWeight: 600 }}>✅ Active until {new Date(flashSale.endTime).toLocaleString()}</div>}
+                    </div>
+                </div>
+
+                {/* Jersey of the Day Control */}
+                <div className="dashboard-card">
+                    <h3 style={{ marginBottom: 16 }}>⭐ Jersey of the Day</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                        <div>
+                            <label style={{ fontSize: 12, color: '#6b7280', fontWeight: 600, display: 'block', marginBottom: 4 }}>Pick a Product</label>
+                            <select
+                                value={jotdId}
+                                onChange={e => setJotdId(e.target.value)}
+                                style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, boxSizing: 'border-box', background: '#fff' }}
+                            >
+                                <option value="">-- Auto-pick best seller --</option>
+                                {products.filter(p => !p.soldOut).map(p => (
+                                    <option key={p._id} value={p._id}>{p.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <button
+                            onClick={() => {
+                                const data = { productId: jotdId, setAt: new Date().toDateString() }
+                                localStorage.setItem('harlon_jotd', JSON.stringify(data))
+                                alert(jotdId ? 'Jersey of the Day set!' : 'Reset to auto-pick!')
+                            }}
+                            className="btn btn-primary"
+                            style={{ padding: '9px 0', fontSize: 13 }}
+                        >
+                            {jotdId ? 'Set as Jersey of the Day ⭐' : 'Save (Auto-pick)'}
+                        </button>
+                        <p style={{ fontSize: 12, color: '#9ca3af' }}>Resets daily. Shows on homepage hero section.</p>
                     </div>
                 </div>
             </div>

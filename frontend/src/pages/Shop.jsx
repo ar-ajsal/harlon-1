@@ -7,8 +7,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
-import { FiSearch, FiX, FiShoppingBag } from 'react-icons/fi'
+import { FiSearch, FiX, FiShoppingBag, FiHeart } from 'react-icons/fi'
 import { useProducts } from '../context/ProductContext'
+import { useWishlist } from '../context/WishlistContext'
 import Skeleton from '../components/ui/Skeleton'
 
 /* Premium home-page card re-used here */
@@ -35,6 +36,8 @@ const gridV = {
 function ShopCard({ product }) {
     const d = disc(product.price, product.originalPrice)
     const sold = !!product.soldOut
+    const { isWishlisted, toggleWishlist } = useWishlist()
+    const wishlisted = isWishlisted(product._id)
 
     return (
         <Link
@@ -58,6 +61,14 @@ function ShopCard({ product }) {
                             ? <span className="hh-product-badge hh-product-badge--sale">{d}% OFF</span>
                             : null
                 }
+                {/* Wishlist heart */}
+                <button
+                    className={`hh-wish-btn${wishlisted ? ' wishlisted' : ''}`}
+                    onClick={(e) => { e.preventDefault(); toggleWishlist(product) }}
+                    aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+                >
+                    <FiHeart size={14} />
+                </button>
                 {sold && <div className="hh-sold-ribbon" aria-hidden="true">⛔ Sold Out</div>}
                 {!sold && (
                     <span className="hh-quick-btn" aria-hidden="true">

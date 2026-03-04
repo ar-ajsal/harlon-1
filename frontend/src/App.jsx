@@ -8,6 +8,7 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import MobileNav from './components/MobileNav'
 import ProtectedRoute from './components/ProtectedRoute'
+import FlashSaleBanner from './components/FlashSaleBanner'
 
 // ── Customer pages — lazy (route-split) ─────────────────────────────────────
 const Home = lazy(() => import('./pages/Home'))
@@ -15,6 +16,7 @@ const Shop = lazy(() => import('./pages/Shop'))
 const ProductDetail = lazy(() => import('./pages/ProductDetail'))
 const Checkout = lazy(() => import('./pages/Checkout'))
 const TrackOrder = lazy(() => import('./pages/TrackOrder'))
+const WishlistPage = lazy(() => import('./pages/WishlistPage'))
 
 // ── Admin pages — lazy, separate chunk group ─────────────────────────────────
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'))
@@ -174,6 +176,7 @@ function App() {
                 {/* ── Customer Routes ───────────────────────────────────── */}
                 <Route path="/*" element={
                     <>
+                        <FlashSaleBanner />
                         <Header />
                         <main className="main-content">
                             <Routes>
@@ -194,6 +197,9 @@ function App() {
                                 } />
                                 <Route path="/t/:token" element={
                                     <Suspense fallback={<CustomerFallback />}><TrackOrder /></Suspense>
+                                } />
+                                <Route path="/wishlist" element={
+                                    <Suspense fallback={<CustomerFallback />}><WishlistPage /></Suspense>
                                 } />
                             </Routes>
                         </main>
