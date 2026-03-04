@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, NavLink, useNavigate, useParams } from 'react-router-dom'
 import { FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag, FiFileText, FiPlus, FiTrash2, FiArrowLeft, FiMenu } from 'react-icons/fi'
 import { toast } from 'react-toastify'
@@ -32,9 +32,13 @@ function EditOrder() {
     })
 
     const [selectedProduct, setSelectedProduct] = useState('')
+    const [selectedProductName, setSelectedProductName] = useState('')
+    const [productSearch, setProductSearch] = useState('')
+    const [showProductDropdown, setShowProductDropdown] = useState(false)
     const [quantity, setQuantity] = useState(1)
     const [customPrice, setCustomPrice] = useState('')
     const [costPrice, setCostPrice] = useState('')
+    const searchRef = useRef(null)
 
     const handleLogout = () => {
         logout()
@@ -44,6 +48,16 @@ function EditOrder() {
     useEffect(() => {
         fetchOrder()
     }, [id])
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (searchRef.current && !searchRef.current.contains(e.target)) {
+                setShowProductDropdown(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+    }, [])
 
     const fetchOrder = async () => {
         try {
@@ -102,6 +116,8 @@ function EditOrder() {
 
         // Reset selection
         setSelectedProduct('')
+        setSelectedProductName('')
+        setProductSearch('')
         setQuantity(1)
         setCustomPrice('')
         setCostPrice('')
@@ -325,22 +341,59 @@ function EditOrder() {
                     <div className="form-section items-section">
                         <h3 className="section-heading">Edit Items</h3>
                         <div className="add-item-row">
-                            <select
-                                value={selectedProduct}
-                                onChange={(e) => {
-                                    setSelectedProduct(e.target.value)
-                                    const product = products.find(p => p._id === e.target.value)
-                                    if (product) setCustomPrice(product.price.toString())
-                                }}
-                                className="product-select"
-                            >
-                                <option value="">Select a product...</option>
-                                {products.map(product => (
-                                    <option key={product._id} value={product._id}>
-                                        {product.name} - ₹{product.price}
-                                    </option>
-                                ))}
-                            </select>
+                            <div className="product-search-wrapper" ref={searchRef}>
+                                <input
+                                    type="text"
+                                    className="product-search-input"
+                                    placeholder="Search product..."
+                                    value={productSearch}
+                                    onChange={(e) => {
+                                        setProductSearch(e.target.value)
+                                        setSelectedProduct('')
+                                        setSelectedProductName('')
+                                        setShowProductDropdown(true)
+                                    }}
+                                    onFocus={() => setShowProductDropdown(true)}
+                                    autoComplete="off"
+                                />
+                                {selectedProductName && (
+                                    <span className="product-search-selected-badge">{selectedProductName}</span>
+                                )}
+                                {showProductDropdown && (
+                                    <div className="product-search-dropdown">
+                                        {products
+                                            .filter(p =>
+                                                p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
+                                                (p.category && p.category.toLowerCase().includes(productSearch.toLowerCase()))
+                                            )
+                                            .slice(0, 30)
+                                            .map(product => (
+                                                <div
+                                                    key={product._id}
+                                                    className="product-search-item"
+                                                    onMouseDown={(e) => {
+                                                        e.preventDefault()
+                                                        setSelectedProduct(product._id)
+                                                        setSelectedProductName(product.name)
+                                                        setProductSearch(product.name)
+                                                        setCustomPrice(product.price.toString())
+                                                        setShowProductDropdown(false)
+                                                    }}
+                                                >
+                                                    <span className="psi-name">{product.name}</span>
+                                                    <span className="psi-price">₹{product.price}</span>
+                                                </div>
+                                            ))
+                                        }
+                                        {products.filter(p =>
+                                            p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
+                                            (p.category && p.category.toLowerCase().includes(productSearch.toLowerCase()))
+                                        ).length === 0 && (
+                                                <div className="product-search-empty">No products found</div>
+                                            )}
+                                    </div>
+                                )}
+                            </div>
                             <input
                                 type="number"
                                 value={quantity}

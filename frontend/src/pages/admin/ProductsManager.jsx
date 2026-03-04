@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiSearch, FiMove, FiFilter } from 'react-icons/fi'
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiSearch, FiMove, FiFilter, FiEye, FiEyeOff } from 'react-icons/fi'
 import { useProducts } from '../../context/ProductContext'
 import ImageUploader from '../../components/ImageUploader'
 import AdminLayout from '../../components/AdminLayout'
@@ -278,6 +278,33 @@ function ProductsManager() {
         }
     }
 
+    const handleHideAll = async () => {
+        if (!window.confirm('Hide ALL products from the store?')) return
+        try {
+            await Promise.all(
+                products
+                    .filter(p => p.isVisible !== false)
+                    .map(p => updateProduct(p._id, { isVisible: false }))
+            )
+            toast.success('All products hidden')
+        } catch (err) {
+            toast.error('Failed to hide all products')
+        }
+    }
+
+    const handleShowAll = async () => {
+        try {
+            await Promise.all(
+                products
+                    .filter(p => p.isVisible === false)
+                    .map(p => updateProduct(p._id, { isVisible: true }))
+            )
+            toast.success('All products visible')
+        } catch (err) {
+            toast.error('Failed to show all products')
+        }
+    }
+
     const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
 
     const filteredProducts = products.filter(product =>
@@ -337,6 +364,27 @@ function ProductsManager() {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        {products.every(p => p.isVisible === false) ? (
+                            <button
+                                className="btn btn-outline"
+                                onClick={handleShowAll}
+                                title="Make all products visible"
+                                style={{ fontSize: '12px', padding: '8px 14px', color: '#16a34a', borderColor: '#16a34a' }}
+                            >
+                                <FiEye /> Show All
+                            </button>
+                        ) : (
+                            <button
+                                className="btn btn-outline"
+                                onClick={handleHideAll}
+                                title="Hide all products from store"
+                                style={{ fontSize: '12px', padding: '8px 14px', color: '#dc2626', borderColor: '#dc2626' }}
+                            >
+                                <FiEyeOff /> Hide All
+                            </button>
+                        )}
                     </div>
                     <button className="btn btn-outline" style={{ display: 'none' }}>
                         <FiFilter /> Filter

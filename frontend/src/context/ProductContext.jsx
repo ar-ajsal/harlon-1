@@ -30,7 +30,7 @@ export function ProductProvider({ children }) {
             setError(null)
 
             const [productsResponse, categoriesData] = await Promise.all([
-                productsApi.getAll({ page: 1, limit: 100, ...options }), // Load more for initial
+                productsApi.getAll({ page: 1, limit: 100, _admin: 'true', ...options }), // Load more for initial
                 categoriesApi.getAll({ limit: 1000 })
             ])
 
@@ -55,7 +55,7 @@ export function ProductProvider({ children }) {
     const loadMore = useCallback(async (page, filters = {}) => {
         try {
             setLoadingMore(true)
-            const response = await productsApi.getAll({ page, limit: pagination.limit, ...filters })
+            const response = await productsApi.getAll({ page, limit: pagination.limit, _admin: 'true', ...filters })
 
             const newProducts = response.data?.data || response.data || response || []
             const newPagination = response.data?.pagination || response.pagination || pagination

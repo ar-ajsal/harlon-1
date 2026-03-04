@@ -10,7 +10,7 @@ const getAuthHeaders = () => {
 // Products API
 export const productsApi = {
     getAll: async (options = {}) => {
-        const { category, page = 1, limit = 12, search } = typeof options === 'string'
+        const { category, page = 1, limit = 12, search, _admin } = typeof options === 'string'
             ? { category: options }
             : options;
 
@@ -19,6 +19,7 @@ export const productsApi = {
         if (page) params.append('page', page);
         if (limit) params.append('limit', limit);
         if (search) params.append('search', search);
+        if (_admin) params.append('_admin', _admin);
 
         const queryString = params.toString();
         const url = queryString ? `${API_URL}/products?${queryString}` : `${API_URL}/products`;

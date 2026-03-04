@@ -1853,3 +1853,107 @@ label {
     background: var(--adm-surface);
     border-color: var(--adm-border);
 }
+
+/* ── Product Search Picker (Invoice Pages) ─────────────────── */
+.product-search-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 180px;
+}
+
+.product-search-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--adm-border);
+    border-radius: 8px;
+    font-size: 14px;
+    color: #111827;
+    background: #ffffff;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.product-search-input:focus {
+    border-color: #111827;
+    box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.06);
+}
+
+.product-search-input::placeholder {
+    color: #9ca3af;
+}
+
+.product-search-selected-badge {
+    display: block;
+    font-size: 11px;
+    color: #16a34a;
+    font-weight: 600;
+    padding: 2px 4px;
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-search-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1.5px solid var(--adm-border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    z-index: 200;
+    max-height: 260px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.product-search-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.1s;
+    gap: 12px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.product-search-item:last-child {
+    border-bottom: none;
+}
+
+.product-search-item:hover {
+    background: #f5f5f7;
+}
+
+.psi-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #111827;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.psi-price {
+    font-size: 12px;
+    font-weight: 700;
+    color: #374151;
+    white-space: nowrap;
+    background: #f3f4f6;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.product-search-empty {
+    padding: 14px;
+    text-align: center;
+    font-size: 13px;
+    color: #9ca3af;
+}
