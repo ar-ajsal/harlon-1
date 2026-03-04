@@ -1,16 +1,19 @@
 import { NavLink } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FiHome, FiShoppingBag, FiPackage } from 'react-icons/fi'
+import { FiHome, FiShoppingBag, FiPackage, FiHeart } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
+import { useWishlist } from '../context/WishlistContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 
-const LINKS = [
-    { to: '/', label: 'Home', icon: FiHome, exact: true },
-    { to: '/shop', label: 'Shop', icon: FiShoppingBag },
-    { to: '/track-order', label: 'Track', icon: FiPackage },
-]
-
 function MobileNav() {
+    const { wishlist } = useWishlist()
+    const wishCount = wishlist.length
+
+    const LINKS = [
+        { to: '/', label: 'Home', icon: FiHome, exact: true },
+        { to: '/shop', label: 'Shop', icon: FiShoppingBag },
+        { to: '/track-order', label: 'Track', icon: FiPackage },
+    ]
     return (
         <nav className="mobile-nav" aria-label="Mobile navigation">
             <ul className="mobile-nav-links" role="list">
@@ -38,6 +41,40 @@ function MobileNav() {
                         </NavLink>
                     </li>
                 ))}
+
+                {/* Wishlist — Jersey Wall */}
+                <li style={{ position: 'relative' }}>
+                    <NavLink
+                        to="/wishlist"
+                        className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`}
+                        aria-label={`Jersey Wall — ${wishCount} saved`}
+                    >
+                        {({ isActive }) => (
+                            <>
+                                <motion.span
+                                    style={{ position: 'relative' }}
+                                    animate={isActive ? { scale: 1.15 } : { scale: 1 }}
+                                    transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                                >
+                                    <FiHeart size={22} aria-hidden="true" />
+                                    {wishCount > 0 && (
+                                        <span style={{
+                                            position: 'absolute', top: -6, right: -6,
+                                            background: '#ef4444', color: '#fff',
+                                            fontSize: 9, fontWeight: 800,
+                                            width: 16, height: 16, borderRadius: '50%',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            lineHeight: 1
+                                        }}>
+                                            {wishCount > 9 ? '9+' : wishCount}
+                                        </span>
+                                    )}
+                                </motion.span>
+                                <span>Wall</span>
+                            </>
+                        )}
+                    </NavLink>
+                </li>
 
                 {/* WhatsApp — prominent order button */}
                 <li>

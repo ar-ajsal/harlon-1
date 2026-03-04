@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiMenu, FiX, FiSearch, FiSun, FiMoon } from 'react-icons/fi'
+import { FiMenu, FiX, FiSearch, FiSun, FiMoon, FiHeart } from 'react-icons/fi'
 import { useTheme } from '../context/ThemeContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 
@@ -130,6 +130,20 @@ function Header() {
                         Contact
                     </motion.a>
 
+                    {/* Wishlist / Jersey Wall */}
+                    <NavLink
+                        to="/wishlist"
+                        className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                        aria-label="Jersey Wall — my saved jerseys"
+                        style={{ position: 'relative' }}
+                    >
+                        {({ isActive }) => (
+                            <motion.span whileHover={{ y: -2 }} style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                                <FiHeart size={16} />
+                            </motion.span>
+                        )}
+                    </NavLink>
+
                     {/* Theme toggle */}
                     <button
                         type="button"
@@ -246,6 +260,20 @@ function Header() {
                                 >
                                     Contact
                                 </a>
+                            </motion.div>
+
+                            <motion.div
+                                initial={{ opacity: 0, x: -12 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: (NAV_LINKS.length + 1) * 0.06, duration: 0.2 }}
+                            >
+                                <NavLink
+                                    to="/wishlist"
+                                    className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
+                                    onClick={closeMenu}
+                                >
+                                    ❤️ Jersey Wall
+                                </NavLink>
                             </motion.div>
                         </motion.nav>
                     )}
