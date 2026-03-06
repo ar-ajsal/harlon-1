@@ -12,6 +12,7 @@ import './styles/coupon.css'
 import './styles/features.css'
 
 async function bootstrap() {
+  console.log('BOOTSTRAP CALLED');
   if (import.meta.env.VITE_MSW === 'true') {
     const { worker } = await import('./mocks/browser.js')
     await worker.start({ onUnhandledRequest: 'bypass', quiet: true })
