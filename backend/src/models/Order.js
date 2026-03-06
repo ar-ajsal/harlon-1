@@ -38,6 +38,7 @@ const orderSchema = new mongoose.Schema({
         name: { type: String, required: true },
         price: { type: Number, required: true },  // Selling price
         costPrice: { type: Number, default: 0 },  // Cost price for profit calculation (admin-only)
+        dropOn: { type: String, default: '' },     // Stock source label e.g. 'Drop 1', 'Drop 2'
         quantity: { type: Number, required: true, min: 1 },
         total: { type: Number, required: true }
     }],
@@ -49,5 +50,10 @@ const orderSchema = new mongoose.Schema({
 
     notes: { type: String }
 }, { timestamps: true });
+
+// Index for date-range aggregation queries (dashboard stats, monthly reports)
+orderSchema.index({ date: -1, status: 1 });
+// Index for invoice number lookups (generateInvoiceNumber helper)
+orderSchema.index({ invoiceNumber: 1 });
 
 export default mongoose.model('Order', orderSchema);

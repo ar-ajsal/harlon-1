@@ -253,6 +253,7 @@ Thank you for your order! 🙏
                             <tr>
                                 <th>#</th>
                                 <th>Item</th>
+                                <th>Drop</th>
                                 <th>Qty</th>
                                 <th>Price</th>
                                 <th>Total</th>
@@ -263,6 +264,11 @@ Thank you for your order! 🙏
                                 <tr key={index}>
                                     <td>{index + 1}</td>
                                     <td>{item.name}</td>
+                                    <td>
+                                        {item.dropOn ? (
+                                            <span className="dropon-badge" data-drop={item.dropOn}>{item.dropOn}</span>
+                                        ) : '—'}
+                                    </td>
                                     <td>{item.quantity}</td>
                                     <td>{formatCurrency(item.price)}</td>
                                     <td>{formatCurrency(item.total)}</td>

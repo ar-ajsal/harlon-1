@@ -34,7 +34,11 @@ function CreateOrder() {
     const [quantity, setQuantity] = useState(1)
     const [customPrice, setCustomPrice] = useState('')
     const [costPrice, setCostPrice] = useState('')
+    const [dropOn, setDropOn] = useState('Drop 1')
+    const [customDropLabel, setCustomDropLabel] = useState('')
     const searchRef = useRef(null)
+
+    const DROP_OPTIONS = ['Drop 1', 'Drop 2', 'Drop 3', 'Drop 4', 'Custom']
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -65,14 +69,15 @@ function CreateOrder() {
         if (!product) return
 
         const price = customPrice ? parseFloat(customPrice) : product.price
-        // Use custom cost price or default to 0 (admin only field)
         const cost = costPrice ? parseFloat(costPrice) : 0
+        const resolvedDrop = dropOn === 'Custom' ? (customDropLabel.trim() || 'Custom') : dropOn
 
         const newItem = {
             product: product._id,
             name: product.name,
             price: price,
             costPrice: cost,
+            dropOn: resolvedDrop,
             quantity: parseInt(quantity),
             total: price * parseInt(quantity)
         }
@@ -89,6 +94,8 @@ function CreateOrder() {
         setQuantity(1)
         setCustomPrice('')
         setCostPrice('')
+        setDropOn('Drop 1')
+        setCustomDropLabel('')
     }
 
     const removeItem = (index) => {
@@ -366,6 +373,26 @@ function CreateOrder() {
                                 style={{ borderColor: 'var(--gold)' }}
                                 title="Cost Price (Admin Only - Not shown on invoice)"
                             />
+                            <select
+                                value={dropOn}
+                                onChange={(e) => setDropOn(e.target.value)}
+                                className="dropon-select"
+                                title="Stock Source (Drop-On)"
+                            >
+                                {DROP_OPTIONS.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                            {dropOn === 'Custom' && (
+                                <input
+                                    type="text"
+                                    value={customDropLabel}
+                                    onChange={(e) => setCustomDropLabel(e.target.value)}
+                                    placeholder="Label…"
+                                    className="dropon-custom-input"
+                                    maxLength={30}
+                                />
+                            )}
                             <button type="button" onClick={addItem} className="btn btn-secondary add-item-btn">
                                 <FiPlus /> Add
                             </button>
@@ -378,6 +405,7 @@ function CreateOrder() {
                                     <thead>
                                         <tr>
                                             <th>Item</th>
+                                            <th>Drop</th>
                                             <th>Price</th>
                                             <th>Qty</th>
                                             <th>Total</th>
@@ -388,6 +416,11 @@ function CreateOrder() {
                                         {formData.items.map((item, index) => (
                                             <tr key={index}>
                                                 <td>{item.name}</td>
+                                                <td>
+                                                    {item.dropOn ? (
+                                                        <span className="dropon-badge" data-drop={item.dropOn}>{item.dropOn}</span>
+                                                    ) : '—'}
+                                                </td>
                                                 <td>{formatCurrency(item.price)}</td>
                                                 <td>
                                                     <div className="qty-controls">

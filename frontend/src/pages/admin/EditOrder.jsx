@@ -38,7 +38,11 @@ function EditOrder() {
     const [quantity, setQuantity] = useState(1)
     const [customPrice, setCustomPrice] = useState('')
     const [costPrice, setCostPrice] = useState('')
+    const [dropOn, setDropOn] = useState('Drop 1')
+    const [customDropLabel, setCustomDropLabel] = useState('')
     const searchRef = useRef(null)
+
+    const DROP_OPTIONS = ['Drop 1', 'Drop 2', 'Drop 3', 'Drop 4', 'Custom']
 
     const handleLogout = () => {
         logout()
@@ -97,14 +101,15 @@ function EditOrder() {
         if (!product) return
 
         const price = customPrice ? parseFloat(customPrice) : product.price
-        // Use custom cost price or default to 0 (admin only field)
         const cost = costPrice ? parseFloat(costPrice) : 0
+        const resolvedDrop = dropOn === 'Custom' ? (customDropLabel.trim() || 'Custom') : dropOn
 
         const newItem = {
             product: product._id,
             name: product.name,
             price: price,
             costPrice: cost,
+            dropOn: resolvedDrop,
             quantity: parseInt(quantity),
             total: price * parseInt(quantity)
         }
@@ -121,6 +126,8 @@ function EditOrder() {
         setQuantity(1)
         setCustomPrice('')
         setCostPrice('')
+        setDropOn('Drop 1')
+        setCustomDropLabel('')
     }
 
     const removeItem = (index) => {
@@ -418,6 +425,26 @@ function EditOrder() {
                                 style={{ borderColor: 'var(--gold)' }}
                                 title="Cost Price (Admin Only - Not shown on invoice)"
                             />
+                            <select
+                                value={dropOn}
+                                onChange={(e) => setDropOn(e.target.value)}
+                                className="dropon-select"
+                                title="Stock Source (Drop-On)"
+                            >
+                                {DROP_OPTIONS.map(opt => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                ))}
+                            </select>
+                            {dropOn === 'Custom' && (
+                                <input
+                                    type="text"
+                                    value={customDropLabel}
+                                    onChange={(e) => setCustomDropLabel(e.target.value)}
+                                    placeholder="Label…"
+                                    className="dropon-custom-input"
+                                    maxLength={30}
+                                />
+                            )}
                             <button type="button" onClick={addItem} className="btn btn-secondary add-item-btn">
                                 <FiPlus /> Add
                             </button>
@@ -430,6 +457,7 @@ function EditOrder() {
                                     <thead>
                                         <tr>
                                             <th>Item</th>
+                                            <th>Drop</th>
                                             <th>Price</th>
                                             <th>Qty</th>
                                             <th>Total</th>
@@ -440,6 +468,40 @@ function EditOrder() {
                                         {formData.items.map((item, index) => (
                                             <tr key={index}>
                                                 <td>{item.name}</td>
+                                                <td style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                                                    <select
+                                                        className="dropon-select-inline"
+                                                        value={['Drop 1', 'Drop 2', 'Drop 3', 'Drop 4'].includes(item.dropOn) ? item.dropOn : 'Custom'}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value
+                                                            setFormData(prev => ({
+                                                                ...prev,
+                                                                items: prev.items.map((it, i) =>
+                                                                    i === index ? { ...it, dropOn: val === 'Custom' ? 'Custom ' : val } : it
+                                                                )
+                                                            }))
+                                                        }}
+                                                    >
+                                                        {DROP_OPTIONS.map(opt => (
+                                                            <option key={opt} value={opt}>{opt}</option>
+                                                        ))}
+                                                    </select>
+                                                    {!['Drop 1', 'Drop 2', 'Drop 3', 'Drop 4'].includes(item.dropOn) && (
+                                                        <input
+                                                            type="text"
+                                                            className="dropon-custom-input"
+                                                            value={item.dropOn.trim() === 'Custom' ? '' : item.dropOn}
+                                                            maxLength={30}
+                                                            placeholder="Type drop name..."
+                                                            onChange={(e) => setFormData(prev => ({
+                                                                ...prev,
+                                                                items: prev.items.map((it, i) =>
+                                                                    i === index ? { ...it, dropOn: e.target.value } : it
+                                                                )
+                                                            }))}
+                                                        />
+                                                    )}
+                                                </td>
                                                 <td>{formatCurrency(item.price)}</td>
                                                 <td>
                                                     <div className="qty-controls">

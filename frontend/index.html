@@ -12,26 +12,32 @@
     <meta name="apple-mobile-web-app-title" content="Harlon" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>Harlon - Retro Football Jerseys</title>
+
+    <!-- ✅ PERF: Preconnect to font origins FIRST to reduce DNS lookup latency -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- ✅ PERF: Non-blocking font load — media trick defers load until after paint.
+         font-display=swap is baked into the Google Fonts URL. -->
+    <link rel="preload" as="style"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    </noscript>
+
+    <!-- ✅ PERF: Preconnect to Cloudinary CDN for faster image delivery -->
+    <link rel="preconnect" href="https://res.cloudinary.com">
+
+    <!-- ✅ PERF: DNS prefetch for Render backend to reduce TTFB -->
+    <link rel="dns-prefetch" href="https://harlon-backend.onrender.com">
 </head>
 
 <body>
-    <!-- Force-clear any stale service worker caches from old deployments -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function (regs) {
-                regs.forEach(function (reg) { reg.unregister(); });
-            });
-            // Clear caches that might be serving old JS chunks
-            if (window.caches) {
-                caches.keys().then(function (names) {
-                    names.forEach(function (name) { caches.delete(name); });
-                });
-            }
-        }
-    </script>
+    <!-- ✅ PERF: Service worker registration handled by vite-plugin-pwa (sw.js).
+         The old self-destruct block was removed — it was wiping the PWA cache
+         on every page load, defeating the entire purpose of the service worker. -->
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
 </body>

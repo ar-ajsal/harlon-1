@@ -3028,12 +3028,93 @@ h6 {
     flex: none !important;
 }
 
+/* ── Drop-On (stock source) controls ──────────────────────────────────────── */
+.dropon-select {
+    flex: none !important;
+    width: 96px !important;
+    padding: var(--space-2) var(--space-2) !important;
+    font-size: var(--text-xs) !important;
+    border: 1.5px solid var(--gold) !important;
+    border-radius: var(--border-radius-sm) !important;
+    background: hsla(38, 45%, 52%, 0.08) !important;
+    color: var(--noir-100) !important;
+    cursor: pointer;
+    transition: border-color var(--duration-normal);
+}
+
+.dropon-select:focus {
+    outline: none;
+    border-color: var(--noir-100) !important;
+}
+
+.dropon-custom-input {
+    flex: none !important;
+    width: 90px !important;
+    font-size: var(--text-xs) !important;
+    padding: var(--space-2) !important;
+    border: 1.5px dashed var(--gold) !important;
+    border-radius: var(--border-radius-sm) !important;
+    background: var(--white) !important;
+}
+
+/* Badge shown in CreateOrder items table */
+.dropon-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    background: hsla(38, 45%, 52%, 0.15);
+    color: hsl(38, 60%, 30%);
+    border: 1px solid hsla(38, 45%, 52%, 0.35);
+}
+
+/* Different accent per drop number */
+.dropon-badge[data-drop="Drop 1"] {
+    background: hsla(200, 80%, 45%, 0.12);
+    color: hsl(200, 80%, 30%);
+    border-color: hsla(200, 80%, 45%, 0.4);
+}
+
+.dropon-badge[data-drop="Drop 2"] {
+    background: hsla(280, 60%, 55%, 0.12);
+    color: hsl(280, 60%, 35%);
+    border-color: hsla(280, 60%, 55%, 0.4);
+}
+
+.dropon-badge[data-drop="Drop 3"] {
+    background: hsla(140, 60%, 40%, 0.12);
+    color: hsl(140, 60%, 25%);
+    border-color: hsla(140, 60%, 40%, 0.4);
+}
+
+.dropon-badge[data-drop="Drop 4"] {
+    background: hsla(15, 80%, 55%, 0.12);
+    color: hsl(15, 80%, 35%);
+    border-color: hsla(15, 80%, 55%, 0.4);
+}
+
+/* Inline select used in EditOrder rows */
+.dropon-select-inline {
+    font-size: var(--text-xs) !important;
+    padding: 2px 4px !important;
+    border: 1px solid var(--gold) !important;
+    border-radius: var(--border-radius-sm) !important;
+    background: hsla(38, 45%, 52%, 0.08) !important;
+    color: var(--noir-100) !important;
+    cursor: pointer;
+}
+
 .add-item-btn {
     display: flex;
     align-items: center;
     gap: var(--space-2);
     white-space: nowrap;
 }
+
 
 /* Items List */
 .items-list {

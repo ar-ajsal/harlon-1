@@ -1,8 +1,58 @@
 import Product from '../models/Product.js';
 import ApiError from '../utils/ApiError.js';
 
+// ─── In-Memory Cache ─────────────────────────────────────────────────────────
+// Caches public product listing for 2 minutes — eliminates repeated DB hits on
+// the busiest endpoint without needing Redis.
+const CACHE_TTL_MS = 2 * 60 * 1000; // 2 minutes
+const cache = new Map(); // key → { data, expiresAt }
+
+function cacheKey(filters) {
+    return JSON.stringify({
+        category: filters.category || '',
+        featured: filters.featured || '',
+        bestSeller: filters.bestSeller || '',
+        search: filters.search || '',
+        page: filters.page || 1,
+        limit: filters.limit || 20,
+    });
+}
+
+function cacheGet(key) {
+    const entry = cache.get(key);
+    if (!entry) return null;
+    if (Date.now() > entry.expiresAt) {
+        cache.delete(key);
+        return null;
+    }
+    return entry.data;
+}
+
+function cacheSet(key, data) {
+    cache.set(key, { data, expiresAt: Date.now() + CACHE_TTL_MS });
+    // Prevent unbounded growth
+    if (cache.size > 200) {
+        const firstKey = cache.keys().next().value;
+        cache.delete(firstKey);
+    }
+}
+
+export function invalidateProductCache() {
+    cache.clear();
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 class ProductService {
     async getAll(filters = {}) {
+        const isAdminRequest = filters._admin === 'true';
+        const key = cacheKey(filters);
+
+        // Only cache public (non-admin) requests
+        if (!isAdminRequest) {
+            const cached = cacheGet(key);
+            if (cached) return cached;
+        }
+
         const query = {};
 
         if (filters.category && filters.category !== 'all') {
@@ -18,28 +68,36 @@ class ProductService {
             query.$text = { $search: filters.search };
         }
 
+        // Always show visible products for public; admin sees all
+        if (!isAdminRequest) {
+            query.isVisible = true;
+        }
+
         // Pagination
         const page = parseInt(filters.page) || 1;
         const limit = parseInt(filters.limit) || 20;
         const skip = (page - 1) * limit;
 
-        // Determine if this is an admin request (admin routes send token)
-        // Public shop/home listing: project only fields needed for cards (payload ~50% smaller)
-        const isAdminRequest = filters._admin === 'true'
+        // Field projection — public gets card-only fields (~50% smaller payload)
         const projection = isAdminRequest
-            ? null  // admin gets full document
-            : 'name price originalPrice images category sizes soldOut inStock featured bestSeller priority'
+            ? null
+            : 'name price originalPrice images category sizes soldOut inStock featured bestSeller priority isVisible';
 
-        const query_ = Product.find(query).sort({ priority: -1, createdAt: -1 }).skip(skip).limit(limit)
-        if (projection) query_.select(projection)
-        query_.lean()  // plain JS objects, ~30% faster than Mongoose documents
+        const dbQuery = Product
+            .find(query)
+            .sort({ priority: -1, createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean();  // plain JS objects — ~30% faster than Mongoose docs
+
+        if (projection) dbQuery.select(projection);
 
         const [products, total] = await Promise.all([
-            query_,
+            dbQuery,
             Product.countDocuments(query)
         ]);
 
-        return {
+        const result = {
             data: products,
             pagination: {
                 total,
@@ -48,10 +106,14 @@ class ProductService {
                 limit
             }
         };
+
+        if (!isAdminRequest) cacheSet(key, result);
+
+        return result;
     }
 
     async getById(id) {
-        const product = await Product.findById(id).lean()  // lean() for speed
+        const product = await Product.findById(id).lean();
         if (!product) {
             throw ApiError.notFound('Product not found');
         }
@@ -59,7 +121,9 @@ class ProductService {
     }
 
     async create(data) {
-        return Product.create(data);
+        const product = await Product.create(data);
+        invalidateProductCache();
+        return product;
     }
 
     async update(id, data) {
@@ -70,6 +134,7 @@ class ProductService {
         if (!product) {
             throw ApiError.notFound('Product not found');
         }
+        invalidateProductCache();
         return product;
     }
 
@@ -78,6 +143,7 @@ class ProductService {
         if (!product) {
             throw ApiError.notFound('Product not found');
         }
+        invalidateProductCache();
         return product;
     }
 
@@ -91,6 +157,7 @@ class ProductService {
 
         if (operations.length > 0) {
             await Product.bulkWrite(operations);
+            invalidateProductCache();
         }
 
         return true;

@@ -76,6 +76,8 @@ router.post('/', async (req, res) => {
                 product: item.product, // ID
                 name: item.name,
                 price: item.price,
+                costPrice: item.costPrice || 0,
+                dropOn: item.dropOn || '',
                 quantity: item.quantity,
                 total: itemTotal
             };
@@ -135,6 +137,8 @@ router.put('/:id', async (req, res) => {
                 product: item.product, // ID
                 name: item.name,
                 price: item.price,
+                costPrice: item.costPrice || 0,
+                dropOn: item.dropOn || '',
                 quantity: item.quantity,
                 total: itemTotal
             };

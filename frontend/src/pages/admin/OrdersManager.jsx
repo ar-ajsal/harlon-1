@@ -71,6 +71,8 @@ function OrdersManager() {
         ? orders
         : orders.filter(order => order.status === statusFilter)
 
+    const totalFilteredAmount = filteredOrders.reduce((sum, order) => sum + (order.finalTotal || 0), 0)
+
     const getStatusClass = (status) => {
         switch (status) {
             case 'Paid': return 'status-paid'
@@ -128,6 +130,18 @@ function OrdersManager() {
                 </div>
             </div>
 
+            {/* Total Summary */}
+            <div style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                padding: '0 0 16px 0',
+                color: 'var(--text-main)',
+                fontSize: '1rem',
+                fontWeight: '600'
+            }}>
+                Total Amount ({statusFilter === 'all' ? 'All' : statusFilter}): <span style={{ color: 'var(--primary, #0f172a)', marginLeft: '8px' }}>{formatCurrency(totalFilteredAmount)}</span>
+            </div>
+
             {/* Orders Content */}
             <div className="orders-content">
                 {loading ? (
@@ -151,6 +165,13 @@ function OrdersManager() {
                                         <div className="mobile-card-title">{order.invoiceNumber}</div>
                                         <div className="mobile-card-subtitle">{order.customer?.name}</div>
                                         <div className="mobile-card-subtitle">{formatDate(order.date)}</div>
+                                        {order.items?.length > 0 && Array.from(new Set(order.items.map(it => it.dropOn).filter(Boolean))).length > 0 && (
+                                            <div style={{ marginTop: 2, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                                                {Array.from(new Set(order.items.map(it => it.dropOn).filter(Boolean))).map(drop => (
+                                                    <span key={drop} className="dropon-badge" data-drop={drop}>{drop}</span>
+                                                ))}
+                                            </div>
+                                        )}
                                         <div className="mobile-card-price">{formatCurrency(order.finalTotal)}</div>
                                         <div className={`mobile-card-status ${order.status === 'Paid' ? 'visible' : 'hidden'}`} style={{
                                             background: order.status === 'Paid' ? '#d1fae5' : order.status === 'Cancelled' ? '#fee2e2' : '#fef3c7',
@@ -170,6 +191,7 @@ function OrdersManager() {
                                     <tr>
                                         <th>Invoice</th>
                                         <th>Customer</th>
+                                        <th>Drop</th>
                                         <th>Date</th>
                                         <th>Amount</th>
                                         <th>Payment</th>
@@ -186,6 +208,15 @@ function OrdersManager() {
                                                     <span className="customer-name">{order.customer?.name}</span>
                                                     <span className="customer-phone">{order.customer?.phone}</span>
                                                 </div>
+                                            </td>
+                                            <td>
+                                                {order.items?.length > 0 && Array.from(new Set(order.items.map(it => it.dropOn).filter(Boolean))).length > 0 ? (
+                                                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                                                        {Array.from(new Set(order.items.map(it => it.dropOn).filter(Boolean))).map(drop => (
+                                                            <span key={drop} className="dropon-badge" data-drop={drop}>{drop}</span>
+                                                        ))}
+                                                    </div>
+                                                ) : '—'}
                                             </td>
                                             <td>{formatDate(order.date)}</td>
                                             <td className="amount">{formatCurrency(order.finalTotal)}</td>
