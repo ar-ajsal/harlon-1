@@ -166,7 +166,9 @@ function ProductsManager() {
         featured: false,
         bestSeller: false,
         isVisible: true,
-        soldOut: false
+        soldOut: false,
+        tryOnEnabled: false,
+        overlayImage: ''
     })
 
     const openAddModal = () => {
@@ -183,7 +185,9 @@ function ProductsManager() {
             featured: false,
             bestSeller: false,
             isVisible: true,
-            soldOut: false
+            soldOut: false,
+            tryOnEnabled: false,
+            overlayImage: ''
         })
         setShowModal(true)
     }
@@ -202,7 +206,9 @@ function ProductsManager() {
             featured: product.featured,
             bestSeller: product.bestSeller || false,
             isVisible: product.isVisible !== false, // Default to true if undefined
-            soldOut: product.soldOut || false
+            soldOut: product.soldOut || false,
+            tryOnEnabled: product.tryOnEnabled || false,
+            overlayImage: product.overlayImage || ''
         })
         setShowModal(true)
     }
@@ -694,6 +700,47 @@ function ProductsManager() {
                                             </span>
                                         </label>
                                     </div>
+
+                                    <div className="switch-divider"></div>
+
+                                    {/* Try-On Settings */}
+                                    <div style={{ marginTop: 8 }}>
+                                        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--noir-80)', marginBottom: 10 }}>🧥 Virtual Try-On</div>
+                                        <label className="switch-label">
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.tryOnEnabled}
+                                                onChange={e => setFormData({ ...formData, tryOnEnabled: e.target.checked })}
+                                                style={{ marginTop: '4px', width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--primary)' }}
+                                            />
+                                            <span className="switch-text">
+                                                <span className="switch-title">Enable Try-On</span>
+                                                <span className="switch-desc">Show « Try This Jersey » button on product page</span>
+                                            </span>
+                                        </label>
+
+                                        {formData.tryOnEnabled && (
+                                            <div style={{ marginTop: 14 }}>
+                                                <label className="form-label" style={{ marginBottom: 6 }}>Jersey Overlay Image</label>
+                                                <small style={{ display: 'block', color: 'var(--noir-60)', fontSize: '11px', marginBottom: 8 }}>Upload a background-removed jersey PNG/WebP. This is placed on the user's photo.</small>
+                                                <ImageUploader
+                                                    images={formData.overlayImage ? [formData.overlayImage] : []}
+                                                    onImagesChange={(imgs) => setFormData({ ...formData, overlayImage: imgs[0] || '' })}
+                                                    maxImages={1}
+                                                />
+                                                {formData.overlayImage && (
+                                                    <div style={{ marginTop: 8, textAlign: 'center' }}>
+                                                        <img
+                                                            src={formData.overlayImage}
+                                                            alt="Overlay preview"
+                                                            style={{ maxHeight: 80, objectFit: 'contain', borderRadius: 6, background: 'repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%) 0 0 / 12px 12px', border: '1px solid var(--border)' }}
+                                                        />
+                                                        <div style={{ fontSize: 11, color: 'var(--noir-60)', marginTop: 4 }}>Overlay preview (transparent background shown as checkerboard)</div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -707,9 +754,10 @@ function ProductsManager() {
                             </div>
                         </form>
                     </div>
-                </div>
-            )}
-        </AdminLayout>
+                </div >
+            )
+            }
+        </AdminLayout >
     )
 }
 

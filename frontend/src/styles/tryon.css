@@ -1,0 +1,575 @@
+/* ─── Virtual Try-On — Mobile-First CSS ─────────────────────────────────────── */
+
+/* Overlay / backdrop */
+.tryon-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+    /* slide-up on mobile */
+    animation: tryon-fade-in 0.22s ease;
+}
+
+@keyframes tryon-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Main modal panel */
+.tryon-panel {
+    position: relative;
+    width: 100%;
+    max-width: 540px;
+    max-height: 96vh;
+    background: linear-gradient(160deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    border-radius: 24px 24px 0 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 0 env(safe-area-inset-bottom, 0) 0;
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.6);
+    animation: tryon-slide-up 0.3s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+@media (min-width: 600px) {
+    .tryon-backdrop {
+        align-items: center;
+    }
+
+    .tryon-panel {
+        border-radius: 20px;
+        max-height: 90vh;
+    }
+}
+
+@keyframes tryon-slide-up {
+    from {
+        transform: translateY(60px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Header */
+.tryon-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 20px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    position: sticky;
+    top: 0;
+    background: inherit;
+    z-index: 10;
+}
+
+.tryon-title {
+    font-family: 'Syne', 'Inter', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
+}
+
+.tryon-subtitle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 2px;
+    font-weight: 400;
+}
+
+.tryon-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: background 0.18s;
+    flex-shrink: 0;
+}
+
+.tryon-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Body area */
+.tryon-body {
+    padding: 20px;
+}
+
+/* ── Instruction Screen ────────────────────────────────────────────────────── */
+.tryon-instructions {
+    text-align: center;
+    padding: 8px 0 16px;
+}
+
+.tryon-anim-jersey {
+    font-size: 72px;
+    animation: jersey-float 2.2s ease-in-out infinite;
+    display: block;
+    margin-bottom: 8px;
+}
+
+@keyframes jersey-float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.tryon-instructions h3 {
+    font-family: 'Syne', 'Inter', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 6px;
+}
+
+.tryon-instructions p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.55;
+    margin-bottom: 20px;
+}
+
+.tryon-tips {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.tryon-tip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.tryon-tip-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+/* ── Input Screen ─────────────────────────────────────────────────────────── */
+.tryon-input-options {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 4px;
+}
+
+.tryon-btn-camera {
+    width: 100%;
+    padding: 18px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, hsl(38, 65%, 55%) 0%, hsl(28, 80%, 48%) 100%);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Syne', 'Inter', sans-serif;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(214, 138, 69, 0.3);
+}
+
+.tryon-btn-camera:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(214, 138, 69, 0.4);
+}
+
+.tryon-btn-camera:active {
+    transform: translateY(0);
+}
+
+.tryon-btn-upload {
+    width: 100%;
+    padding: 15px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 15px;
+    font-weight: 600;
+    border: 1.5px dashed rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.18s, border-color 0.18s;
+}
+
+.tryon-btn-upload:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── Processing Screen ────────────────────────────────────────────────────── */
+.tryon-processing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    gap: 20px;
+}
+
+.tryon-spinner-wrap {
+    position: relative;
+    width: 72px;
+    height: 72px;
+}
+
+.tryon-spinner-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    border-top-color: hsl(38, 65%, 55%);
+    animation: tryon-spin 0.9s linear infinite;
+}
+
+.tryon-spinner-ring-2 {
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: rgba(255, 255, 255, 0.4);
+    animation: tryon-spin 1.4s linear infinite reverse;
+}
+
+@keyframes tryon-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.tryon-spinner-emoji {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+}
+
+.tryon-processing p {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    line-height: 1.5;
+    font-family: 'Inter', sans-serif;
+}
+
+.tryon-processing-label {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    font-family: 'Syne', 'Inter', sans-serif;
+}
+
+/* ── Canvas / Result ──────────────────────────────────────────────────────── */
+.tryon-canvas-wrap {
+    position: relative;
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+.tryon-canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 52vh;
+    object-fit: contain;
+}
+
+.tryon-canvas-hint {
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.45);
+    margin-top: 8px;
+}
+
+/* ── Adjustment Controls ────────────────────────────────────────────────────── */
+.tryon-controls {
+    margin-top: 16px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 14px 16px;
+}
+
+.tryon-controls-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 12px;
+}
+
+.tryon-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.tryon-slider-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    width: 60px;
+    flex-shrink: 0;
+}
+
+.tryon-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    outline: none;
+    cursor: pointer;
+}
+
+.tryon-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: hsl(38, 65%, 55%);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    transition: transform 0.12s;
+}
+
+.tryon-slider::-webkit-slider-thumb:active {
+    transform: scale(1.2);
+}
+
+.tryon-slider-val {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    width: 36px;
+    text-align: right;
+}
+
+.tryon-reset-btn {
+    margin-top: 4px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    transition: color 0.15s;
+}
+
+.tryon-reset-btn:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* ── Action Buttons ────────────────────────────────────────────────────────── */
+.tryon-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.tryon-actions-full {
+    grid-column: 1 / -1;
+}
+
+.tryon-btn-download {
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.18s;
+}
+
+.tryon-btn-download:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.tryon-btn-share {
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.18s;
+}
+
+.tryon-btn-share:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.tryon-btn-buy {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, hsl(38, 65%, 55%) 0%, hsl(28, 80%, 48%) 100%);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+    font-family: 'Syne', 'Inter', sans-serif;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: transform 0.14s, box-shadow 0.14s;
+    box-shadow: 0 4px 20px rgba(214, 138, 69, 0.35);
+    letter-spacing: 0.3px;
+}
+
+.tryon-btn-buy:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px rgba(214, 138, 69, 0.5);
+}
+
+.tryon-btn-buy:active {
+    transform: translateY(0);
+}
+
+.tryon-btn-retry {
+    padding: 11px 18px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tryon-btn-retry:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* ── Fallback Banner ─────────────────────────────────────────────────────── */
+.tryon-fallback-banner {
+    background: rgba(255, 160, 50, 0.12);
+    border: 1px solid rgba(255, 160, 50, 0.3);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.5;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.tryon-fallback-banner span:first-child {
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+/* ── Progress Steps pill ─────────────────────────────────────────────────── */
+.tryon-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 20px 0;
+}
+
+.tryon-step-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    transition: width 0.2s, background 0.2s;
+}
+
+.tryon-step-dot.active {
+    width: 22px;
+    background: hsl(38, 65%, 55%);
+}
+
+/* ── Retake / back row ───────────────────────────────────────────────────── */
+.tryon-retake-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+/* ── Scrollbar thin on panel ─────────────────────────────────────────────── */
+.tryon-panel::-webkit-scrollbar {
+    width: 4px;
+}
+
+.tryon-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tryon-panel::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+}

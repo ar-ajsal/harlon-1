@@ -55,16 +55,26 @@ function OrdersManager() {
             setStatsLoading(true)
             const filters = getActiveFilters()
 
-            const [ordersRes, statsRes] = await Promise.all([
+            // Run both independently — a stats failure shouldn't blank out orders
+            const [ordersRes, statsRes] = await Promise.allSettled([
                 ordersAPI.getAll(filters),
                 ordersAPI.getFilteredStats(filters)
             ])
 
-            const data = ordersRes.data?.data || ordersRes.data || []
-            setOrders(Array.isArray(data) ? data : [])
-            if (ordersRes.data?.pagination) setPagination(ordersRes.data.pagination)
+            if (ordersRes.status === 'fulfilled') {
+                const data = ordersRes.value.data?.data || ordersRes.value.data || []
+                setOrders(Array.isArray(data) ? data : [])
+                if (ordersRes.value.data?.pagination) setPagination(ordersRes.value.data.pagination)
+            } else {
+                toast.error('Failed to load orders')
+            }
 
-            setStats(statsRes.data?.data || EMPTY_STATS)
+            if (statsRes.status === 'fulfilled') {
+                setStats(statsRes.value.data?.data || EMPTY_STATS)
+            } else {
+                console.warn('Stats fetch failed:', statsRes.reason)
+                setStats(EMPTY_STATS)
+            }
         } catch (error) {
             console.error('Error fetching orders:', error)
             toast.error('Failed to load orders')

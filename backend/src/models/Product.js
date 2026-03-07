@@ -65,6 +65,14 @@ const productSchema = new mongoose.Schema({
     priority: {
         type: Number,
         default: 0
+    },
+    overlayImage: {
+        type: String,
+        default: ''
+    },
+    tryOnEnabled: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true

@@ -7,13 +7,17 @@ const storage = new CloudinaryStorage({
     params: {
         folder: 'harlon-products',
         allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
-        transformation: [{ width: 800, height: 800, crop: 'limit', quality: 'auto' }]
+        transformation: [{
+            quality: 100,
+            fetch_format: 'auto',
+            flags: 'preserve_transparency' // Allows PNG alpha channel
+        }]
     }
 });
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 } // 5MB
+    limits: { fileSize: 20 * 1024 * 1024 } // 20MB — supports high-res originals
 });
 
 export default upload;

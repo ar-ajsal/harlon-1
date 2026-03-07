@@ -1,0 +1,12 @@
+﻿diff --git a/frontend/src/main.jsx b/frontend/src/main.jsx
+index 0ec9d30..0362a07 100644
+--- a/frontend/src/main.jsx
++++ b/frontend/src/main.jsx
+@@ -12,6 +12,7 @@ import './styles/coupon.css'
+ import './styles/features.css'
+ 
+ async function bootstrap() {
++  console.log('BOOTSTRAP CALLED');
+   if (import.meta.env.VITE_MSW === 'true') {
+     const { worker } = await import('./mocks/browser.js')
+     await worker.start({ onUnhandledRequest: 'bypass', quiet: true })

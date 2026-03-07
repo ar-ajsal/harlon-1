@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback, lazy, Suspense } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { FaArrowLeft, FaTags, FaShoppingBag, FaCog, FaMapMarkerAlt, FaEnvelope } from 'react-icons/fa'
@@ -14,6 +14,9 @@ import ProductGallery from '../components/product/ProductGallery'
 import ProductSummary from '../components/product/ProductSummary'
 import ProductCard from '../components/ProductCard'
 import '../styles/product-detail.css'
+import '../styles/tryon.css'
+
+const VirtualTryOn = lazy(() => import('../components/VirtualTryOn'))
 
 // ─── Delivery helpers ────────────────────────────────────────────────────────
 function getDeliveryDates() {
@@ -97,6 +100,7 @@ function ProductDetail() {
     const [stickyVisible, setStickyVisible] = useState(false)
     const { isWishlisted, toggleWishlist } = useWishlist()
     const wishlisted = product ? isWishlisted(product._id) : false
+    const [showTryOn, setShowTryOn] = useState(false)
 
     const { h, m, s } = useCountdown()
     const dates = getDeliveryDates()
@@ -370,6 +374,37 @@ function ProductDetail() {
                             </AnimatePresence>
                         </div>
 
+                        {/* Try This Jersey button — shown only if tryOnEnabled */}
+                        {product.tryOnEnabled && product.overlayImage && (
+                            <button
+                                type="button"
+                                className="pd-inquiry-link"
+                                onClick={() => setShowTryOn(true)}
+                                style={{
+                                    marginBottom: 6,
+                                    background: 'linear-gradient(135deg, hsl(38,65%,55%) 0%, hsl(28,80%,48%) 100%)',
+                                    color: '#fff',
+                                    border: 'none',
+                                    padding: '12px 16px',
+                                    borderRadius: 10,
+                                    fontWeight: 700,
+                                    fontSize: 14,
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 8,
+                                    width: '100%',
+                                    justifyContent: 'center',
+                                    boxShadow: '0 4px 16px rgba(214,138,69,0.3)',
+                                    transition: 'transform 0.14s, box-shadow 0.14s'
+                                }}
+                                onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(214,138,69,0.45)'; }}
+                                onMouseOut={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 4px 16px rgba(214,138,69,0.3)'; }}
+                            >
+                                🧥 Try This Jersey
+                            </button>
+                        )}
+
                         {/* Size Quiz link */}
                         <button
                             type="button"
@@ -539,6 +574,18 @@ function ProductDetail() {
                     <SizeQuiz onClose={() => setShowSizeQuiz(false)} />
                 )}
             </AnimatePresence>
+
+            {/* ── Virtual Try-On modal (lazy loaded) ── */}
+            <Suspense fallback={null}>
+                {showTryOn && (
+                    <VirtualTryOn
+                        overlayImage={product.overlayImage}
+                        productName={product.name}
+                        onClose={() => setShowTryOn(false)}
+                        onBuy={() => { setShowTryOn(false); handleBuy() }}
+                    />
+                )}
+            </Suspense>
         </div>
     )
 }
