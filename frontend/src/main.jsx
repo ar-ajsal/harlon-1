@@ -11,31 +11,6 @@ import './styles/design-system.css'
 import './styles/coupon.css'
 import './styles/features.css'
 
-async function bootstrap() {
-  console.log('BOOTSTRAP CALLED');
-  if (import.meta.env.VITE_MSW === 'true') {
-    const { worker } = await import('./mocks/browser.js')
-    await worker.start({ onUnhandledRequest: 'bypass', quiet: true })
-  }
-  ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.StrictMode>
-      <ErrorBoundary>
-        <BrowserRouter>
-          <AuthProvider>
-            <ThemeProvider>
-              <ProductProvider>
-                <WishlistProvider>
-                  <App />
-                </WishlistProvider>
-              </ProductProvider>
-            </ThemeProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </ErrorBoundary>
-    </React.StrictMode>,
-  )
-}
-
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -63,4 +38,35 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-bootstrap()
+async function bootstrap() {
+  if (import.meta.env.VITE_MSW === 'true') {
+    const { worker } = await import('./mocks/browser.js')
+    await worker.start({ onUnhandledRequest: 'bypass', quiet: true })
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    <React.StrictMode>
+      <ErrorBoundary>
+        <BrowserRouter>
+          <AuthProvider>
+            <ThemeProvider>
+              <ProductProvider>
+                <WishlistProvider>
+                  <App />
+                </WishlistProvider>
+              </ProductProvider>
+            </ThemeProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </ErrorBoundary>
+    </React.StrictMode>,
+  )
+}
+
+bootstrap().catch(err => {
+  console.error('Fatal startup error:', err);
+  document.getElementById('root').innerHTML = `
+    <div style="padding:20px;color:red;font-family:monospace">
+      <h1>App failed to start</h1>
+      <pre>${err?.message || err}</pre>
+    </div>`;
+});
