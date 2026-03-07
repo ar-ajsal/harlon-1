@@ -119,14 +119,6 @@ function OrdersManager() {
     const fmt = (amount) => `₹${(amount || 0).toLocaleString('en-IN')}`
     const fmtDate = (date) => new Date(date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
 
-    const statCards = [
-        { label: 'Revenue', value: fmt(stats.totalRevenue), color: 'var(--gold)', bg: 'hsla(38,45%,52%,0.1)' },
-        { label: 'Profit', value: fmt(stats.totalProfit), color: '#22c55e', bg: 'hsla(142,76%,36%,0.1)' },
-        { label: 'Cost', value: fmt(stats.totalCost), color: '#f59e0b', bg: 'hsla(38,92%,50%,0.1)' },
-        { label: 'Discount', value: fmt(stats.totalDiscount), color: '#ef4444', bg: 'hsla(0,84%,60%,0.1)' },
-        { label: 'Avg Order', value: fmt(stats.avgOrderValue), color: '#8b5cf6', bg: 'hsla(262,83%,58%,0.1)' },
-        { label: `Orders (${stats.totalOrders})`, value: `✅${stats.paidCount} ⏳${stats.pendingCount} ❌${stats.cancelledCount}`, color: 'var(--noir-80)', bg: 'var(--noir-5)' },
-    ]
 
     return (
         <AdminLayout
@@ -214,30 +206,28 @@ function OrdersManager() {
                 )}
             </div>
 
-            {/* ── Calculation Summary Panel ────────────────────────── */}
+            {/* ── Total Amount Bar ─────────────────────────────────── */}
             <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-                gap: '10px',
-                marginBottom: '20px'
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                gap: '16px',
+                padding: '10px 16px',
+                background: 'var(--card-bg, #fff)',
+                border: '1px solid var(--noir-10)',
+                borderRadius: '10px',
+                marginBottom: '16px',
+                opacity: statsLoading ? 0.5 : 1,
+                transition: 'opacity 0.2s'
             }}>
-                {statCards.map(card => (
-                    <div key={card.label} style={{
-                        background: card.bg,
-                        border: `1px solid ${card.color}33`,
-                        borderRadius: '10px',
-                        padding: '12px 14px',
-                        opacity: statsLoading ? 0.5 : 1,
-                        transition: 'opacity 0.2s'
-                    }}>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--noir-60)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                            {card.label}
-                        </div>
-                        <div style={{ fontSize: '1rem', fontWeight: 700, color: card.color }}>
-                            {card.value}
-                        </div>
-                    </div>
-                ))}
+                <span style={{ color: 'var(--noir-60)', fontSize: '0.9rem' }}>
+                    {stats.totalOrders} order{stats.totalOrders !== 1 ? 's' : ''}
+                </span>
+                <span style={{ color: 'var(--noir-20)', fontSize: '1.2rem' }}>|</span>
+                <span style={{ fontSize: '0.9rem', color: 'var(--noir-60)' }}>Total Amount</span>
+                <span style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--gold, #c9a962)' }}>
+                    {fmt(stats.totalRevenue)}
+                </span>
             </div>
 
             {/* ── Orders List ──────────────────────────────────────── */}
