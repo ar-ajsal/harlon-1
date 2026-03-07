@@ -24,13 +24,18 @@ const generateInvoiceNumber = async () => {
     return `INV-${year}-${nextNum}`;
 };
 
-// Helper to build a filter object from query params (status, paymentMethod, date range, search)
+// Helper to build a filter object from query params (status, paymentMethod, dropOn, date range, search)
 function buildOrderFilter(query) {
-    const { search, status, paymentMethod, dateFrom, dateTo } = query;
+    const { search, status, paymentMethod, dropOn, dateFrom, dateTo } = query;
     const filter = {};
 
     if (status) filter.status = status;
     if (paymentMethod) filter.paymentMethod = paymentMethod;
+
+    // Filter orders that contain at least one item from the selected drop
+    if (dropOn) {
+        filter.items = { $elemMatch: { dropOn } };
+    }
 
     if (dateFrom || dateTo) {
         filter.date = {};
@@ -43,18 +48,30 @@ function buildOrderFilter(query) {
     }
 
     if (search) {
-        const re = { $regex: search, $options: 'i' };
-        const orClauses = [
-            { invoiceNumber: re },
-            { 'customer.name': re },
-            { 'customer.phone': re }
+        filter.$or = [
+            { invoiceNumber: { $regex: search, $options: 'i' } },
+            { 'customer.name': { $regex: search, $options: 'i' } },
+            { 'customer.phone': { $regex: search, $options: 'i' } }
         ];
-        // Merge with existing filter if any
-        filter.$or = orClauses;
     }
 
     return filter;
 }
+
+// GET all unique dropOn values (for the filter dropdown)
+router.get('/stats/drop-ons', async (req, res) => {
+    try {
+        const values = await Order.aggregate([
+            { $unwind: '$items' },
+            { $match: { 'items.dropOn': { $nin: [null, ''] } } },
+            { $group: { _id: '$items.dropOn' } },
+            { $sort: { _id: 1 } }
+        ]);
+        res.json({ success: true, data: values.map(v => v._id) });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
 
 // GET all orders — supports: search, status, paymentMethod, dateFrom, dateTo, page, limit
 router.get('/', async (req, res) => {

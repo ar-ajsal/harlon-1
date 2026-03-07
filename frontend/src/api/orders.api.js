@@ -1,8 +1,11 @@
 import api from './axios';
 
 export const ordersAPI = {
-    // Get all orders with optional filters: search, status, paymentMethod, dateFrom, dateTo, page, limit
+    // Get all orders with optional filters: search, status, paymentMethod, dropOn, dateFrom, dateTo, page, limit
     getAll: (params = {}) => api.get('/orders', { params }),
+
+    // Get unique dropOn values for the filter dropdown
+    getDropOns: () => api.get('/orders/stats/drop-ons'),
 
     // Get single order by ID
     getById: (id) => api.get(`/orders/${id}`),

@@ -19,29 +19,39 @@ function OrdersManager() {
     const [loading, setLoading] = useState(true)
     const [stats, setStats] = useState(EMPTY_STATS)
     const [statsLoading, setStatsLoading] = useState(false)
+    const [dropOnOptions, setDropOnOptions] = useState([])
 
     // Filters
     const [search, setSearch] = useState('')
     const [statusFilter, setStatusFilter] = useState('')
     const [paymentFilter, setPaymentFilter] = useState('')
+    const [dropOnFilter, setDropOnFilter] = useState('')
     const [dateFrom, setDateFrom] = useState('')
     const [dateTo, setDateTo] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
     const [pagination, setPagination] = useState({ total: 0, pages: 1, limit: 20 })
 
+    // Load unique Drop On values once on mount
+    useEffect(() => {
+        ordersAPI.getDropOns()
+            .then(res => setDropOnOptions(res.data?.data || []))
+            .catch(() => { })
+    }, [])
+
     const getActiveFilters = useCallback(() => ({
         search: search || undefined,
         status: statusFilter || undefined,
         paymentMethod: paymentFilter || undefined,
+        dropOn: dropOnFilter || undefined,
         dateFrom: dateFrom || undefined,
         dateTo: dateTo || undefined,
         page: currentPage,
         limit: 20,
-    }), [search, statusFilter, paymentFilter, dateFrom, dateTo, currentPage])
+    }), [search, statusFilter, paymentFilter, dropOnFilter, dateFrom, dateTo, currentPage])
 
     useEffect(() => {
         fetchOrders()
-    }, [search, statusFilter, paymentFilter, dateFrom, dateTo, currentPage])
+    }, [search, statusFilter, paymentFilter, dropOnFilter, dateFrom, dateTo, currentPage])
 
     const fetchOrders = async () => {
         try {
@@ -72,12 +82,13 @@ function OrdersManager() {
         setSearch('')
         setStatusFilter('')
         setPaymentFilter('')
+        setDropOnFilter('')
         setDateFrom('')
         setDateTo('')
         setCurrentPage(1)
     }
 
-    const hasActiveFilters = search || statusFilter || paymentFilter || dateFrom || dateTo
+    const hasActiveFilters = search || statusFilter || paymentFilter || dropOnFilter || dateFrom || dateTo
 
     const handlePageChange = (page) => {
         setCurrentPage(page)
@@ -165,9 +176,22 @@ function OrdersManager() {
                     style={{ height: '40px', minWidth: '130px' }}
                 >
                     <option value="">All Statuses</option>
-                    <option value="Paid">Paid</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Cancelled">Cancelled</option>
+                    <option value="Paid">✅ Paid</option>
+                    <option value="Pending">⏳ Pending</option>
+                    <option value="Cancelled">❌ Cancelled</option>
+                </select>
+
+                {/* Drop On */}
+                <select
+                    value={dropOnFilter}
+                    onChange={(e) => { setDropOnFilter(e.target.value); setCurrentPage(1) }}
+                    className="form-input"
+                    style={{ height: '40px', minWidth: '130px' }}
+                >
+                    <option value="">All Drops</option>
+                    {dropOnOptions.map(d => (
+                        <option key={d} value={d}>{d}</option>
+                    ))}
                 </select>
 
                 {/* Payment Method */}
