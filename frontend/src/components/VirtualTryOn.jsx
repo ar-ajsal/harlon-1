@@ -23,10 +23,10 @@ function loadMediaPipe() {
     return mediapipePromise
 }
 
+import { computePlacement, LM } from '../utils/tryonMath.js'
+
 /* ─── Constants ───────────────────────────────────────────────────────────── */
 const STEPS = ['tips', 'input', 'processing', 'result']
-// MediaPipe landmark indices
-const LM = { LEFT_SHOULDER: 11, RIGHT_SHOULDER: 12, LEFT_HIP: 23, RIGHT_HIP: 24 }
 
 /* ─── VirtualTryOn ─────────────────────────────────────────────────────────── */
 function VirtualTryOn({ overlayImage, productName, onClose, onBuy }) {
@@ -38,9 +38,11 @@ function VirtualTryOn({ overlayImage, productName, onClose, onBuy }) {
     const fileInputRef = useRef(null)
     const streamRef = useRef(null)
 
-    // Overlay placement state
-    const [overlayPos, setOverlayPos] = useState({ x: 0, y: 0, scale: 1 })
-    const [overlayDefaults, setOverlayDefaults] = useState({ x: 0, y: 0, scale: 1 })
+    // Overlay placement & debug state
+    const [overlayPos, setOverlayPos] = useState({ x: 0, y: 0, scale: 1, angle: 0 })
+    const [overlayDefaults, setOverlayDefaults] = useState({ x: 0, y: 0, scale: 1, angle: 0 })
+    const [savedLandmarks, setSavedLandmarks] = useState(null)
+    const [showSkeleton, setShowSkeleton] = useState(false)
     const draggingRef = useRef(false)
     const lastTouchRef = useRef(null)
     const photoRef = useRef(null)  // stores final captured ImageData / image element
@@ -53,6 +55,16 @@ function VirtualTryOn({ overlayImage, productName, onClose, onBuy }) {
             }
         }
     }, [])
+
+    // Ensure canvas is drawn when entering result/fallback steps
+    useEffect(() => {
+        if (step === 'result' || step === 'fallback') {
+            const timer = setTimeout(() => {
+                rerenderCanvas(overlayPos, showSkeleton)
+            }, 50)
+            return () => clearTimeout(timer)
+        }
+    }, [step, showSkeleton])
 
     /* ─── Capture from camera ─────────────────────────────────────────────── */
     const handleCamera = useCallback(async () => {
@@ -122,19 +134,20 @@ function VirtualTryOn({ overlayImage, productName, onClose, onBuy }) {
 
             if (landmarks && landmarks.length > 0) {
                 setStatus('Overlaying jersey…')
+                setSavedLandmarks(landmarks)
                 const placement = computePlacement(landmarks, photoImg.width, photoImg.height)
-                await renderCanvas(photoImg, placement)
-                setOverlayPos({ x: placement.x, y: placement.y, scale: placement.scale })
-                setOverlayDefaults({ x: placement.x, y: placement.y, scale: placement.scale })
+                setOverlayPos(placement)
+                setOverlayDefaults(placement)
                 setStep('result')
             } else {
                 // Fallback: centre overlay manually
+                setSavedLandmarks(null)
                 const fallbackPlacement = {
                     x: photoImg.width * 0.15,
                     y: photoImg.height * 0.18,
-                    scale: photoImg.width * 0.70
+                    scale: photoImg.width * 0.70,
+                    angle: 0
                 }
-                await renderCanvas(photoImg, fallbackPlacement)
                 setOverlayPos(fallbackPlacement)
                 setOverlayDefaults(fallbackPlacement)
                 setStep('fallback')
@@ -145,10 +158,11 @@ function VirtualTryOn({ overlayImage, productName, onClose, onBuy }) {
             const fallbackPlacement = {
                 x: photoImg.width * 0.15,
                 y: photoImg.height * 0.18,
-                scale: photoImg.width * 0.70
+                scale: photoImg.width * 0.70,
+                angle: 0
             }
             try {
-                await renderCanvas(photoImg, fallbackPlacement)
+                setSavedLandmarks(null)
                 setOverlayPos(fallbackPlacement)
                 setOverlayDefaults(fallbackPlacement)
                 setStep('fallback')
@@ -194,74 +208,45 @@ function VirtualTryOn({ overlayImage, productName, onClose, onBuy }) {
         })
     }
 
-    /* ─── Compute jersey placement from landmarks ─────────────────────────── */
-    function computePlacement(landmarks, imgW, imgH) {
-        const ls = landmarks[LM.LEFT_SHOULDER]
-        const rs = landmarks[LM.RIGHT_SHOULDER]
-        const lh = landmarks[LM.LEFT_HIP]
-        const rh = landmarks[LM.RIGHT_HIP]
-
-        if (!ls || !rs) {
-            return { x: imgW * 0.15, y: imgH * 0.18, scale: imgW * 0.70 }
-        }
-
-        const lsx = ls.x * imgW, lsy = ls.y * imgH
-        const rsx = rs.x * imgW, rsy = rs.y * imgH
-        const lhx = lh ? lh.x * imgW : lsx + (rsx - lsx) * 0.1
-        const lhy = lh ? lh.y * imgH : lsy + imgH * 0.3
-        const rhx = rh ? rh.x * imgW : rsx - (rsx - lsx) * 0.1
-        const rhy = rh ? rh.y * imgH : rsy + imgH * 0.3
-
-        // Shoulder width → jersey width (add ~30% padding each side)
-        const shoulderW = Math.abs(rsx - lsx)
-        const jerseyW = shoulderW * 1.6
-        const jerseyH = jerseyW * 1.35   // typical jersey aspect ratio
-
-        // Center X between shoulders, Y above shoulders
-        const centerX = (lsx + rsx) / 2
-        const shoulderY = (lsy + rsy) / 2
-        const x = centerX - jerseyW / 2
-        const y = shoulderY - jerseyW * 0.12  // slight pull-up so collar aligns
-
-        return { x, y, scale: jerseyW }
-    }
-
-    /* ─── Render canvas ───────────────────────────────────────────────────── */
-    async function renderCanvas(photoImg, placement) {
-        const canvas = canvasRef.current
-        if (!canvas) return
-
-        canvas.width = photoImg.width
-        canvas.height = photoImg.height
-        const ctx = canvas.getContext('2d')
-
-        // Draw photo
-        ctx.drawImage(photoImg, 0, 0)
-
-        // Draw jersey overlay
-        await new Promise((resolve) => {
-            const jerseyImg = new Image()
-            jerseyImg.crossOrigin = 'anonymous'
-            jerseyImg.src = overlayImage
-            jerseyImg.onload = () => {
-                const jerseyW = placement.scale
-                const jerseyH = (jerseyImg.naturalHeight / jerseyImg.naturalWidth) * jerseyW
-                ctx.drawImage(jerseyImg, placement.x, placement.y, jerseyW, jerseyH)
-                resolve()
-            }
-            jerseyImg.onerror = resolve   // fail silently, just show photo
-        })
-    }
+    // Extracted computePlacement logic is now imported from tryonMath.js
 
     /* ─── Re-render canvas when sliders change ────────────────────────────── */
-    const rerenderCanvas = useCallback(async (pos) => {
+    const rerenderCanvas = useCallback(async (pos, skeleton) => {
         if (!photoRef.current || !canvasRef.current) return
         const canvas = canvasRef.current
         const ctx = canvas.getContext('2d')
         const photoImg = photoRef.current
 
+        canvas.width = photoImg.width
+        canvas.height = photoImg.height
+
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         ctx.drawImage(photoImg, 0, 0)
+
+        // Draw debug skeleton if enabled
+        if (skeleton && savedLandmarks) {
+            ctx.fillStyle = '#00ff00'
+            const markers = [LM.NOSE, LM.LEFT_SHOULDER, LM.RIGHT_SHOULDER, LM.LEFT_HIP, LM.RIGHT_HIP]
+            for (let idx of markers) {
+                const lm = savedLandmarks[idx]
+                if (lm) {
+                    ctx.beginPath()
+                    ctx.arc(lm.x * canvas.width, lm.y * canvas.height, 6, 0, 2 * Math.PI)
+                    ctx.fill()
+                }
+            }
+            // Draw shoulder line
+            const ls = savedLandmarks[LM.LEFT_SHOULDER]
+            const rs = savedLandmarks[LM.RIGHT_SHOULDER]
+            if (ls && rs) {
+                ctx.strokeStyle = '#00ff00'
+                ctx.lineWidth = 3
+                ctx.beginPath()
+                ctx.moveTo(ls.x * canvas.width, ls.y * canvas.height)
+                ctx.lineTo(rs.x * canvas.width, rs.y * canvas.height)
+                ctx.stroke()
+            }
+        }
 
         const jerseyImg = new Image()
         jerseyImg.crossOrigin = 'anonymous'
@@ -269,7 +254,15 @@ function VirtualTryOn({ overlayImage, productName, onClose, onBuy }) {
         jerseyImg.onload = () => {
             const jerseyW = pos.scale
             const jerseyH = (jerseyImg.naturalHeight / jerseyImg.naturalWidth) * jerseyW
-            ctx.drawImage(jerseyImg, pos.x, pos.y, jerseyW, jerseyH)
+
+            ctx.save()
+            // Translate to the center of the jersey, rotate, then draw
+            const cx = pos.x + jerseyW / 2
+            const cy = pos.y + jerseyH / 2
+            ctx.translate(cx, cy)
+            ctx.rotate((pos.angle || 0) * Math.PI / 180)
+            ctx.drawImage(jerseyImg, -jerseyW / 2, -jerseyH / 2, jerseyW, jerseyH)
+            ctx.restore()
         }
     }, [overlayImage])
 
@@ -318,7 +311,7 @@ function VirtualTryOn({ overlayImage, productName, onClose, onBuy }) {
     const handleSliderChange = (field, value) => {
         const newPos = { ...overlayPos, [field]: Number(value) }
         setOverlayPos(newPos)
-        rerenderCanvas(newPos)
+        rerenderCanvas(newPos, showSkeleton)
     }
 
     /* ─── Render helpers ─────────────────────────────────────────────────── */
@@ -440,7 +433,15 @@ function VirtualTryOn({ overlayImage, productName, onClose, onBuy }) {
                             onChange={handleSliderChange}
                         />
 
-                        <div className="tryon-canvas-hint">✨ Jersey placed automatically — adjust with sliders if needed</div>
+                        <div className="tryon-canvas-hint">
+                            ✨ Jersey placed automatically — adjust with sliders if needed
+                            {savedLandmarks && (
+                                <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 8, cursor: 'pointer', fontSize: 13 }}>
+                                    <input type="checkbox" checked={showSkeleton} onChange={e => setShowSkeleton(e.target.checked)} />
+                                    Show AI landmarks (Debug)
+                                </label>
+                            )}
+                        </div>
 
                         <div className="tryon-actions">
                             <button className="tryon-btn-download" onClick={handleDownload}>⬇ Download</button>
@@ -547,12 +548,27 @@ function AdjustmentControls({ overlayPos, overlayDefaults, onChange }) {
                 <span className="tryon-slider-val">{Math.round(overlayPos.scale)}</span>
             </div>
 
+            <div className="tryon-slider-row">
+                <span className="tryon-slider-label">↻ Tilt</span>
+                <input
+                    type="range"
+                    className="tryon-slider"
+                    min={-45}
+                    max={45}
+                    step={1}
+                    value={overlayPos.angle || 0}
+                    onChange={e => onChange('angle', e.target.value)}
+                />
+                <span className="tryon-slider-val">{Math.round(overlayPos.angle || 0)}°</span>
+            </div>
+
             <button
                 className="tryon-reset-btn"
                 onClick={() => {
                     onChange('x', overlayDefaults.x)
                     onChange('y', overlayDefaults.y)
                     onChange('scale', overlayDefaults.scale)
+                    onChange('angle', overlayDefaults.angle || 0)
                 }}
             >
                 Reset to auto position
