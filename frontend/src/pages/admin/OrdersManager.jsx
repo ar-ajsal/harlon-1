@@ -26,8 +26,6 @@ function OrdersManager() {
     const [statusFilter, setStatusFilter] = useState('')
     const [paymentFilter, setPaymentFilter] = useState('')
     const [dropOnFilter, setDropOnFilter] = useState('')
-    const [dateFrom, setDateFrom] = useState('')
-    const [dateTo, setDateTo] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
     const [pagination, setPagination] = useState({ total: 0, pages: 1, limit: 20 })
 
@@ -43,15 +41,13 @@ function OrdersManager() {
         status: statusFilter || undefined,
         paymentMethod: paymentFilter || undefined,
         dropOn: dropOnFilter || undefined,
-        dateFrom: dateFrom || undefined,
-        dateTo: dateTo || undefined,
         page: currentPage,
         limit: 20,
-    }), [search, statusFilter, paymentFilter, dropOnFilter, dateFrom, dateTo, currentPage])
+    }), [search, statusFilter, paymentFilter, dropOnFilter, currentPage])
 
     useEffect(() => {
         fetchOrders()
-    }, [search, statusFilter, paymentFilter, dropOnFilter, dateFrom, dateTo, currentPage])
+    }, [search, statusFilter, paymentFilter, dropOnFilter, currentPage])
 
     const fetchOrders = async () => {
         try {
@@ -83,12 +79,10 @@ function OrdersManager() {
         setStatusFilter('')
         setPaymentFilter('')
         setDropOnFilter('')
-        setDateFrom('')
-        setDateTo('')
         setCurrentPage(1)
     }
 
-    const hasActiveFilters = search || statusFilter || paymentFilter || dropOnFilter || dateFrom || dateTo
+    const hasActiveFilters = search || statusFilter || paymentFilter || dropOnFilter
 
     const handlePageChange = (page) => {
         setCurrentPage(page)
@@ -206,24 +200,6 @@ function OrdersManager() {
                     <option value="Cash">Cash</option>
                     <option value="UPI">UPI</option>
                 </select>
-
-                {/* Date Range */}
-                <input
-                    type="date"
-                    value={dateFrom}
-                    onChange={(e) => { setDateFrom(e.target.value); setCurrentPage(1) }}
-                    className="form-input"
-                    style={{ height: '40px' }}
-                    title="From date"
-                />
-                <input
-                    type="date"
-                    value={dateTo}
-                    onChange={(e) => { setDateTo(e.target.value); setCurrentPage(1) }}
-                    className="form-input"
-                    style={{ height: '40px' }}
-                    title="To date"
-                />
 
                 {/* Clear */}
                 {hasActiveFilters && (
