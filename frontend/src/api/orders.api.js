@@ -1,8 +1,8 @@
 import api from './axios';
 
 export const ordersAPI = {
-    // Get all orders with optional search
-    getAll: (search = '') => api.get('/orders', { params: { search } }),
+    // Get all orders with optional filters: search, status, paymentMethod, dateFrom, dateTo, page, limit
+    getAll: (params = {}) => api.get('/orders', { params }),
 
     // Get single order by ID
     getById: (id) => api.get(`/orders/${id}`),
@@ -19,11 +19,14 @@ export const ordersAPI = {
     // Delete order
     delete: (id) => api.delete(`/orders/${id}`),
 
-    // Get order statistics
+    // Get order statistics (legacy summary)
     getStats: () => api.get('/orders/stats/summary'),
 
     // Get Today's Stats for Dashboard
     getTodayStats: () => api.get('/orders/stats/today'),
+
+    // Get aggregated stats for the currently active filters (for the calculation panel)
+    getFilteredStats: (params = {}) => api.get('/orders/stats/filtered', { params }),
 
     // Get Monthly Report
     getMonthlyReport: (year, month) => api.get(`/orders/reports/${year}/${month}`),

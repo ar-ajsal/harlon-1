@@ -24,26 +24,47 @@ const generateInvoiceNumber = async () => {
     return `INV-${year}-${nextNum}`;
 };
 
-// GET all orders
+// Helper to build a filter object from query params (status, paymentMethod, date range, search)
+function buildOrderFilter(query) {
+    const { search, status, paymentMethod, dateFrom, dateTo } = query;
+    const filter = {};
+
+    if (status) filter.status = status;
+    if (paymentMethod) filter.paymentMethod = paymentMethod;
+
+    if (dateFrom || dateTo) {
+        filter.date = {};
+        if (dateFrom) filter.date.$gte = new Date(dateFrom);
+        if (dateTo) {
+            const end = new Date(dateTo);
+            end.setHours(23, 59, 59, 999);
+            filter.date.$lte = end;
+        }
+    }
+
+    if (search) {
+        const re = { $regex: search, $options: 'i' };
+        const orClauses = [
+            { invoiceNumber: re },
+            { 'customer.name': re },
+            { 'customer.phone': re }
+        ];
+        // Merge with existing filter if any
+        filter.$or = orClauses;
+    }
+
+    return filter;
+}
+
+// GET all orders — supports: search, status, paymentMethod, dateFrom, dateTo, page, limit
 router.get('/', async (req, res) => {
     try {
-        const { search, page = 1, limit = 20 } = req.query;
-        let query = {};
-
-        if (search) {
-            query = {
-                $or: [
-                    { invoiceNumber: { $regex: search, $options: 'i' } },
-                    { 'customer.name': { $regex: search, $options: 'i' } },
-                    { 'customer.phone': { $regex: search, $options: 'i' } }
-                ]
-            };
-        }
-
+        const { page = 1, limit = 20 } = req.query;
+        const query = buildOrderFilter(req.query);
         const skip = (parseInt(page) - 1) * parseInt(limit);
 
         const [orders, total] = await Promise.all([
-            Order.find(query).sort({ createdAt: -1 }).skip(skip).limit(parseInt(limit)),
+            Order.find(query).sort({ date: -1 }).skip(skip).limit(parseInt(limit)),
             Order.countDocuments(query)
         ]);
 
@@ -57,6 +78,54 @@ router.get('/', async (req, res) => {
                 limit: parseInt(limit)
             }
         });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// GET aggregated financial stats for the current filter (used by UI calculation panel)
+router.get('/stats/filtered', async (req, res) => {
+    try {
+        const matchFilter = buildOrderFilter(req.query);
+
+        const [agg] = await Order.aggregate([
+            { $match: matchFilter },
+            {
+                $group: {
+                    _id: null,
+                    totalOrders: { $sum: 1 },
+                    totalRevenue: { $sum: '$finalTotal' },
+                    totalSubtotal: { $sum: '$subtotal' },
+                    totalDiscount: { $sum: '$discount' },
+                    totalCost: {
+                        $sum: {
+                            $reduce: {
+                                input: '$items',
+                                initialValue: 0,
+                                in: { $add: ['$$value', { $multiply: ['$$this.costPrice', '$$this.quantity'] }] }
+                            }
+                        }
+                    },
+                    paidCount: { $sum: { $cond: [{ $eq: ['$status', 'Paid'] }, 1, 0] } },
+                    pendingCount: { $sum: { $cond: [{ $eq: ['$status', 'Pending'] }, 1, 0] } },
+                    cancelledCount: { $sum: { $cond: [{ $eq: ['$status', 'Cancelled'] }, 1, 0] } },
+                    paidRevenue: { $sum: { $cond: [{ $eq: ['$status', 'Paid'] }, '$finalTotal', 0] } }
+                }
+            }
+        ]);
+
+        const result = agg || {
+            totalOrders: 0, totalRevenue: 0, totalSubtotal: 0,
+            totalDiscount: 0, totalCost: 0,
+            paidCount: 0, pendingCount: 0, cancelledCount: 0, paidRevenue: 0
+        };
+
+        result.totalProfit = result.totalRevenue - result.totalCost;
+        result.avgOrderValue = result.totalOrders > 0
+            ? Math.round(result.totalRevenue / result.totalOrders)
+            : 0;
+
+        res.json({ success: true, data: result });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
