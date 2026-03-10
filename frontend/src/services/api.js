@@ -1,4 +1,8 @@
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+let envUrl = import.meta.env.VITE_API_URL || '/api';
+if (envUrl.startsWith('http') && !envUrl.endsWith('/api')) {
+    envUrl = envUrl.replace(/\/$/, '') + '/api';
+}
+const API_URL = envUrl;
 console.log('Using API URL:', API_URL);
 
 // Helper to get auth headers
