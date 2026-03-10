@@ -13,6 +13,9 @@ const PRIMARY_ITEMS = [
 const MORE_ITEMS = [
     { to: '/admin/categories', label: '📂 Categories' },
     { to: '/admin/stock', label: '📦 Stock' },
+    { to: '/admin/drops', label: '⚡ Drops' },
+    { to: '/admin/predictions', label: '⚽ Predictions' },
+    { to: '/admin/story', label: '📖 Stories' },
     { to: '/admin/coupons', label: '🎁 Coupons' },
     { to: '/admin/orders', label: '🧾 Invoices' },
     { to: '/admin/guest-inquiries', label: '💬 Inquiries' },

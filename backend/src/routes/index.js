@@ -13,6 +13,10 @@ import inquiryRoutes from './inquiry.routes.js';
 import guestAdminRoutes from './guestAdmin.routes.js';
 // ── Monitoring ─────────────────────────────────────────────────────────────────
 import vitalsRoutes from './vitals.routes.js';
+// ── Football Fan Platform ──────────────────────────────────────────────────────
+import dropRoutes from './drop.routes.js';
+import predictionRoutes from './prediction.routes.js';
+import fanCollectionRoutes from './fanCollection.routes.js';
 
 const router = Router();
 
@@ -30,6 +34,10 @@ router.use('/inquiries', inquiryRoutes);
 router.use('/guest-admin', guestAdminRoutes);
 // ── Monitoring ─────────────────────────────────────────────────────────────────
 router.use('/vitals', vitalsRoutes);
+// ── Football Fan Platform ──────────────────────────────────────────────────────
+router.use('/drops', dropRoutes);
+router.use('/predictions', predictionRoutes);
+router.use('/fan', fanCollectionRoutes);
 
 export default router;
 

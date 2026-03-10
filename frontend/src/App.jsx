@@ -1,4 +1,5 @@
-import { Suspense, lazy, useEffect } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
+import HarlonLoader from './components/HarlonLoader'
 import { Routes, Route, useParams } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -33,6 +34,16 @@ const CouponDetails = lazy(() => import('./pages/admin/CouponDetails'))
 const GuestOrders = lazy(() => import('./pages/admin/GuestOrders'))
 const InquiriesManager = lazy(() => import('./pages/admin/InquiriesManager'))
 const StockManager = lazy(() => import('./pages/admin/StockManager'))
+const DropsManager = lazy(() => import('./pages/admin/DropsManager'))
+const PredictionsManager = lazy(() => import('./pages/admin/PredictionsManager'))
+const StoryManager = lazy(() => import('./pages/admin/StoryManager'))
+
+// ── Football Fan Platform ────────────────────────────────────────────────────────────────
+const DropPage = lazy(() => import('./pages/DropPage'))
+const MysteryBoxPage = lazy(() => import('./pages/MysteryBoxPage'))
+const PredictionsPage = lazy(() => import('./pages/PredictionsPage'))
+const FanCollectionPage = lazy(() => import('./pages/FanCollectionPage'))
+const OutfitBuilderPage = lazy(() => import('./pages/OutfitBuilderPage'))
 
 function AdminFallback() {
     return (
@@ -72,8 +83,18 @@ function useBackendWarmup() {
 function App() {
     useBackendWarmup()
 
+    // Show loader once per browser session
+    const [showLoader, setShowLoader] = useState(
+        () => !sessionStorage.getItem('hl-loaded')
+    )
+    const handleLoaderDone = () => {
+        sessionStorage.setItem('hl-loaded', '1')
+        setShowLoader(false)
+    }
+
     return (
         <div className="app">
+            {showLoader && <HarlonLoader onDone={handleLoaderDone} />}
             <Routes>
                 {/* ── Admin Routes ─────────────────────────────────────── */}
                 <Route path="/admin" element={
@@ -172,6 +193,27 @@ function App() {
                         </Suspense>
                     </ProtectedRoute>
                 } />
+                <Route path="/admin/drops" element={
+                    <ProtectedRoute>
+                        <Suspense fallback={<AdminFallback />}>
+                            <DropsManager />
+                        </Suspense>
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin/predictions" element={
+                    <ProtectedRoute>
+                        <Suspense fallback={<AdminFallback />}>
+                            <PredictionsManager />
+                        </Suspense>
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin/story" element={
+                    <ProtectedRoute>
+                        <Suspense fallback={<AdminFallback />}>
+                            <StoryManager />
+                        </Suspense>
+                    </ProtectedRoute>
+                } />
 
                 {/* ── Customer Routes ───────────────────────────────────── */}
                 <Route path="/*" element={
@@ -200,6 +242,25 @@ function App() {
                                 } />
                                 <Route path="/wishlist" element={
                                     <Suspense fallback={<CustomerFallback />}><WishlistPage /></Suspense>
+                                } />
+                                {/* ── Football Fan Platform ────────────────────────────────────────────── */}
+                                <Route path="/drops" element={
+                                    <Suspense fallback={<CustomerFallback />}><DropPage /></Suspense>
+                                } />
+                                <Route path="/mystery-box" element={
+                                    <Suspense fallback={<CustomerFallback />}><MysteryBoxPage /></Suspense>
+                                } />
+                                <Route path="/predictions" element={
+                                    <Suspense fallback={<CustomerFallback />}><PredictionsPage /></Suspense>
+                                } />
+                                <Route path="/fan" element={
+                                    <Suspense fallback={<CustomerFallback />}><FanCollectionPage /></Suspense>
+                                } />
+                                <Route path="/fan/:username" element={
+                                    <Suspense fallback={<CustomerFallback />}><FanCollectionPage /></Suspense>
+                                } />
+                                <Route path="/outfits" element={
+                                    <Suspense fallback={<CustomerFallback />}><OutfitBuilderPage /></Suspense>
                                 } />
                             </Routes>
                         </main>

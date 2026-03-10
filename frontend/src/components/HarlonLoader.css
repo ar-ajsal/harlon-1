@@ -1,0 +1,230 @@
+/* ── HarlonLoader ─────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
+
+:root {
+    --hl-maroon: #6b1a2a;
+    --hl-maroon-light: #8b2a3e;
+    --hl-maroon-dark: #4a0f1c;
+    --hl-cream: #faf6f1;
+    --hl-gold: #c9a86c;
+}
+
+/* Full-screen overlay — sits on top of everything */
+.hl-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--hl-cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Dancing Script', cursive;
+    overflow: hidden;
+    animation: hl-fadeOut 0.5s ease 3.4s forwards;
+}
+
+/* Subtle grain overlay */
+.hl-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* Jersey stitch border */
+.hl-stitch-ring {
+    position: absolute;
+    inset: 18px;
+    border: 2px dashed rgba(107, 26, 42, 0.08);
+    border-radius: 4px;
+    pointer-events: none;
+}
+
+.hl-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 36px;
+}
+
+/* ── Logo SVG ── */
+.hl-logo-svg {
+    width: 320px;
+    overflow: visible;
+    filter: drop-shadow(0 4px 18px rgba(107, 26, 42, 0.18));
+}
+
+/* Draw-on stroke animation */
+.hl-path {
+    fill: none;
+    stroke: var(--hl-maroon);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 2000;
+    stroke-dashoffset: 2000;
+    animation: hl-draw 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s forwards;
+}
+
+/* Fill fades in after draw */
+.hl-fill {
+    fill: var(--hl-maroon);
+    opacity: 0;
+    animation: hl-fillIn 0.6s ease 1.9s forwards;
+}
+
+/* Swoosh underline */
+.hl-swoosh {
+    fill: none;
+    stroke: var(--hl-maroon);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+    animation: hl-draw 0.8s ease 1.6s forwards;
+}
+
+.hl-swoosh-fill {
+    fill: var(--hl-maroon);
+    opacity: 0;
+    animation: hl-fillIn 0.5s ease 1.9s forwards;
+}
+
+@keyframes hl-draw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes hl-fillIn {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes hl-fadeOut {
+    to {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
+/* ── Progress bar ── */
+.hl-bar-wrap {
+    position: relative;
+    width: 260px;
+}
+
+.hl-bar-track {
+    width: 100%;
+    height: 3px;
+    background: rgba(107, 26, 42, 0.12);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.hl-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--hl-maroon-dark), var(--hl-maroon-light), var(--hl-gold));
+    border-radius: 2px;
+    animation: hl-progress 2.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
+}
+
+@keyframes hl-progress {
+    0% {
+        width: 0%;
+    }
+
+    40% {
+        width: 45%;
+    }
+
+    70% {
+        width: 72%;
+    }
+
+    100% {
+        width: 100%;
+    }
+}
+
+/* Percentage label */
+.hl-pct {
+    position: absolute;
+    right: 0;
+    top: -22px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--hl-maroon);
+    opacity: 0.7;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+}
+
+/* Pulsing dots */
+.hl-dots {
+    display: flex;
+    gap: 8px;
+    margin-top: -10px;
+}
+
+.hl-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--hl-maroon);
+    opacity: 0.2;
+}
+
+.hl-dot:nth-child(1) {
+    animation: hl-pulse 1.2s ease-in-out 0.0s infinite;
+}
+
+.hl-dot:nth-child(2) {
+    animation: hl-pulse 1.2s ease-in-out 0.2s infinite;
+}
+
+.hl-dot:nth-child(3) {
+    animation: hl-pulse 1.2s ease-in-out 0.4s infinite;
+}
+
+@keyframes hl-pulse {
+
+    0%,
+    100% {
+        opacity: 0.2;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.4);
+    }
+}
+
+/* Tagline */
+.hl-tagline {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--hl-maroon);
+    opacity: 0;
+    animation: hl-fadeUp 0.7s ease 2.2s forwards;
+}
+
+@keyframes hl-fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 0.6;
+        transform: translateY(0);
+    }
+}

@@ -442,7 +442,97 @@ function UrgencyBand() {
     )
 }
 
-/* 7. FOOTER CTA BAND ──────────────────────────────────────────────── */
+/* 7. PLATFORM FEATURES ─────────────────────────────────────────────── */
+const PLATFORM_CARDS = [
+    {
+        to: '/drops',
+        emoji: '⚡',
+        tag: 'MATCHDAY',
+        title: 'Drop Engine',
+        sub: 'Limited jersey drops. Countdown timers. Real-time stock.',
+        color: '#FFD700',
+        bg: 'linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(255,165,0,0.04) 100%)',
+        border: 'rgba(255,215,0,0.2)',
+    },
+    {
+        to: '/mystery-box',
+        emoji: '🎁',
+        tag: 'SURPRISE',
+        title: 'Mystery Box',
+        sub: 'Rare retro jersey inside. Animated unboxing reveal.',
+        color: '#a855f7',
+        bg: 'linear-gradient(135deg, rgba(168,85,247,0.08) 0%, rgba(109,40,217,0.04) 100%)',
+        border: 'rgba(168,85,247,0.2)',
+    },
+    {
+        to: '/predictions',
+        emoji: '⚽',
+        tag: 'WIN COUPONS',
+        title: 'Predict & Win',
+        sub: 'Predict scores. Climb the leaderboard. Earn discount codes.',
+        color: '#22c55e',
+        bg: 'linear-gradient(135deg, rgba(34,197,94,0.08) 0%, rgba(16,185,129,0.04) 100%)',
+        border: 'rgba(34,197,94,0.2)',
+    },
+]
+
+function PlatformFeatures({ shouldReduceMotion }) {
+    return (
+        <section style={{ padding: '64px 0', background: 'var(--bg, #0a0e1a)' }} aria-label="Platform features">
+            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px' }}>
+                <div style={{ textAlign: 'center', marginBottom: 40 }}>
+                    <p className="hh-section-eyebrow" style={{ color: '#FFD700', marginBottom: 8 }}>Fan Universe</p>
+                    <h2 className="hh-section-title" style={{ margin: 0 }}>More Than a Store</h2>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
+                    {PLATFORM_CARDS.map(({ to, emoji, tag, title, sub, color, bg, border }, i) => (
+                        <motion.div
+                            key={to}
+                            initial={shouldReduceMotion ? {} : { opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.45, delay: i * 0.1 }}
+                            whileHover={{ y: -6, scale: 1.02 }}
+                        >
+                            <Link
+                                to={to}
+                                style={{
+                                    display: 'block', background: bg,
+                                    border: `1px solid ${border}`,
+                                    borderRadius: 20, padding: '28px 24px',
+                                    textDecoration: 'none', color: 'inherit',
+                                    transition: 'box-shadow 0.25s',
+                                    boxShadow: `0 4px 24px ${border}`,
+                                    height: '100%',
+                                }}
+                            >
+                                <div style={{ fontSize: 36, marginBottom: 12 }}>{emoji}</div>
+                                <span style={{
+                                    fontSize: 10, fontWeight: 800, letterSpacing: '2px',
+                                    color, background: `${color}18`,
+                                    padding: '3px 10px', borderRadius: 99, textTransform: 'uppercase'
+                                }}>
+                                    {tag}
+                                </span>
+                                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: '12px 0 8px', color: '#fff' }}>
+                                    {title}
+                                </h3>
+                                <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.55)', lineHeight: 1.65, margin: 0 }}>
+                                    {sub}
+                                </p>
+                                <div style={{ marginTop: 20, display: 'flex', alignItems: 'center', gap: 6, color, fontWeight: 700, fontSize: '0.83rem' }}>
+                                    Explore <span>→</span>
+                                </div>
+                            </Link>
+                        </motion.div>
+                    ))}
+                </div>
+            </div>
+        </section>
+    )
+}
+
+/* 8. FOOTER CTA BAND ──────────────────────────────────────────────── */
 function FooterCTABand({ shouldReduceMotion }) {
     return (
         <section className="hh-footer-cta" aria-label="Final call to action" id="footer-cta">
@@ -673,7 +763,10 @@ export default function Home() {
                 />
             )}
 
-            {/* 7 ── Footer CTA Band */}
+            {/* 7 ── Platform Features (Drops / Mystery Box / Predictions) */}
+            <PlatformFeatures shouldReduceMotion={shouldReduceMotion} />
+
+            {/* 8 ── Footer CTA Band */}
             <FooterCTABand shouldReduceMotion={shouldReduceMotion} />
 
             {/* Sticky Bottom CTA (mobile) */}

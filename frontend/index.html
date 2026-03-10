@@ -17,14 +17,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- ✅ PERF: Non-blocking font load — media trick defers load until after paint.
-         font-display=swap is baked into the Google Fonts URL. -->
+    <!-- ✅ PERF: Non-blocking font load — preload trick defers until after paint -->
     <link rel="preload" as="style"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&family=Outfit:wght@400;600;700;800&display=swap"
         onload="this.onload=null;this.rel='stylesheet'">
     <noscript>
         <link rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&family=Outfit:wght@400;600;700;800&display=swap">
     </noscript>
 
     <!-- ✅ PERF: Preconnect to Cloudinary CDN for faster image delivery -->

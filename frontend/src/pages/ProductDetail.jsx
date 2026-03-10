@@ -101,6 +101,7 @@ function ProductDetail() {
     const { isWishlisted, toggleWishlist } = useWishlist()
     const wishlisted = product ? isWishlisted(product._id) : false
     const [showTryOn, setShowTryOn] = useState(false)
+    const [collectionSaved, setCollectionSaved] = useState(false)
 
     const { h, m, s } = useCountdown()
     const dates = getDeliveryDates()
@@ -425,6 +426,28 @@ function ProductDetail() {
                             {wishlisted ? 'Saved to Jersey Wall' : 'Save to Jersey Wall'}
                         </button>
 
+                        {/* Save to Fan Collection */}
+                        <button
+                            type="button"
+                            className="pd-inquiry-link"
+                            style={{ marginBottom: 6, color: collectionSaved ? '#3b82f6' : undefined }}
+                            onClick={() => {
+                                const u = localStorage.getItem('fan_username')
+                                if (!u) { navigate('/fan'); return }
+                                const API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+                                fetch(`${API}/fan/${u}/add`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ productId: product._id })
+                                }).then(r => r.json()).then(d => {
+                                    if (d.success) { setCollectionSaved(true); toast.success('👕 Saved to your Collection!') }
+                                    else toast.info(d.message)
+                                }).catch(() => toast.error('Failed to save'))
+                            }}
+                        >
+                            {collectionSaved ? '✅ In Your Collection' : '🏆 Save to Fan Collection'}
+                        </button>
+
                         {/* Inquiry link */}
                         <button
                             type="button"
@@ -436,6 +459,90 @@ function ProductDetail() {
                         </button>
                     </motion.div>
                 </div>
+
+                {/* ── Pre-Order Section ── */}
+                {product.isPreOrder && (
+                    <div style={{
+                        background: 'linear-gradient(135deg, rgba(59,130,246,0.08), rgba(37,99,235,0.04))',
+                        border: '1px solid rgba(59,130,246,0.2)',
+                        borderRadius: 16, padding: '20px 24px', margin: '0 0 24px'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                            <span style={{ fontSize: '1.2rem' }}>📦</span>
+                            <div>
+                                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#3b82f6' }}>Pre-Order Now</div>
+                                {product.expectedShipDate && (
+                                    <div style={{ fontSize: '0.8rem', color: 'rgba(59,130,246,0.7)', marginTop: 2 }}>
+                                        Expected to ship: {new Date(product.expectedShipDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        {product.preorderTarget > 0 && (
+                            <>
+                                <div style={{ background: 'rgba(255,255,255,0.07)', borderRadius: 6, height: 8, overflow: 'hidden', marginBottom: 6 }}>
+                                    <div style={{
+                                        height: '100%', borderRadius: 6,
+                                        background: 'linear-gradient(90deg, #3b82f6, #1d4ed8)',
+                                        width: `${Math.min(100, ((product.preorderCount || 0) / product.preorderTarget) * 100)}%`,
+                                        transition: 'width 0.5s ease'
+                                    }} />
+                                </div>
+                                <p style={{ fontSize: '0.78rem', color: 'rgba(59,130,246,0.7)', margin: 0 }}>
+                                    {product.preorderCount || 0} / {product.preorderTarget} pre-orders · We ship when we hit target
+                                </p>
+                            </>
+                        )}
+                    </div>
+                )}
+
+                {/* ── Football Story Section ── */}
+                {product.storyEnabled && product.storyTitle && (
+                    <motion.div
+                        style={{
+                            background: 'linear-gradient(135deg, rgba(10,14,26,0.95), rgba(20,28,50,0.9))',
+                            border: '1px solid rgba(255,215,0,0.15)',
+                            borderRadius: 20,
+                            padding: '40px 32px',
+                            margin: '0 0 32px',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <div style={{ position: 'absolute', top: 0, right: 0, width: 300, height: 300, background: 'radial-gradient(circle, rgba(255,215,0,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                            <span style={{ fontSize: '1.3rem' }}>⚽</span>
+                            <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '2px', color: '#FFD700', textTransform: 'uppercase' }}>The Story</span>
+                        </div>
+                        <h2 style={{ fontSize: 'clamp(1.3rem, 3vw, 1.8rem)', fontWeight: 900, margin: '0 0 8px', lineHeight: 1.2 }}>{product.storyTitle}</h2>
+                        {product.storyPlayer && (
+                            <p style={{ fontSize: '0.875rem', color: 'rgba(255,215,0,0.7)', fontWeight: 600, margin: '0 0 16px' }}>
+                                👤 {product.storyPlayer} {product.storyYear && `· ${product.storyYear}`}
+                            </p>
+                        )}
+                        {product.storyText && (
+                            <p style={{ color: 'rgba(255,255,255,0.7)', lineHeight: 1.7, fontSize: '0.9rem', margin: '0 0 24px', maxWidth: 640 }}>
+                                {product.storyText}
+                            </p>
+                        )}
+                        {product.storyVideo && (
+                            <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: 12, maxWidth: 560 }}>
+                                <iframe
+                                    src={product.storyVideo.replace('watch?v=', 'embed/')}
+                                    title={`${product.storyTitle} - Match Highlight`}
+                                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', borderRadius: 12 }}
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                    loading="lazy"
+                                />
+                            </div>
+                        )}
+                    </motion.div>
+                )}
 
                 {/* ── Description / Size Chart Tabs ── */}
                 <div className="pd-tabs-wrap">

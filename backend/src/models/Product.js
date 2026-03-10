@@ -73,7 +73,49 @@ const productSchema = new mongoose.Schema({
     tryOnEnabled: {
         type: Boolean,
         default: false
-    }
+    },
+
+    // ── Matchday Drop Engine ──────────────────────────────────────────────────
+    dropEnabled: { type: Boolean, default: false },
+    dropStartTime: { type: Date },
+    dropEndTime: { type: Date },
+    dropQuantity: { type: Number, default: 0 },
+    dropSold: { type: Number, default: 0 },
+    dropReminders: [{
+        email: { type: String },
+        phone: { type: String }, // WhatsApp
+        addedAt: { type: Date, default: Date.now }
+    }],
+
+    // ── Pre-Order System ─────────────────────────────────────────────────────
+    isPreOrder: { type: Boolean, default: false },
+    expectedShipDate: { type: Date },
+    preorderCount: { type: Number, default: 0 },
+    preorderTarget: { type: Number, default: 300 },
+
+    // ── Football Story Commerce ──────────────────────────────────────────────
+    storyEnabled: { type: Boolean, default: false },
+    storyTitle: { type: String, default: '' },
+    storyPlayer: { type: String, default: '' },
+    storyYear: { type: String, default: '' },
+    storyText: { type: String, default: '' },
+    storyVideo: { type: String, default: '' }, // YouTube embed URL
+    storyImage: { type: String, default: '' },
+
+    // ── Product Type ─────────────────────────────────────────────────────────
+    productType: {
+        type: String,
+        enum: ['standard', 'mystery-box', 'bundle'],
+        default: 'standard'
+    },
+
+    // ── Bundle / Outfit Builder ──────────────────────────────────────────────
+    bundleItems: [{
+        productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+        label: { type: String } // e.g. 'Scarf', 'Cap'
+    }],
+    bundleDiscountPercent: { type: Number, default: 0 }
+
 }, {
     timestamps: true
 });

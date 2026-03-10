@@ -13,6 +13,7 @@ router.post('/', authMiddleware, productController.create);
 router.put('/reorder', authMiddleware, productController.reorder);
 router.patch('/:id/stock', authMiddleware, productController.updateStock);
 router.put('/:id', authMiddleware, productController.update);
+router.patch('/:id', authMiddleware, productController.update);
 router.delete('/:id', authMiddleware, productController.remove);
 
 export default router;
