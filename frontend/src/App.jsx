@@ -38,12 +38,6 @@ const DropsManager = lazy(() => import('./pages/admin/DropsManager'))
 const PredictionsManager = lazy(() => import('./pages/admin/PredictionsManager'))
 const StoryManager = lazy(() => import('./pages/admin/StoryManager'))
 
-// ── Football Fan Platform ────────────────────────────────────────────────────────────────
-const DropPage = lazy(() => import('./pages/DropPage'))
-const MysteryBoxPage = lazy(() => import('./pages/MysteryBoxPage'))
-const PredictionsPage = lazy(() => import('./pages/PredictionsPage'))
-const FanCollectionPage = lazy(() => import('./pages/FanCollectionPage'))
-const OutfitBuilderPage = lazy(() => import('./pages/OutfitBuilderPage'))
 
 function AdminFallback() {
     return (
@@ -242,25 +236,6 @@ function App() {
                                 } />
                                 <Route path="/wishlist" element={
                                     <Suspense fallback={<CustomerFallback />}><WishlistPage /></Suspense>
-                                } />
-                                {/* ── Football Fan Platform ────────────────────────────────────────────── */}
-                                <Route path="/drops" element={
-                                    <Suspense fallback={<CustomerFallback />}><DropPage /></Suspense>
-                                } />
-                                <Route path="/mystery-box" element={
-                                    <Suspense fallback={<CustomerFallback />}><MysteryBoxPage /></Suspense>
-                                } />
-                                <Route path="/predictions" element={
-                                    <Suspense fallback={<CustomerFallback />}><PredictionsPage /></Suspense>
-                                } />
-                                <Route path="/fan" element={
-                                    <Suspense fallback={<CustomerFallback />}><FanCollectionPage /></Suspense>
-                                } />
-                                <Route path="/fan/:username" element={
-                                    <Suspense fallback={<CustomerFallback />}><FanCollectionPage /></Suspense>
-                                } />
-                                <Route path="/outfits" element={
-                                    <Suspense fallback={<CustomerFallback />}><OutfitBuilderPage /></Suspense>
                                 } />
                             </Routes>
                         </main>
