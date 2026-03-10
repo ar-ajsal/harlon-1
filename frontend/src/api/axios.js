@@ -1,7 +1,14 @@
 import axios from 'axios';
 
+// Safely ensure the base URL ends with /api (fixes empty shop if Vercel ENV misses /api)
+let envUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+if (!envUrl.endsWith('/api')) {
+    // Strip trailing slash if present before adding /api
+    envUrl = envUrl.replace(/\/$/, '') + '/api';
+}
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+    baseURL: envUrl,
     timeout: 10000,  // 10s default — Razorpay calls should pass { timeout: 25000 } override
     headers: { 'Content-Type': 'application/json' }
 });
