@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useCart } from '../context/CartContext'
 import { toast } from 'react-toastify'
 import './MysteryBoxPage.css'
+
+const WHATSAPP = '917994475043'
 
 const MYSTERY_PRODUCT = {
     _id: 'mystery-box-001',
@@ -71,18 +72,21 @@ function UnboxingReveal({ onClose }) {
 }
 
 export default function MysteryBoxPage() {
-    const { addToCart } = useCart()
     const [showUnboxing, setShowUnboxing] = useState(false)
     const [selectedSize, setSelectedSize] = useState('M')
 
     const handleAddToCart = () => {
-        addToCart({ ...MYSTERY_PRODUCT, selectedSize }, 1)
-        toast.success('Mystery Box added to cart!')
+        const msg = encodeURIComponent(`Hi! I'd like to order a Mystery Jersey Box (Size: ${selectedSize})`)
+        window.open(`https://wa.me/${WHATSAPP}?text=${msg}`, '_blank')
+        toast.success('Redirecting to WhatsApp to complete order!')
     }
 
     const handleBuyNow = () => {
-        addToCart({ ...MYSTERY_PRODUCT, selectedSize }, 1)
         setShowUnboxing(true)
+        setTimeout(() => {
+            const msg = encodeURIComponent(`Hi! I want to buy a Mystery Jersey Box (Size: ${selectedSize}) — ready to pay!`)
+            window.open(`https://wa.me/${WHATSAPP}?text=${msg}`, '_blank')
+        }, 3200)
     }
 
     return (
