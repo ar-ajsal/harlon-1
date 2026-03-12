@@ -30,7 +30,7 @@ export function ProductProvider({ children }) {
             setError(null)
 
             const [productsResponse, categoriesData] = await Promise.all([
-                productsApi.getAll({ page: 1, limit: 100, _admin: 'true', ...options }), // Load more for initial
+                productsApi.getAll({ page: 1, limit: 1000, _admin: 'true', ...options }), // Load everything for client admin UI
                 categoriesApi.getAll({ limit: 1000 })
             ])
 

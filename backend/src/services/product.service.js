@@ -68,7 +68,12 @@ class ProductService {
             query.bestSeller = true;
         }
         if (filters.search) {
-            query.$text = { $search: filters.search };
+            const searchRegex = new RegExp(filters.search, 'i');
+            query.$or = [
+                { name: searchRegex },
+                { description: searchRegex },
+                { category: searchRegex }
+            ];
         }
         if (filters.sleeveLength) {
             query.sleeveLength = filters.sleeveLength;

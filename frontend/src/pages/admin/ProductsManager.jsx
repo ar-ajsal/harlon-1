@@ -245,7 +245,10 @@ function ProductsManager() {
             name,
             price,
             costPrice: formData.costPrice ? parseFloat(formData.costPrice) : 0,
-            originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null
+            originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
+            sleeveLength: formData.sleeveLength,
+            collarType: formData.collarType,
+            zip: formData.zip
         }
 
         setSubmitting(true)
