@@ -9,6 +9,7 @@ import { useSearchParams, Link } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { FiSearch, FiX, FiShoppingBag, FiHeart } from 'react-icons/fi'
 import { useProducts } from '../context/ProductContext'
+import { productsApi } from '../services/api'
 import { useWishlist } from '../context/WishlistContext'
 import Skeleton from '../components/ui/Skeleton'
 
@@ -101,36 +102,68 @@ export default function Shop() {
 
     const [selectedCat, setSelectedCat] = useState(searchParams.get('category') || 'all')
     const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '')
+    const [selectedSleeve, setSelectedSleeve] = useState(searchParams.get('sleeve') || '')
+    const [selectedCollar, setSelectedCollar] = useState(searchParams.get('collar') || '')
+    const [selectedZip, setSelectedZip] = useState(searchParams.get('zip') || '')
     const [displayCount, setDisplayCount] = useState(PRODUCTS_PER_PAGE)
+
+    const [filteredProducts, setFilteredProducts] = useState([])
+    const [pageTotal, setPageTotal] = useState(0)
+    const [isFetching, setIsFetching] = useState(true)
+    const [fetchError, setFetchError] = useState(null)
 
     /* Keep state in sync with URL */
     useEffect(() => {
         const c = searchParams.get('category')
         const s = searchParams.get('search')
+        const sl = searchParams.get('sleeve')
+        const co = searchParams.get('collar')
+        const z = searchParams.get('zip')
         if (c) setSelectedCat(c)
         if (s !== null) setSearchTerm(s)
+        if (sl !== null) setSelectedSleeve(sl)
+        if (co !== null) setSelectedCollar(co)
+        if (z !== null) setSelectedZip(z)
     }, [searchParams])
 
-    /* Filtered list */
-    const filtered = (() => {
-        let r = products.filter(p => p.isVisible !== false)
-        if (selectedCat !== 'all') {
-            r = r.filter(p => p.category.toLowerCase() === selectedCat.toLowerCase())
+    /* Fetch from API whenever filters or displayCount change */
+    useEffect(() => {
+        const fetchFilteredProducts = async () => {
+            setIsFetching(true)
+            setFetchError(null)
+            try {
+                const queryOptions = {
+                    limit: displayCount,
+                    page: 1, // Currently UI just loads more on same page
+                    category: selectedCat !== 'all' ? selectedCat : undefined,
+                    search: searchTerm || undefined,
+                    sleeveLength: selectedSleeve || undefined,
+                    collarType: selectedCollar || undefined,
+                    zip: selectedZip || undefined
+                }
+                const res = await productsApi.getAll(queryOptions)
+                const data = res.data?.data || res.data || res || []
+                const total = res.data?.pagination?.total || res.pagination?.total || data.length || 0
+                setFilteredProducts(Array.isArray(data) ? data : [])
+                setPageTotal(total)
+            } catch (err) {
+                console.error('Error fetching filtered products:', err)
+                setFetchError('Failed to load products. Please try again.')
+            } finally {
+                setIsFetching(false)
+            }
         }
-        if (searchTerm.trim()) {
-            const t = searchTerm.toLowerCase()
-            r = r.filter(p =>
-                p.name.toLowerCase().includes(t) ||
-                p.category.toLowerCase().includes(t) ||
-                p.description?.toLowerCase().includes(t)
-            )
-        }
-        return r
-    })()
 
-    const displayed = filtered.slice(0, displayCount)
-    const hasMore = displayCount < filtered.length
-    const remaining = filtered.length - displayCount
+        const delayDebounceFn = setTimeout(() => {
+            fetchFilteredProducts()
+        }, 200) // Small debounce for typing in search
+
+        return () => clearTimeout(delayDebounceFn)
+    }, [selectedCat, searchTerm, selectedSleeve, selectedCollar, selectedZip, displayCount])
+
+    const displayed = filteredProducts
+    const hasMore = displayCount < pageTotal
+    const remaining = pageTotal - displayCount
 
     /* Handlers */
     const setCategory = useCallback((cat) => {
@@ -150,16 +183,51 @@ export default function Shop() {
         setSearchParams(p, { replace: true })
     }, [searchParams, setSearchParams])
 
+    const handleSleeveChange = useCallback((e) => {
+        const val = e.target.value
+        setSelectedSleeve(val)
+        setDisplayCount(PRODUCTS_PER_PAGE)
+        const p = new URLSearchParams(searchParams)
+        val ? p.set('sleeve', val) : p.delete('sleeve')
+        setSearchParams(p, { replace: true })
+    }, [searchParams, setSearchParams])
+
+    const handleCollarChange = useCallback((e) => {
+        const val = e.target.value
+        setSelectedCollar(val)
+        setDisplayCount(PRODUCTS_PER_PAGE)
+        const p = new URLSearchParams(searchParams)
+        val ? p.set('collar', val) : p.delete('collar')
+        setSearchParams(p, { replace: true })
+    }, [searchParams, setSearchParams])
+
+    const handleZipChange = useCallback((e) => {
+        const val = e.target.value
+        setSelectedZip(val)
+        setDisplayCount(PRODUCTS_PER_PAGE)
+        const p = new URLSearchParams(searchParams)
+        val ? p.set('zip', val) : p.delete('zip')
+        setSearchParams(p, { replace: true })
+    }, [searchParams, setSearchParams])
+
     const clearSearch = () => handleSearchChange({ target: { value: '' } })
+    
+    const clearFilters = () => {
+        setCategory('all');
+        clearSearch();
+        handleSleeveChange({ target: { value: '' } });
+        handleCollarChange({ target: { value: '' } });
+        handleZipChange({ target: { value: '' } });
+    }
 
     /* ── Loading ── */
     if (loading) {
         return (
             <div className="shop-page">
-                <div style={{ padding: '120px 20px 40px', maxWidth: 1280, margin: '0 auto' }}>
-                    <div className="hl-shimmer" style={{ height: 44, width: 280, borderRadius: 8, marginBottom: 12 }} />
-                    <div className="hl-shimmer" style={{ height: 20, width: 420, borderRadius: 6, marginBottom: 32 }} />
-                    <div style={{ display: 'flex', gap: 8, marginBottom: 32, flexWrap: 'wrap' }}>
+                <div style={{ padding: '120px 20px 40px', maxWidth: 1280, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div className="hl-shimmer" style={{ height: 44, width: '100%', maxWidth: 280, borderRadius: 8, marginBottom: 12 }} />
+                    <div className="hl-shimmer" style={{ height: 20, width: '100%', maxWidth: 420, borderRadius: 6, marginBottom: 32 }} />
+                    <div style={{ display: 'flex', gap: 8, marginBottom: 32, flexWrap: 'wrap', justifyContent: 'center' }}>
                         {[90, 120, 100, 140, 110].map((w, i) => (
                             <div key={i} className="hl-shimmer" style={{ height: 38, width: w, borderRadius: 99 }} />
                         ))}
@@ -171,14 +239,14 @@ export default function Shop() {
     }
 
     /* ── Error ── */
-    if (error) {
+    if (error || fetchError) {
         return (
             <div style={{ textAlign: 'center', padding: '100px 20px' }}>
                 <p style={{ fontSize: 40, marginBottom: 12 }}>⚠️</p>
                 <h2 style={{ fontFamily: "'Syne',sans-serif", fontWeight: 800, fontSize: 28, marginBottom: 8 }}>
                     Cannot connect
                 </h2>
-                <p style={{ color: '#777', marginBottom: 28 }}>{error}</p>
+                <p style={{ color: '#777', marginBottom: 28 }}>{error || fetchError}</p>
                 <button className="hh-btn-primary" onClick={() => window.location.reload()}>
                     Retry
                 </button>
@@ -304,6 +372,91 @@ export default function Shop() {
                         role="group"
                         aria-label="Filter by category"
                     >
+                        {/* ── Additional Filters (Sleeve/Collar) ── */}
+                        <div style={{ display: 'flex', gap: 8, marginRight: 'auto' }}>
+                            <select
+                                value={selectedSleeve}
+                                onChange={handleSleeveChange}
+                                style={{
+                                    fontFamily: "'Inter', sans-serif",
+                                    fontSize: 13,
+                                    padding: '9px 12px',
+                                    borderRadius: 8,
+                                    border: `1.5px solid ${selectedSleeve ? 'hsl(38,65%,55%)' : '#E5E5E5'}`,
+                                    background: '#fff',
+                                    color: selectedSleeve ? '#0A0A0A' : '#555',
+                                    cursor: 'pointer',
+                                    minHeight: 40,
+                                    outline: 'none',
+                                    appearance: 'none',
+                                    paddingRight: 32,
+                                    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 12px center',
+                                    backgroundSize: '14px'
+                                }}
+                            >
+                                <option value="">Sleeve Length</option>
+                                <option value="Full Sleeve">Full Sleeve</option>
+                                <option value="Half Sleeve">Half Sleeve</option>
+                                <option value="Five Sleeve">Five Sleeve</option>
+                            </select>
+
+                            <select
+                                value={selectedCollar}
+                                onChange={handleCollarChange}
+                                style={{
+                                    fontFamily: "'Inter', sans-serif",
+                                    fontSize: 13,
+                                    padding: '9px 12px',
+                                    borderRadius: 8,
+                                    border: `1.5px solid ${selectedCollar ? 'hsl(38,65%,55%)' : '#E5E5E5'}`,
+                                    background: '#fff',
+                                    color: selectedCollar ? '#0A0A0A' : '#555',
+                                    cursor: 'pointer',
+                                    minHeight: 40,
+                                    outline: 'none',
+                                    appearance: 'none',
+                                    paddingRight: 32,
+                                    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 12px center',
+                                    backgroundSize: '14px'
+                                }}
+                            >
+                                <option value="">Collar</option>
+                                <option value="Round">Round</option>
+                                <option value="Polo">Polo</option>
+                                <option value="No Collar">No Collar</option>
+                            </select>
+
+                            <select
+                                value={selectedZip}
+                                onChange={handleZipChange}
+                                style={{
+                                    fontFamily: "'Inter', sans-serif",
+                                    fontSize: 13,
+                                    padding: '9px 12px',
+                                    borderRadius: 8,
+                                    border: `1.5px solid ${selectedZip ? 'hsl(38,65%,55%)' : '#E5E5E5'}`,
+                                    background: '#fff',
+                                    color: selectedZip ? '#0A0A0A' : '#555',
+                                    cursor: 'pointer',
+                                    minHeight: 40,
+                                    outline: 'none',
+                                    appearance: 'none',
+                                    paddingRight: 32,
+                                    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'right 12px center',
+                                    backgroundSize: '14px'
+                                }}
+                            >
+                                <option value="">Zip</option>
+                                <option value="true">With Zip</option>
+                                <option value="false">Without Zip</option>
+                            </select>
+                        </div>
                         {['all', ...(categories || []).map(c => c.name.toLowerCase())].map((cat, i) => {
                             const label = cat === 'all' ? 'All Products' :
                                 (categories.find(c => c.name.toLowerCase() === cat)?.name || cat)
@@ -343,15 +496,31 @@ export default function Shop() {
                         marginBottom: 24,
                         minHeight: 20,
                     }}>
-                        {filtered.length
-                            ? `${displayed.length} of ${filtered.length} ${filtered.length === 1 ? 'jersey' : 'jerseys'}${searchTerm ? ` for "${searchTerm}"` : ''}`
-                            : searchTerm ? `No jerseys found for "${searchTerm}"` : 'No jerseys in this category'
+                        {isFetching 
+                            ? 'Loading results...' 
+                            : pageTotal 
+                                ? `${displayed.length} of ${pageTotal} ${pageTotal === 1 ? 'jersey' : 'jerseys'}${searchTerm ? ` for "${searchTerm}"` : ''}`
+                                : searchTerm ? `No jerseys found for "${searchTerm}"` : 'No jerseys in this category'
                         }
                     </p>
 
-                    {/* ── Grid ── */}
                     <AnimatePresence mode="wait">
-                        {displayed.length > 0 ? (
+                        {isFetching ? (
+                            <motion.div
+                                key="loading"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                style={{ minHeight: '50vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                            >
+                                <div style={{ display: 'flex', gap: 8, marginBottom: 32, flexWrap: 'wrap', justifyContent: 'center' }}>
+                                    {[90, 120, 100, 140, 110].map((w, i) => (
+                                        <div key={i} className="hl-shimmer" style={{ height: 38, width: w, borderRadius: 99 }} />
+                                    ))}
+                                </div>
+                                <Skeleton.ProductGrid count={8} />
+                            </motion.div>
+                        ) : displayed.length > 0 ? (
                             <motion.div
                                 key={`${selectedCat}-${searchTerm}`}
                                 className="hh-product-grid"
@@ -388,7 +557,7 @@ export default function Shop() {
                                 </p>
                                 <button
                                     className="hh-btn-primary"
-                                    onClick={() => { setCategory('all'); clearSearch() }}
+                                    onClick={clearFilters}
                                 >
                                     Clear filters
                                 </button>

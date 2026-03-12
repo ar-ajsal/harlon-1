@@ -168,7 +168,10 @@ function ProductsManager() {
         isVisible: true,
         soldOut: false,
         tryOnEnabled: false,
-        overlayImage: ''
+        overlayImage: '',
+        sleeveLength: '',
+        collarType: '',
+        zip: false
     })
 
     const openAddModal = () => {
@@ -187,7 +190,10 @@ function ProductsManager() {
             isVisible: true,
             soldOut: false,
             tryOnEnabled: false,
-            overlayImage: ''
+            overlayImage: '',
+            sleeveLength: '',
+            collarType: '',
+            zip: false
         })
         setShowModal(true)
     }
@@ -208,7 +214,10 @@ function ProductsManager() {
             isVisible: product.isVisible !== false, // Default to true if undefined
             soldOut: product.soldOut || false,
             tryOnEnabled: product.tryOnEnabled || false,
-            overlayImage: product.overlayImage || ''
+            overlayImage: product.overlayImage || '',
+            sleeveLength: product.sleeveLength || '',
+            collarType: product.collarType || '',
+            zip: product.zip || false
         })
         setShowModal(true)
     }
@@ -532,6 +541,50 @@ function ProductsManager() {
                                                 <option key={cat._id} value={cat.name}>{cat.name}</option>
                                             ))}
                                         </select>
+                                    </div>
+
+                                    <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                                        <div className="form-group">
+                                            <label className="form-label">Sleeve Length</label>
+                                            <select
+                                                className="form-select"
+                                                value={formData.sleeveLength}
+                                                onChange={e => setFormData({ ...formData, sleeveLength: e.target.value })}
+                                            >
+                                                <option value="">Select Sleeve Length</option>
+                                                <option value="Full Sleeve">Full Sleeve</option>
+                                                <option value="Half Sleeve">Half Sleeve</option>
+                                                <option value="Five Sleeve">Five Sleeve (Sleeveless)</option>
+                                            </select>
+                                        </div>
+                                        <div className="form-group">
+                                            <label className="form-label">Collar Type</label>
+                                            <select
+                                                className="form-select"
+                                                value={formData.collarType}
+                                                onChange={e => setFormData({ ...formData, collarType: e.target.value })}
+                                            >
+                                                <option value="">Select Collar Type</option>
+                                                <option value="Round">Round</option>
+                                                <option value="Polo">Polo</option>
+                                                <option value="No Collar">No Collar</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="form-group" style={{ marginTop: '16px' }}>
+                                        <label className="switch-label">
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.zip}
+                                                onChange={e => setFormData({ ...formData, zip: e.target.checked })}
+                                                style={{ marginTop: '4px', width: '18px', height: '18px', cursor: 'pointer' }}
+                                            />
+                                            <span className="switch-text">
+                                                <span className="switch-title">Has Zip?</span>
+                                                <span className="switch-desc">Does this jersey have a zipper?</span>
+                                            </span>
+                                        </label>
                                     </div>
 
                                     <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>

@@ -34,6 +34,20 @@ const productSchema = new mongoose.Schema({
         type: String,
         enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
     }],
+    sleeveLength: {
+        type: String,
+        enum: ['Full Sleeve', 'Half Sleeve', 'Five Sleeve', ''],
+        default: ''
+    },
+    collarType: {
+        type: String,
+        enum: ['Round', 'Polo', 'No Collar', ''],
+        default: ''
+    },
+    zip: {
+        type: Boolean,
+        default: false
+    },
     images: [{
         type: String
     }],

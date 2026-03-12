@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FiHome, FiShoppingBag, FiHeart } from 'react-icons/fi'
+import { FiHome, FiShoppingBag, FiHeart, FiPackage } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useWishlist } from '../context/WishlistContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
@@ -12,9 +12,7 @@ function MobileNav() {
     const LINKS = [
         { to: '/', label: 'Home', icon: FiHome, exact: true },
         { to: '/shop', label: 'Shop', icon: FiShoppingBag },
-        { to: '/drops', label: '⚡', isEmoji: true, emojiLabel: 'Drops' },
-        { to: '/predictions', label: '⚽', isEmoji: true, emojiLabel: 'Predict' },
-        { to: '/fan', label: '🏆', isEmoji: true, emojiLabel: 'Fan' },
+        { to: '/track-order', label: 'Track', icon: FiPackage },
     ]
 
     return (

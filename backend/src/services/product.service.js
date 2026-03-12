@@ -13,6 +13,9 @@ function cacheKey(filters) {
         featured: filters.featured || '',
         bestSeller: filters.bestSeller || '',
         search: filters.search || '',
+        sleeveLength: filters.sleeveLength || '',
+        collarType: filters.collarType || '',
+        zip: filters.zip || '',
         page: filters.page || 1,
         limit: filters.limit || 20,
     });
@@ -67,6 +70,15 @@ class ProductService {
         if (filters.search) {
             query.$text = { $search: filters.search };
         }
+        if (filters.sleeveLength) {
+            query.sleeveLength = filters.sleeveLength;
+        }
+        if (filters.collarType) {
+            query.collarType = filters.collarType;
+        }
+        if (filters.zip !== undefined && filters.zip !== '') {
+            query.zip = filters.zip === 'true';
+        }
 
         // Always show visible products for public; admin sees all
         if (!isAdminRequest) {
@@ -81,7 +93,7 @@ class ProductService {
         // Field projection — public gets card-only fields (~50% smaller payload)
         const projection = isAdminRequest
             ? null
-            : 'name price originalPrice images category sizes soldOut inStock featured bestSeller priority isVisible tryOnEnabled overlayImage';
+            : 'name price originalPrice images category sizes sleeveLength collarType zip soldOut inStock featured bestSeller priority isVisible tryOnEnabled overlayImage';
 
         const dbQuery = Product
             .find(query)

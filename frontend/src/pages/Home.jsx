@@ -445,16 +445,6 @@ function UrgencyBand() {
 /* 7. PLATFORM FEATURES ─────────────────────────────────────────────── */
 const PLATFORM_CARDS = [
     {
-        to: '/drops',
-        emoji: '⚡',
-        tag: 'MATCHDAY',
-        title: 'Drop Engine',
-        sub: 'Limited jersey drops. Countdown timers. Real-time stock.',
-        color: '#FFD700',
-        bg: 'linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(255,165,0,0.04) 100%)',
-        border: 'rgba(255,215,0,0.2)',
-    },
-    {
         to: '/mystery-box',
         emoji: '🎁',
         tag: 'SURPRISE',
@@ -463,17 +453,7 @@ const PLATFORM_CARDS = [
         color: '#a855f7',
         bg: 'linear-gradient(135deg, rgba(168,85,247,0.08) 0%, rgba(109,40,217,0.04) 100%)',
         border: 'rgba(168,85,247,0.2)',
-    },
-    {
-        to: '/predictions',
-        emoji: '⚽',
-        tag: 'WIN COUPONS',
-        title: 'Predict & Win',
-        sub: 'Predict scores. Climb the leaderboard. Earn discount codes.',
-        color: '#22c55e',
-        bg: 'linear-gradient(135deg, rgba(34,197,94,0.08) 0%, rgba(16,185,129,0.04) 100%)',
-        border: 'rgba(34,197,94,0.2)',
-    },
+    }
 ]
 
 function PlatformFeatures({ shouldReduceMotion }) {

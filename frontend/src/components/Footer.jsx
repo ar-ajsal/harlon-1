@@ -18,10 +18,15 @@ export default function Footer() {
     const phone = WHATSAPP_NUMBER.replace(/^91/, '+91 ')
 
     return (
-        <footer style={{
+        <footer className="app-footer" style={{
             background: '#0A0A0A',
             borderTop: '1px solid rgba(255,255,255,0.06)',
         }}>
+            <style>{`
+                @media (max-width: 768px) {
+                    .app-footer { display: none !important; }
+                }
+            `}</style>
             {/* Top section */}
             <div style={{
                 maxWidth: 1280,
