@@ -18,6 +18,7 @@ const ProductDetail = lazy(() => import('./pages/ProductDetail'))
 const Checkout = lazy(() => import('./pages/Checkout'))
 const TrackOrder = lazy(() => import('./pages/TrackOrder'))
 const WishlistPage = lazy(() => import('./pages/WishlistPage'))
+const MysteryBox = lazy(() => import('./pages/MysteryBox'))
 
 // ── Admin pages — lazy, separate chunk group ─────────────────────────────────
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'))
@@ -236,6 +237,9 @@ function App() {
                                 } />
                                 <Route path="/wishlist" element={
                                     <Suspense fallback={<CustomerFallback />}><WishlistPage /></Suspense>
+                                } />
+                                <Route path="/mystery-box" element={
+                                    <Suspense fallback={<CustomerFallback />}><MysteryBox /></Suspense>
                                 } />
                             </Routes>
                         </main>
