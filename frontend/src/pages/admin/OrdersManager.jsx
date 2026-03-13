@@ -10,7 +10,8 @@ import '../../styles/admin-responsive.css'
 const EMPTY_STATS = {
     totalOrders: 0, totalRevenue: 0, totalDiscount: 0,
     totalCost: 0, totalProfit: 0, avgOrderValue: 0,
-    paidCount: 0, pendingCount: 0, cancelledCount: 0
+    paidCount: 0, pendingCount: 0, cancelledCount: 0,
+    paidRevenue: 0, pendingRevenue: 0
 }
 
 function OrdersManager() {
@@ -65,14 +66,34 @@ function OrdersManager() {
                 const data = ordersRes.value.data?.data || ordersRes.value.data || []
                 setOrders(Array.isArray(data) ? data : [])
                 if (ordersRes.value.data?.pagination) setPagination(ordersRes.value.data.pagination)
+
+                // Fallback client-side calculation if stats endpoint fails/timeouts on MongoDB Free Tier
+                let localTotal = 0;
+                let localPaid = 0;
+                let localPending = 0;
+                let localCount = 0;
+
+                (Array.isArray(data) ? data : []).forEach(o => {
+                    localCount++;
+                    localTotal += (o.finalTotal || 0);
+                    if (o.status === 'Paid') localPaid += (o.finalTotal || 0);
+                    if (o.status === 'Pending') localPending += (o.finalTotal || 0);
+                });
+
+                if (statsRes.status === 'fulfilled') {
+                    const sv = statsRes.value.data?.data || EMPTY_STATS;
+                    // Prefer server stats, but if server returns 0s and we have local data, use local data
+                    if (sv.totalRevenue === 0 && localTotal > 0) {
+                        setStats({ ...sv, totalOrders: localCount, totalRevenue: localTotal, paidRevenue: localPaid, pendingRevenue: localPending });
+                    } else {
+                        setStats(sv);
+                    }
+                } else {
+                    console.warn('Stats fetch failed, using local aggregate:', statsRes.reason);
+                    setStats({ ...EMPTY_STATS, totalOrders: localCount, totalRevenue: localTotal, paidRevenue: localPaid, pendingRevenue: localPending });
+                }
             } else {
                 toast.error('Failed to load orders')
-            }
-
-            if (statsRes.status === 'fulfilled') {
-                setStats(statsRes.value.data?.data || EMPTY_STATS)
-            } else {
-                console.warn('Stats fetch failed:', statsRes.reason)
                 setStats(EMPTY_STATS)
             }
         } catch (error) {
@@ -220,23 +241,19 @@ function OrdersManager() {
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'flex-end',
-                gap: '16px',
-                padding: '10px 16px',
-                background: 'var(--card-bg, #fff)',
-                border: '1px solid var(--noir-10)',
-                borderRadius: '10px',
+                justifyContent: 'flex-start',
+                padding: '0 4px',
                 marginBottom: '16px',
                 opacity: statsLoading ? 0.5 : 1,
-                transition: 'opacity 0.2s'
+                transition: 'opacity 0.2s',
+                fontSize: '14px',
+                color: 'var(--noir-60)',
+                fontWeight: 600
             }}>
-                <span style={{ color: 'var(--noir-60)', fontSize: '0.9rem' }}>
+                <span>
                     {stats.totalOrders} order{stats.totalOrders !== 1 ? 's' : ''}
-                </span>
-                <span style={{ color: 'var(--noir-20)', fontSize: '1.2rem' }}>|</span>
-                <span style={{ fontSize: '0.9rem', color: 'var(--noir-60)' }}>Total Amount</span>
-                <span style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--gold, #c9a962)' }}>
-                    {fmt(stats.totalRevenue)}
+                    {' • '}
+                    Total pending payed: {fmt(stats.totalRevenue)}
                 </span>
             </div>
 

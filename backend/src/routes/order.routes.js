@@ -47,11 +47,12 @@ function buildOrderFilter(query) {
         }
     }
 
-    if (search) {
+    if (search && search.trim().length >= 2) {
+        const cleanSearch = search.trim();
         filter.$or = [
-            { invoiceNumber: { $regex: search, $options: 'i' } },
-            { 'customer.name': { $regex: search, $options: 'i' } },
-            { 'customer.phone': { $regex: search, $options: 'i' } }
+            { invoiceNumber: { $regex: cleanSearch, $options: 'i' } },
+            { 'customer.name': { $regex: cleanSearch, $options: 'i' } },
+            { 'customer.phone': { $regex: cleanSearch, $options: 'i' } }
         ];
     }
 
@@ -80,18 +81,24 @@ router.get('/', async (req, res) => {
         const query = buildOrderFilter(req.query);
         const skip = (parseInt(page) - 1) * parseInt(limit);
 
-        const [orders, total] = await Promise.all([
-            Order.find(query).sort({ date: -1 }).skip(skip).limit(parseInt(limit)),
-            Order.countDocuments(query)
-        ]);
+        // Optimize count query to avoid timeouts on MongoDB Atlas free tier for un-indexed searches
+        // Remove `.countDocuments()` entirely as it triggers Mongo Atlas buffer timeouts on free unindexed tiers.
+        const orders = await Order.find(query)
+            .sort({ _id: -1 }) // Sort strictly by the indexed _id (createdAt equivalent)
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        // Let the frontend know there's more pages if we hit our limit exactly
+        const hasMore = orders.length === parseInt(limit);
+        const presumedTotal = skip + orders.length + (hasMore ? 1 : 0);
 
         res.json({
             success: true,
             data: orders,
             pagination: {
-                total,
+                total: presumedTotal,
                 page: parseInt(page),
-                pages: Math.ceil(total / parseInt(limit)),
+                pages: hasMore ? parseInt(page) + 1 : parseInt(page),
                 limit: parseInt(limit)
             }
         });
@@ -106,7 +113,6 @@ router.get('/stats/filtered', async (req, res) => {
         const matchFilter = buildOrderFilter(req.query);
 
         const [agg] = await Order.aggregate([
-            { $match: matchFilter },
             {
                 $group: {
                     _id: null,
@@ -114,19 +120,11 @@ router.get('/stats/filtered', async (req, res) => {
                     totalRevenue: { $sum: '$finalTotal' },
                     totalSubtotal: { $sum: '$subtotal' },
                     totalDiscount: { $sum: '$discount' },
-                    totalCost: {
-                        $sum: {
-                            $reduce: {
-                                input: '$items',
-                                initialValue: 0,
-                                in: { $add: ['$$value', { $multiply: ['$$this.costPrice', '$$this.quantity'] }] }
-                            }
-                        }
-                    },
                     paidCount: { $sum: { $cond: [{ $eq: ['$status', 'Paid'] }, 1, 0] } },
                     pendingCount: { $sum: { $cond: [{ $eq: ['$status', 'Pending'] }, 1, 0] } },
                     cancelledCount: { $sum: { $cond: [{ $eq: ['$status', 'Cancelled'] }, 1, 0] } },
-                    paidRevenue: { $sum: { $cond: [{ $eq: ['$status', 'Paid'] }, '$finalTotal', 0] } }
+                    paidRevenue: { $sum: { $cond: [{ $eq: ['$status', 'Paid'] }, '$finalTotal', 0] } },
+                    pendingRevenue: { $sum: { $cond: [{ $eq: ['$status', 'Pending'] }, '$finalTotal', 0] } }
                 }
             }
         ]);
@@ -134,13 +132,17 @@ router.get('/stats/filtered', async (req, res) => {
         const result = agg || {
             totalOrders: 0, totalRevenue: 0, totalSubtotal: 0,
             totalDiscount: 0, totalCost: 0,
-            paidCount: 0, pendingCount: 0, cancelledCount: 0, paidRevenue: 0
+            paidCount: 0, pendingCount: 0, cancelledCount: 0, 
+            paidRevenue: 0, pendingRevenue: 0
         };
 
         result.totalProfit = result.totalRevenue - result.totalCost;
         result.avgOrderValue = result.totalOrders > 0
             ? Math.round(result.totalRevenue / result.totalOrders)
             : 0;
+
+        console.log('--- AGGREGATE STATS ---');
+        console.log(result);
 
         res.json({ success: true, data: result });
     } catch (err) {

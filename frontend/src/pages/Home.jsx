@@ -254,7 +254,7 @@ function CategoryStrip({ categories, products, shouldReduceMotion }) {
                             transition={{ duration: 0.45, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
                         >
                             <Link
-                                to={`/shop?category=${cat.slug}`}
+                                to={`/shop?category=${encodeURIComponent(cat.name.toLowerCase())}`}
                                 className="hh-cat-card"
                                 aria-label={`Browse ${cat.name}`}
                             >

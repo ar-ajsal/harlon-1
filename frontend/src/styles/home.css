@@ -393,6 +393,7 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
+    gap: 16px;
     padding: 0 20px;
     max-width: 1280px;
     margin: 0 auto 24px;
@@ -416,6 +417,7 @@
     line-height: 1.1;
     letter-spacing: -0.02em;
     margin: 0;
+    word-break: break-word;
 }
 
 .hh-view-all {
@@ -499,16 +501,18 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+    align-items: flex-start;
     padding: 20px;
 }
 
 .hh-cat-name {
     font-family: 'Syne', sans-serif;
     font-weight: 800;
-    font-size: 20px;
+    font-size: clamp(14px, 5vw, 20px);
     color: #fff;
     margin: 0 0 6px;
     line-height: 1.2;
+    word-break: break-word; /* Allows "SLEEVE" to properly stay in bounds */
 }
 
 .hh-cat-cta {
@@ -712,6 +716,7 @@
     line-height: 1.3;
     margin: 0 0 8px;
     display: -webkit-box;
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;

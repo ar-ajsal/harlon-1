@@ -19,7 +19,7 @@ export default function CategoryStories({ categories, products }) {
             const img = cat.image
                 || products?.find(p => p.category === cat.name && p.images?.[0])?.images?.[0]
                 || null
-            return { id: cat.slug || cat.name.toLowerCase(), name: cat.name, image: img, emoji: null }
+            return { id: encodeURIComponent(cat.name.toLowerCase()), name: cat.name, image: img, emoji: null }
         })
     ]
 

@@ -4,7 +4,7 @@
  * Features: animated header, category pill rail, result count, premium grid,
  *           staggered card entrance, load-more, empty state
  */
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { FiSearch, FiX, FiShoppingBag, FiHeart } from 'react-icons/fi'
@@ -105,11 +105,12 @@ export default function Shop() {
     const [selectedSleeve, setSelectedSleeve] = useState(searchParams.get('sleeve') || '')
     const [selectedCollar, setSelectedCollar] = useState(searchParams.get('collar') || '')
     const [selectedZip, setSelectedZip] = useState(searchParams.get('zip') || '')
-    const [displayCount, setDisplayCount] = useState(PRODUCTS_PER_PAGE)
+    const [page, setPage] = useState(1)
 
     const [filteredProducts, setFilteredProducts] = useState([])
     const [pageTotal, setPageTotal] = useState(0)
     const [isFetching, setIsFetching] = useState(true)
+    const [isAppending, setIsAppending] = useState(false)
     const [fetchError, setFetchError] = useState(null)
 
     /* Keep state in sync with URL */
@@ -126,15 +127,17 @@ export default function Shop() {
         if (z !== null) setSelectedZip(z)
     }, [searchParams])
 
-    /* Fetch from API whenever filters or displayCount change */
+    /* Fetch from API whenever filters or page change */
     useEffect(() => {
         const fetchFilteredProducts = async () => {
-            setIsFetching(true)
+            if (page === 1) setIsFetching(true)
+            else setIsAppending(true)
+            
             setFetchError(null)
             try {
                 const queryOptions = {
-                    limit: displayCount,
-                    page: 1, // Currently UI just loads more on same page
+                    limit: PRODUCTS_PER_PAGE,
+                    page: page,
                     category: selectedCat !== 'all' ? selectedCat : undefined,
                     search: searchTerm || undefined,
                     sleeveLength: selectedSleeve || undefined,
@@ -144,31 +147,58 @@ export default function Shop() {
                 const res = await productsApi.getAll(queryOptions)
                 const data = res.data?.data || res.data || res || []
                 const total = res.data?.pagination?.total || res.pagination?.total || data.length || 0
-                setFilteredProducts(Array.isArray(data) ? data : [])
+                
+                setFilteredProducts(prev => page === 1 ? (Array.isArray(data) ? data : []) : [...prev, ...(Array.isArray(data) ? data : [])])
                 setPageTotal(total)
             } catch (err) {
                 console.error('Error fetching filtered products:', err)
                 setFetchError('Failed to load products. Please try again.')
             } finally {
                 setIsFetching(false)
+                setIsAppending(false)
             }
         }
 
         const delayDebounceFn = setTimeout(() => {
             fetchFilteredProducts()
-        }, 200) // Small debounce for typing in search
+        }, 200)
 
         return () => clearTimeout(delayDebounceFn)
-    }, [selectedCat, searchTerm, selectedSleeve, selectedCollar, selectedZip, displayCount])
+    }, [selectedCat, searchTerm, selectedSleeve, selectedCollar, selectedZip, page])
 
     const displayed = filteredProducts
-    const hasMore = displayCount < pageTotal
-    const remaining = pageTotal - displayCount
+    const hasMore = displayed.length < pageTotal
+    const remaining = pageTotal - displayed.length
+
+    /* Intersection Observer for Infinite Scroll */
+    const loaderRef = useRef(null)
+
+    useEffect(() => {
+        const currentLoader = loaderRef.current
+        if (!currentLoader || !hasMore || isFetching || loading) return
+
+        const observer = new IntersectionObserver((entries) => {
+            const first = entries[0]
+            if (first.isIntersecting) {
+                setPage(p => p + 1)
+            }
+        }, {
+            root: null,
+            rootMargin: '200px', // Trigger load 200px before reaching the exact bottom
+            threshold: 0
+        })
+
+        observer.observe(currentLoader)
+
+        return () => {
+            if (currentLoader) observer.unobserve(currentLoader)
+        }
+    }, [hasMore, isFetching, loading])
 
     /* Handlers */
     const setCategory = useCallback((cat) => {
         setSelectedCat(cat)
-        setDisplayCount(PRODUCTS_PER_PAGE)
+        setPage(1)
         const p = new URLSearchParams(searchParams)
         p.set('category', cat)
         setSearchParams(p, { replace: true })
@@ -177,7 +207,7 @@ export default function Shop() {
     const handleSearchChange = useCallback((e) => {
         const val = e.target.value
         setSearchTerm(val)
-        setDisplayCount(PRODUCTS_PER_PAGE)
+        setPage(1)
         const p = new URLSearchParams(searchParams)
         val ? p.set('search', val) : p.delete('search')
         setSearchParams(p, { replace: true })
@@ -186,7 +216,7 @@ export default function Shop() {
     const handleSleeveChange = useCallback((e) => {
         const val = e.target.value
         setSelectedSleeve(val)
-        setDisplayCount(PRODUCTS_PER_PAGE)
+        setPage(1)
         const p = new URLSearchParams(searchParams)
         val ? p.set('sleeve', val) : p.delete('sleeve')
         setSearchParams(p, { replace: true })
@@ -195,7 +225,7 @@ export default function Shop() {
     const handleCollarChange = useCallback((e) => {
         const val = e.target.value
         setSelectedCollar(val)
-        setDisplayCount(PRODUCTS_PER_PAGE)
+        setPage(1)
         const p = new URLSearchParams(searchParams)
         val ? p.set('collar', val) : p.delete('collar')
         setSearchParams(p, { replace: true })
@@ -204,7 +234,7 @@ export default function Shop() {
     const handleZipChange = useCallback((e) => {
         const val = e.target.value
         setSelectedZip(val)
-        setDisplayCount(PRODUCTS_PER_PAGE)
+        setPage(1)
         const p = new URLSearchParams(searchParams)
         val ? p.set('zip', val) : p.delete('zip')
         setSearchParams(p, { replace: true })
@@ -565,21 +595,22 @@ export default function Shop() {
                         )}
                     </AnimatePresence>
 
-                    {/* ── Load More ── */}
+                    {/* ── Auto Load More Sentinel ── */}
                     {hasMore && (
-                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 40 }}>
-                            <motion.button
-                                className="hh-btn-primary"
-                                onClick={() => setDisplayCount(c => c + PRODUCTS_PER_PAGE)}
-                                disabled={loadingMore}
-                                whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
-                                whileTap={shouldReduceMotion ? {} : { scale: 0.97 }}
-                                style={{ minWidth: 200 }}
-                            >
-                                {loadingMore
-                                    ? 'Loading…'
-                                    : `Load More — ${remaining} left`}
-                            </motion.button>
+                        <div
+                            ref={loaderRef}
+                            style={{ display: 'flex', justifyContent: 'center', marginTop: 40, paddingBottom: 40 }}
+                            aria-live="polite"
+                        >
+                            {loadingMore || isFetching || isAppending ? (
+                                <motion.div 
+                                    initial={{ opacity: 0 }} 
+                                    animate={{ opacity: 1 }}
+                                    style={{ color: '#999', fontSize: 14, fontFamily: "'Inter', sans-serif" }}
+                                >
+                                    Loading more jerseys...
+                                </motion.div>
+                            ) : null}
                         </div>
                     )}
                 </div>

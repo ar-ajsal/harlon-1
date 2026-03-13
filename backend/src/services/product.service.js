@@ -68,11 +68,22 @@ class ProductService {
             query.bestSeller = true;
         }
         if (filters.search) {
-            const searchRegex = new RegExp(filters.search, 'i');
+            // 1. Exact Substring Match (Case-Insensitive)
+            const exactRegex = new RegExp(filters.search, 'i');
+
+            // 2. Fuzzy Match (Forgiving typos, e.g., "milan" -> "m.*i.*l.*a.*n")
+            // Strip special characters and replace spaces with wildcard matches
+            const cleanSearch = filters.search.replace(/[^a-zA-Z0-9\s]/g, '').trim();
+            const fuzzyPattern = cleanSearch.split(/\s*/).join('.*');
+            const fuzzyRegex = new RegExp(fuzzyPattern, 'i');
+
             query.$or = [
-                { name: searchRegex },
-                { description: searchRegex },
-                { category: searchRegex }
+                { name: exactRegex },
+                { description: exactRegex },
+                { category: exactRegex },
+                { name: fuzzyRegex },
+                { description: fuzzyRegex },
+                { category: fuzzyRegex }
             ];
         }
         if (filters.sleeveLength) {
