@@ -1,5 +1,14 @@
 import Product from '../models/Product.js';
 import ApiError from '../utils/ApiError.js';
+import algoliasearch from 'algoliasearch';
+
+let algoliaIndex = null;
+if (process.env.ALGOLIA_APP_ID && process.env.ALGOLIA_ADMIN_KEY) {
+    const client = algoliasearch(process.env.ALGOLIA_APP_ID, process.env.ALGOLIA_ADMIN_KEY);
+    algoliaIndex = client.initIndex('products');
+} else {
+    console.warn('⚠️ Algolia credentials missing. Algolia sync is disabled.');
+}
 
 // ─── In-Memory Cache ─────────────────────────────────────────────────────────
 // Caches public product listing for 2 minutes — eliminates repeated DB hits on
@@ -68,23 +77,29 @@ class ProductService {
             query.bestSeller = true;
         }
         if (filters.search) {
-            // 1. Exact Substring Match (Case-Insensitive)
-            const exactRegex = new RegExp(filters.search, 'i');
+            const searchTerms = filters.search.trim().split(/\s+/).filter(Boolean);
+            
+            if (searchTerms.length > 0) {
+                // For each term, it must appear in at least one of the fields (name, desc, category)
+                const andConditions = searchTerms.map(term => {
+                    // Escape special regex characters
+                    const safeTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(safeTerm, 'i');
+                    return {
+                        $or: [
+                            { name: regex },
+                            { description: regex },
+                            { category: regex }
+                        ]
+                    };
+                });
 
-            // 2. Fuzzy Match (Forgiving typos, e.g., "milan" -> "m.*i.*l.*a.*n")
-            // Strip special characters and replace spaces with wildcard matches
-            const cleanSearch = filters.search.replace(/[^a-zA-Z0-9\s]/g, '').trim();
-            const fuzzyPattern = cleanSearch.split(/\s*/).join('.*');
-            const fuzzyRegex = new RegExp(fuzzyPattern, 'i');
-
-            query.$or = [
-                { name: exactRegex },
-                { description: exactRegex },
-                { category: exactRegex },
-                { name: fuzzyRegex },
-                { description: fuzzyRegex },
-                { category: fuzzyRegex }
-            ];
+                if (query.$and) {
+                    query.$and.push(...andConditions);
+                } else {
+                    query.$and = andConditions;
+                }
+            }
         }
         if (filters.sleeveLength) {
             query.sleeveLength = filters.sleeveLength;
@@ -151,6 +166,20 @@ class ProductService {
     async create(data) {
         const product = await Product.create(data);
         invalidateProductCache();
+
+        if (algoliaIndex) {
+            try {
+                // Remove Mongoose specific properties and set objectID
+                const algoRecord = product.toObject ? product.toObject() : { ...product };
+                algoRecord.objectID = product._id.toString();
+                delete algoRecord._id;
+                delete algoRecord.__v;
+                await algoliaIndex.saveObject(algoRecord);
+            } catch (err) {
+                console.error('Algolia Create Sync Error:', err);
+            }
+        }
+
         return product;
     }
 
@@ -163,6 +192,19 @@ class ProductService {
             throw ApiError.notFound('Product not found');
         }
         invalidateProductCache();
+
+        if (algoliaIndex) {
+            try {
+                const algoRecord = product.toObject ? product.toObject() : { ...product };
+                algoRecord.objectID = product._id.toString();
+                delete algoRecord._id;
+                delete algoRecord.__v;
+                await algoliaIndex.partialUpdateObject(algoRecord);
+            } catch (err) {
+                console.error('Algolia Update Sync Error:', err);
+            }
+        }
+
         return product;
     }
 
@@ -172,6 +214,15 @@ class ProductService {
             throw ApiError.notFound('Product not found');
         }
         invalidateProductCache();
+
+        if (algoliaIndex) {
+            try {
+                await algoliaIndex.deleteObject(id.toString());
+            } catch (err) {
+                console.error('Algolia Delete Sync Error:', err);
+            }
+        }
+
         return product;
     }
 
@@ -186,6 +237,18 @@ class ProductService {
         if (operations.length > 0) {
             await Product.bulkWrite(operations);
             invalidateProductCache();
+
+            if (algoliaIndex) {
+                try {
+                    const objects = updates.map(({ _id, priority }) => ({
+                        objectID: _id.toString(),
+                        priority
+                    }));
+                    await algoliaIndex.partialUpdateObjects(objects);
+                } catch (err) {
+                    console.error('Algolia Reorder Sync Error:', err);
+                }
+            }
         }
 
         return true;

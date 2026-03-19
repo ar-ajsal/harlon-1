@@ -77,18 +77,16 @@ router.get('/stats/drop-ons', async (req, res) => {
 // GET all orders — supports: search, status, paymentMethod, dateFrom, dateTo, page, limit
 router.get('/', async (req, res) => {
     try {
-        const { page = 1, limit = 20 } = req.query;
+        const { page = 1, limit = 100 } = req.query;
         const query = buildOrderFilter(req.query);
         const skip = (parseInt(page) - 1) * parseInt(limit);
 
-        // Optimize count query to avoid timeouts on MongoDB Atlas free tier for un-indexed searches
-        // Remove `.countDocuments()` entirely as it triggers Mongo Atlas buffer timeouts on free unindexed tiers.
+        // We avoid countDocuments here as it times out on unindexed fields on Atlas free tier
         const orders = await Order.find(query)
-            .sort({ _id: -1 }) // Sort strictly by the indexed _id (createdAt equivalent)
+            .sort({ _id: -1 })
             .skip(skip)
             .limit(parseInt(limit));
 
-        // Let the frontend know there's more pages if we hit our limit exactly
         const hasMore = orders.length === parseInt(limit);
         const presumedTotal = skip + orders.length + (hasMore ? 1 : 0);
 
@@ -113,6 +111,7 @@ router.get('/stats/filtered', async (req, res) => {
         const matchFilter = buildOrderFilter(req.query);
 
         const [agg] = await Order.aggregate([
+            { $match: matchFilter },
             {
                 $group: {
                     _id: null,

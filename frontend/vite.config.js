@@ -103,6 +103,11 @@ export default defineConfig({
     minify: 'esbuild',
   },
 
+  optimizeDeps: {
+    include: ['react-instantsearch', 'algoliasearch/lite'],
+    force: true // Force dependency optimization to clear corrupted cache
+  },
+
   server: {
     port: 5173,
     host: true,

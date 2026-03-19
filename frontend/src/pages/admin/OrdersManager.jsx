@@ -28,13 +28,24 @@ function OrdersManager() {
     const [paymentFilter, setPaymentFilter] = useState('')
     const [dropOnFilter, setDropOnFilter] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
-    const [pagination, setPagination] = useState({ total: 0, pages: 1, limit: 20 })
+    const [pagination, setPagination] = useState({ total: 0, pages: 1, page: 1, limit: 100 })
 
     // Load unique Drop On values once on mount
     useEffect(() => {
         ordersAPI.getDropOns()
-            .then(res => setDropOnOptions(res.data?.data || []))
-            .catch(() => { })
+            .then(res => {
+                const rawOptions = res.data?.data || []
+                const validOptions = rawOptions.filter(d => 
+                    d && d !== 'All Drops' && d !== 'WhatsApp' && d !== 'Cash' && d !== 'UPI'
+                )
+                // Ensure the standard drops always exist, preventing an empty dropdown UI bug
+                const standardDrops = ['Drop 1', 'Drop 2', 'Drop 3', 'Drop 4', 'Custom']
+                const merged = Array.from(new Set([...standardDrops, ...validOptions]))
+                setDropOnOptions(merged)
+            })
+            .catch(() => {
+                setDropOnOptions(['Drop 1', 'Drop 2', 'Drop 3', 'Drop 4', 'Custom'])
+            })
     }, [])
 
     const getActiveFilters = useCallback(() => ({
@@ -43,7 +54,7 @@ function OrdersManager() {
         paymentMethod: paymentFilter || undefined,
         dropOn: dropOnFilter || undefined,
         page: currentPage,
-        limit: 20,
+        limit: 100,
     }), [search, statusFilter, paymentFilter, dropOnFilter, currentPage])
 
     useEffect(() => {
@@ -375,7 +386,7 @@ function OrdersManager() {
                         {pagination.pages > 1 && (
                             <div style={{ marginTop: '1.5rem' }}>
                                 <Pagination
-                                    currentPage={pagination.page}
+                                    currentPage={currentPage}
                                     totalPages={pagination.pages}
                                     onPageChange={handlePageChange}
                                 />
