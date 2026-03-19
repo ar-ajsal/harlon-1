@@ -262,7 +262,7 @@ function Checkout() {
         )
     }
 
-    const price = product.discountedPrice || product.price
+    const price = product.price
     const submitLabel = loading
         ? 'Processing…'
         : paymentMethod === 'whatsapp'
@@ -564,8 +564,8 @@ function Checkout() {
 
 // ── Order summary panel (shared: mobile collapsible + desktop sticky) ─────────
 function SummaryPanel({ product, form, setForm, fmt, prefersReduced }) {
-    const price = product.discountedPrice || product.price
-    const hasDiscount = product.discountedPrice && product.discountedPrice < product.price
+    const price = product.price
+    const hasDiscount = product.originalPrice && product.originalPrice > product.price
 
     return (
         <div className="co-summary-card">
@@ -605,13 +605,13 @@ function SummaryPanel({ product, form, setForm, fmt, prefersReduced }) {
             <div className="co-summary-divider" />
 
             <div className="co-price-row">
-                <span>Subtotal</span>
-                <span>₹{fmt(price)}</span>
+                <span>{hasDiscount ? 'MRP' : 'Subtotal'}</span>
+                <span>₹{fmt(hasDiscount ? product.originalPrice : price)}</span>
             </div>
             {hasDiscount && (
                 <div className="co-price-row free">
                     <span>Discount</span>
-                    <span>−₹{fmt(product.price - price)}</span>
+                    <span>−₹{fmt(product.originalPrice - price)}</span>
                 </div>
             )}
             <div className="co-price-row free">
@@ -634,3 +634,4 @@ function SummaryPanel({ product, form, setForm, fmt, prefersReduced }) {
 }
 
 export default Checkout
+

@@ -3,7 +3,6 @@ if (envUrl.startsWith('http') && !envUrl.endsWith('/api')) {
     envUrl = envUrl.replace(/\/$/, '') + '/api';
 }
 const API_URL = envUrl;
-console.log('Using API URL:', API_URL);
 
 // Helper to get auth headers
 const getAuthHeaders = () => {

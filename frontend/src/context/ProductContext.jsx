@@ -30,7 +30,7 @@ export function ProductProvider({ children }) {
             setError(null)
 
             const [productsResponse, categoriesData] = await Promise.all([
-                productsApi.getAll({ page: 1, limit: 1000, _admin: 'true', ...options }), // Load everything for client admin UI
+                productsApi.getAll({ page: 1, limit: 1000, ...options }), // Load visible products only (isVisible: true filter applies)
                 categoriesApi.getAll({ limit: 1000 })
             ])
 
@@ -55,7 +55,7 @@ export function ProductProvider({ children }) {
     const loadMore = useCallback(async (page, filters = {}) => {
         try {
             setLoadingMore(true)
-            const response = await productsApi.getAll({ page, limit: pagination.limit, _admin: 'true', ...filters })
+            const response = await productsApi.getAll({ page, limit: pagination.limit, ...filters })
 
             const newProducts = response.data?.data || response.data || response || []
             const newPagination = response.data?.pagination || response.pagination || pagination
