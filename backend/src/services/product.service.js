@@ -1,14 +1,5 @@
 import Product from '../models/Product.js';
 import ApiError from '../utils/ApiError.js';
-import algoliasearch from 'algoliasearch';
-
-let algoliaIndex = null;
-if (process.env.ALGOLIA_APP_ID && process.env.ALGOLIA_ADMIN_KEY) {
-    const client = algoliasearch(process.env.ALGOLIA_APP_ID, process.env.ALGOLIA_ADMIN_KEY);
-    algoliaIndex = client.initIndex('products');
-} else {
-    console.warn('⚠️ Algolia credentials missing. Algolia sync is disabled.');
-}
 
 // ─── In-Memory Cache ─────────────────────────────────────────────────────────
 // Caches public product listing for 2 minutes — eliminates repeated DB hits on
@@ -166,20 +157,6 @@ class ProductService {
     async create(data) {
         const product = await Product.create(data);
         invalidateProductCache();
-
-        if (algoliaIndex) {
-            try {
-                // Remove Mongoose specific properties and set objectID
-                const algoRecord = product.toObject ? product.toObject() : { ...product };
-                algoRecord.objectID = product._id.toString();
-                delete algoRecord._id;
-                delete algoRecord.__v;
-                await algoliaIndex.saveObject(algoRecord);
-            } catch (err) {
-                console.error('Algolia Create Sync Error:', err);
-            }
-        }
-
         return product;
     }
 
@@ -192,19 +169,6 @@ class ProductService {
             throw ApiError.notFound('Product not found');
         }
         invalidateProductCache();
-
-        if (algoliaIndex) {
-            try {
-                const algoRecord = product.toObject ? product.toObject() : { ...product };
-                algoRecord.objectID = product._id.toString();
-                delete algoRecord._id;
-                delete algoRecord.__v;
-                await algoliaIndex.partialUpdateObject(algoRecord);
-            } catch (err) {
-                console.error('Algolia Update Sync Error:', err);
-            }
-        }
-
         return product;
     }
 
@@ -214,15 +178,6 @@ class ProductService {
             throw ApiError.notFound('Product not found');
         }
         invalidateProductCache();
-
-        if (algoliaIndex) {
-            try {
-                await algoliaIndex.deleteObject(id.toString());
-            } catch (err) {
-                console.error('Algolia Delete Sync Error:', err);
-            }
-        }
-
         return product;
     }
 
@@ -237,18 +192,6 @@ class ProductService {
         if (operations.length > 0) {
             await Product.bulkWrite(operations);
             invalidateProductCache();
-
-            if (algoliaIndex) {
-                try {
-                    const objects = updates.map(({ _id, priority }) => ({
-                        objectID: _id.toString(),
-                        priority
-                    }));
-                    await algoliaIndex.partialUpdateObjects(objects);
-                } catch (err) {
-                    console.error('Algolia Reorder Sync Error:', err);
-                }
-            }
         }
 
         return true;
