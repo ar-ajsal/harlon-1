@@ -53,9 +53,9 @@
         'Inter',
         -apple-system,
         sans-serif;
-    --font-mono-family: 'JetBrains Mono',
-        'Fira Code',
-        monospace;
+    --font-mono-family: 'Inter',
+        system-ui,
+        sans-serif;
 
     /* Font Weights */
     --weight-light: 300;
