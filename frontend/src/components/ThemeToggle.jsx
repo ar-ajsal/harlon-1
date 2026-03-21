@@ -1,7 +1,7 @@
 import { useTheme } from '../context/ThemeContext'
 import './ThemeToggle.css'
 
-export default function ThemeToggle() {
+export default function ThemeToggle({ className = '' }) {
     const { theme, toggleTheme } = useTheme()
 
     // Assuming Light Mode = Day (Sun/Clouds) -> Checked = true
@@ -9,7 +9,7 @@ export default function ThemeToggle() {
     const isLightMode = theme === 'light'
 
     return (
-        <label className="theme-switch" aria-label="Toggle Theme">
+        <label className={`theme-switch ${className}`} aria-label="Toggle Theme">
             <input 
                 checked={isLightMode} 
                 id="theme-checkbox" 

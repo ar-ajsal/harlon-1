@@ -9,7 +9,7 @@
     min-height: 100dvh;
     padding-top: 72px;
     /* header height */
-    background: #fff;
+    background: var(--surface);
 }
 
 .pd-container {
@@ -36,7 +36,7 @@
 }
 
 .pd-back:hover {
-    color: #0A0A0A;
+    color: var(--ink);
 }
 
 /* ─── Main 2-column grid ───────────────────────────────────── */
@@ -230,7 +230,7 @@
 
 .pd-gallery-prev:hover,
 .pd-gallery-next:hover {
-    background: #fff;
+    background: var(--surface);
 }
 
 /* ====================================================
@@ -249,7 +249,7 @@
     font-size: clamp(26px, 5vw, 40px);
     letter-spacing: -0.025em;
     line-height: 1.1;
-    color: #0A0A0A;
+    color: var(--ink);
     margin: 0 0 14px;
 }
 
@@ -278,7 +278,7 @@
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
     font-size: 28px;
     font-weight: 700;
-    color: #0A0A0A;
+    color: var(--ink);
 }
 
 .pd-price-orig {
@@ -293,7 +293,7 @@
     font-size: 12px;
     font-weight: 700;
     color: #16a34a;
-    background: #f0fdf4;
+    background: var(--surface-2);
     border-radius: 99px;
     padding: 3px 10px;
 }
@@ -303,7 +303,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #fef2f2;
+    background: var(--surface-2);
     color: #991b1b;
     border: 1px solid #fecaca;
     border-radius: 8px;
@@ -355,7 +355,7 @@
 
 .pd-size-selected {
     font-weight: 700;
-    color: #0A0A0A;
+    color: var(--ink);
     text-transform: none;
     letter-spacing: 0;
 }
@@ -386,11 +386,11 @@
     height: 54px;
     border-radius: 12px;
     border: 2px solid #E5E5E5;
-    background: #fff;
+    background: var(--surface);
     font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 600;
-    color: #333;
+    color: var(--ink);
     cursor: pointer;
     transition: border-color 0.15s, background 0.15s, color 0.15s, transform 0.1s, box-shadow 0.15s;
     display: flex;
@@ -399,14 +399,14 @@
 }
 
 .pd-size-btn:hover:not(:disabled) {
-    border-color: #0A0A0A;
+    border-color: var(--ink);
     transform: translateY(-2px);
 }
 
 .pd-size-btn.active {
     border-color: hsl(38, 65%, 55%);
     background: hsl(38, 65%, 55%);
-    color: #0A0A0A;
+    color: var(--ink);
     font-weight: 700;
     box-shadow: 0 4px 14px hsl(38, 65%, 55%, 0.35);
 }
@@ -436,7 +436,7 @@
     justify-content: center;
     gap: 8px;
     background: hsl(38, 65%, 55%);
-    color: #0A0A0A;
+    color: var(--ink);
     font-family: 'Inter', sans-serif;
     font-size: 16px;
     font-weight: 700;
@@ -468,7 +468,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: #fff;
+    background: var(--surface);
     color: #128C7E;
     font-family: 'Inter', sans-serif;
     font-size: 15px;
@@ -509,7 +509,7 @@
 
 .pd-btn-waitlist:hover {
     border-color: #999;
-    color: #0A0A0A;
+    color: var(--ink);
 }
 
 /* ─── Trust grid ──────────────────────────────────── */
@@ -524,7 +524,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #F7F6F3;
+    background: var(--surface-2);
     border-radius: 10px;
     padding: 10px 12px;
     font-family: 'Inter', sans-serif;
@@ -571,11 +571,11 @@
     padding: 11px 16px;
     border-radius: 99px;
     border: 1.5px solid #E5E5E5;
-    background: #fff;
+    background: var(--surface);
     font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 600;
-    color: #0A0A0A;
+    color: var(--ink);
     letter-spacing: 0.04em;
     outline: none;
     transition: border-color 0.2s;
@@ -614,7 +614,7 @@
     font-size: 12px;
     font-weight: 600;
     color: #16a34a;
-    background: #f0fdf4;
+    background: var(--surface-2);
     border-radius: 8px;
     padding: 6px 12px;
     display: inline-flex;
@@ -642,7 +642,7 @@
 }
 
 .pd-inquiry-link:hover {
-    color: #333;
+    color: var(--ink);
 }
 
 /* ─── Tabs ────────────────────────────────────────── */
@@ -674,12 +674,12 @@
 }
 
 .pd-tab-btn.active {
-    color: #0A0A0A;
+    color: var(--ink);
     border-bottom-color: hsl(38, 65%, 55%);
 }
 
 .pd-tab-btn:hover {
-    color: #0A0A0A;
+    color: var(--ink);
 }
 
 .pd-tab-content {
@@ -700,10 +700,10 @@
 
 .pd-size-table th {
     font-weight: 700;
-    color: #0A0A0A;
+    color: var(--ink);
     text-align: left;
     padding: 10px 12px;
-    background: #F7F6F3;
+    background: var(--surface-2);
     border: 1px solid #eee;
     font-size: 11px;
     text-transform: uppercase;
@@ -762,7 +762,7 @@
     font-family: 'Syne', sans-serif;
     font-weight: 800;
     font-size: 22px;
-    color: #0A0A0A;
+    color: var(--ink);
     margin: 0;
 }
 
@@ -831,7 +831,7 @@
 .pd-sticky-buy {
     flex-shrink: 0;
     background: hsl(38, 65%, 55%);
-    color: #0A0A0A;
+    color: var(--ink);
     font-family: 'Inter', sans-serif;
     font-size: 13px;
     font-weight: 700;
@@ -860,7 +860,7 @@
 }
 
 .pd-modal-card {
-    background: #fff;
+    background: var(--surface);
     width: 100%;
     max-width: 520px;
     max-height: 92dvh;
@@ -882,7 +882,7 @@
     font-family: 'Syne', sans-serif;
     font-weight: 800;
     font-size: 22px;
-    color: #0A0A0A;
+    color: var(--ink);
     margin: 0 0 4px;
 }
 
@@ -932,10 +932,10 @@
     padding: 13px 16px;
     border: 1.5px solid #E5E5E5;
     border-radius: 12px;
-    background: #fff;
+    background: var(--surface);
     font-family: 'Inter', sans-serif;
     font-size: 15px;
-    color: #0A0A0A;
+    color: var(--ink);
     outline: none;
     resize: vertical;
     transition: border-color 0.2s;
@@ -962,7 +962,7 @@
     font-family: 'Syne', sans-serif;
     font-weight: 800;
     font-size: 24px;
-    color: #0A0A0A;
+    color: var(--ink);
     margin: 0 0 8px;
 }
 

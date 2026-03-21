@@ -48,7 +48,7 @@
 }
 
 .nav-item.active {
-    color: #111827;
+    color: var(--ink);
 }
 
 .nav-item.active .nav-item-icon::after {
@@ -94,7 +94,7 @@
     bottom: 64px;
     left: 0;
     right: 0;
-    background: #fff;
+    background: var(--surface);
     border-top: 1px solid #f0f0f0;
     border-radius: 24px 24px 0 0;
     padding: 12px 20px 20px;
@@ -134,7 +134,7 @@
     align-items: center;
     gap: 10px;
     padding: 14px 16px;
-    background: #f9fafb;
+    background: var(--surface-2);
     border-radius: 12px;
     font-size: 14px;
     font-weight: 600;

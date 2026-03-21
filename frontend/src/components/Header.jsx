@@ -150,7 +150,7 @@ function Header() {
 
                 {/* ── Mobile controls ── */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <ThemeToggle />
+                    <ThemeToggle className="mobile-theme-btn" />
 
                     {/* Hamburger */}
                     <button

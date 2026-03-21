@@ -8,7 +8,7 @@
 .co-page {
     min-height: 100dvh;
     padding-top: 72px;
-    background: #F7F6F3;
+    background: var(--surface-2);
 }
 
 .co-container {
@@ -38,7 +38,7 @@
     font-weight: 800;
     font-size: clamp(28px, 6vw, 40px);
     letter-spacing: -0.025em;
-    color: #0A0A0A;
+    color: var(--ink);
     margin: 0;
 }
 
@@ -52,7 +52,7 @@
 
 /* ─── Collapsible order summary (mobile top) ───────────────── */
 .co-summary-toggle {
-    background: #fff;
+    background: var(--surface);
     border-radius: 14px;
     border: 1.5px solid #E5E5E5;
     padding: 14px 16px;
@@ -87,13 +87,13 @@
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
     font-size: 16px;
     font-weight: 700;
-    color: #0A0A0A;
+    color: var(--ink);
     margin-left: auto;
 }
 
 /* ─── Form / Summary card ──────────────────────────────────── */
 .co-card {
-    background: #fff;
+    background: var(--surface);
     border-radius: 16px;
     padding: 24px;
     border: 1px solid #EBEBEB;
@@ -103,7 +103,7 @@
     font-family: 'Syne', sans-serif;
     font-weight: 800;
     font-size: 18px;
-    color: #0A0A0A;
+    color: var(--ink);
     margin: 0 0 20px;
     letter-spacing: -0.01em;
 }
@@ -121,7 +121,7 @@
     border-radius: 14px;
     padding: 14px 16px;
     cursor: pointer;
-    background: #fff;
+    background: var(--surface);
     text-align: left;
     transition: border-color 0.2s, background 0.2s;
     position: relative;
@@ -147,7 +147,7 @@
     width: 20px;
     height: 20px;
     background: hsl(38, 65%, 55%);
-    color: #0A0A0A;
+    color: var(--ink);
     border-radius: 50%;
     font-size: 11px;
     font-weight: 800;
@@ -168,7 +168,7 @@
     font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 700;
-    color: #0A0A0A;
+    color: var(--ink);
     display: block;
 }
 
@@ -184,7 +184,7 @@
     align-items: center;
     gap: 4px;
     background: hsl(38, 65%, 55%);
-    color: #0A0A0A;
+    color: var(--ink);
     font-family: 'Inter', sans-serif;
     font-size: 9px;
     font-weight: 700;
@@ -271,10 +271,10 @@
     padding: 13px 16px;
     border: 1.5px solid #E5E5E5;
     border-radius: 12px;
-    background: #fff;
+    background: var(--surface);
     font-family: 'Inter', sans-serif;
     font-size: 15px;
-    color: #0A0A0A;
+    color: var(--ink);
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
     box-sizing: border-box;
@@ -387,7 +387,7 @@
     gap: 8px;
     width: 100%;
     background: hsl(38, 65%, 55%);
-    color: #0A0A0A;
+    color: var(--ink);
     font-family: 'Inter', sans-serif;
     font-size: 16px;
     font-weight: 700;
@@ -441,7 +441,7 @@
 
 /* ─── Order summary card ───────────────────────────────────── */
 .co-summary-card {
-    background: #fff;
+    background: var(--surface);
     border-radius: 16px;
     border: 1px solid #EBEBEB;
     padding: 20px;
@@ -483,7 +483,7 @@
     font-family: 'Syne', sans-serif;
     font-weight: 700;
     font-size: 15px;
-    color: #0A0A0A;
+    color: var(--ink);
     line-height: 1.3;
     margin: 0 0 6px;
 }
@@ -492,7 +492,7 @@
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
     font-size: 16px;
     font-weight: 700;
-    color: #0A0A0A;
+    color: var(--ink);
 }
 
 /* Size selector in summary */
@@ -519,11 +519,11 @@
     height: 44px;
     border-radius: 10px;
     border: 1.5px solid #E5E5E5;
-    background: #fff;
+    background: var(--surface);
     font-family: 'Inter', sans-serif;
     font-size: 13px;
     font-weight: 600;
-    color: #333;
+    color: var(--ink);
     cursor: pointer;
     transition: border-color 0.15s, background 0.15s;
     display: flex;
@@ -534,7 +534,7 @@
 .co-size-btn.selected {
     border-color: hsl(38, 65%, 55%);
     background: hsl(38, 65%, 55%);
-    color: #0A0A0A;
+    color: var(--ink);
     font-weight: 700;
 }
 
@@ -567,7 +567,7 @@
     font-family: 'Inter', sans-serif;
     font-size: 15px;
     font-weight: 700;
-    color: #0A0A0A;
+    color: var(--ink);
     margin-top: 10px;
 }
 
@@ -580,7 +580,7 @@
 /* ─── SUCCESS SCREEN ───────────────────────────────────────── */
 .co-success {
     min-height: 100dvh;
-    background: #fff;
+    background: var(--surface);
     padding-top: 72px;
     display: flex;
     align-items: center;
@@ -627,7 +627,7 @@
     font-weight: 800;
     font-size: clamp(28px, 7vw, 44px);
     letter-spacing: -0.025em;
-    color: #0A0A0A;
+    color: var(--ink);
     line-height: 1.05;
     margin: 0 0 10px;
 }
@@ -645,7 +645,7 @@
 }
 
 .co-success-order {
-    background: #F7F6F3;
+    background: var(--surface-2);
     border-radius: 14px;
     padding: 14px 20px;
     margin-bottom: 24px;
@@ -667,7 +667,7 @@
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
     font-size: 12px;
     font-weight: 700;
-    color: #0A0A0A;
+    color: var(--ink);
     letter-spacing: 0.04em;
 }
 
@@ -695,7 +695,7 @@
     justify-content: center;
     gap: 8px;
     background: hsl(38, 65%, 55%);
-    color: #0A0A0A;
+    color: var(--ink);
     font-family: 'Inter', sans-serif;
     font-size: 15px;
     font-weight: 700;

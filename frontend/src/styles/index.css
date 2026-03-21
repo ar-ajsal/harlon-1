@@ -1139,7 +1139,7 @@ h6 {
     aspect-ratio: 3 / 4;
     overflow: hidden;
     /* White canvas in light mode — bg-removed images look clean */
-    background: #ffffff;
+    background: var(--surface);
 }
 
 
@@ -1239,7 +1239,7 @@ h6 {
 /* ── Football Fan Platform badges ── */
 .product-badge.drop-badge {
     background: linear-gradient(135deg, #FFD700, #FFA500);
-    color: #000;
+    color: var(--ink);
     animation: drop-pulse 1.8s ease-in-out infinite;
 }
 
@@ -2564,7 +2564,7 @@ h6 {
     height: 18px;
     left: 3px;
     top: 3px;
-    background: #fff;
+    background: var(--surface);
     border-radius: 50%;
     transition: transform 0.22s ease;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
@@ -4675,7 +4675,7 @@ select.form-input {
 
 .row-out-of-stock {
     opacity: 0.6;
-    background: #fff5f5;
+    background: var(--surface-2);
 }
 
 /* =====================================================
@@ -4931,12 +4931,12 @@ select.form-input {
 .track-order-page {
     min-height: 80vh;
     padding: 40px 0 80px;
-    background: #f9fafb;
+    background: var(--surface-2);
 }
 
 /* ── Search card ── */
 .track-order-card {
-    background: #fff;
+    background: var(--surface);
     border-radius: 16px;
     padding: 32px;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
@@ -4947,7 +4947,7 @@ select.form-input {
 .track-title {
     font-size: 24px;
     font-weight: 700;
-    color: #111827;
+    color: var(--ink);
     margin: 0 0 8px;
 }
 
@@ -4983,7 +4983,7 @@ select.form-input {
 
 /* ── Summary card ── */
 .track-summary-card {
-    background: #fff;
+    background: var(--surface);
     border-radius: 16px;
     padding: 20px 24px;
     border: 1px solid #e5e7eb;
@@ -5014,7 +5014,7 @@ select.form-input {
 .track-product-name {
     font-size: 16px;
     font-weight: 700;
-    color: #111827;
+    color: var(--ink);
     margin-bottom: 6px;
 }
 
@@ -5155,7 +5155,7 @@ select.form-input {
 
 .track-ps-node.done .track-ps-circle {
     background: #111827;
-    border-color: #111827;
+    border-color: var(--ink);
     color: #fff;
     font-size: 16px;
 }
@@ -5178,13 +5178,13 @@ select.form-input {
 }
 
 .track-ps-label.current {
-    color: #111827;
+    color: var(--ink);
     font-weight: 700;
 }
 
 /* ── Section headings ── */
 .track-section {
-    background: #fff;
+    background: var(--surface);
     border-radius: 16px;
     padding: 20px 24px;
     border: 1px solid #e5e7eb;
@@ -5346,7 +5346,7 @@ select.form-input {
 
 /* ── Support ── */
 .track-support {
-    background: #fff;
+    background: var(--surface);
     border-radius: 16px;
     padding: 20px 24px;
     border: 1px solid #e5e7eb;
@@ -5375,7 +5375,7 @@ select.form-input {
 }
 
 .track-support-btn.whatsapp {
-    background: #f0fdf4;
+    background: var(--surface-2);
     color: #166534;
     border: 1.5px solid #bbf7d0;
 }
@@ -5385,7 +5385,7 @@ select.form-input {
 }
 
 .track-support-btn.email {
-    background: #f9fafb;
+    background: var(--surface-2);
     color: #374151;
     border: 1.5px solid #e5e7eb;
 }
@@ -5412,7 +5412,7 @@ select.form-input {
     padding: 16px 12px;
     border-radius: 12px;
     border: 2px solid #e5e7eb;
-    background: #fff;
+    background: var(--surface);
     cursor: pointer;
     transition: all 0.2s;
     font-size: 14px;
@@ -5422,11 +5422,11 @@ select.form-input {
 
 .pay-method-btn:hover {
     border-color: #6b7280;
-    background: #f9fafb;
+    background: var(--surface-2);
 }
 
 .pay-method-btn.selected {
-    border-color: #111827;
+    border-color: var(--ink);
     background: #111827;
     color: #fff;
     box-shadow: 0 4px 12px rgba(17, 24, 39, 0.15);
@@ -5455,7 +5455,7 @@ select.form-input {
 
 /* WhatsApp notice box */
 .wa-notice-box {
-    background: #f0fdf4;
+    background: var(--surface-2);
     border: 1.5px solid #bbf7d0;
     border-radius: 12px;
     padding: 16px 20px;
