@@ -187,7 +187,7 @@ function ProductDetail() {
         let message = `*Harlon Order Request*\n\n` +
             `*Product:* ${product.name}\n` +
             `*Size:* ${selectedSize}\n` +
-            `*Price:* ₹${product.discountedPrice || product.price}\n`
+            `*Price:* ₹${product.price}\n`
         if (validatedCoupon) message += `*🎫 Coupon:* ${validatedCoupon.code}\n`
         message += `\n*Page:* ${pageUrl}\n\nI would like to place an order. Is this available?`
 
@@ -236,8 +236,7 @@ function ProductDetail() {
             </div>
         )
     }
-
-    const discountedPrice = product.discountedPrice || product.price
+    const currentPrice = product.price
     const fmt = (n) => new Intl.NumberFormat('en-IN').format(n)
 
     return (
@@ -656,7 +655,7 @@ function ProductDetail() {
                     >
                         <div className="pd-sticky-info">
                             <span className="pd-sticky-name">{product.name}</span>
-                            <span className="pd-sticky-price">₹{fmt(discountedPrice)}</span>
+                            <span className="pd-sticky-price">₹{fmt(currentPrice)}</span>
                         </div>
                         <button
                             type="button"

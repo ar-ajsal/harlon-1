@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -147,9 +147,12 @@ function SortableMobileCard({ product, onEdit, onVisibilityToggle }) {
     );
 }
 
-
 function ProductsManager() {
-    const { products, categories, addProduct, updateProduct, deleteProduct, reorderProducts } = useProducts()
+    const { products, categories, addProduct, updateProduct, deleteProduct, reorderProducts, loadAdminData } = useProducts()
+
+    useEffect(() => {
+        loadAdminData()
+    }, [])
 
     const [showModal, setShowModal] = useState(false)
     const [editingProduct, setEditingProduct] = useState(null)

@@ -512,7 +512,8 @@
     color: #fff;
     margin: 0 0 6px;
     line-height: 1.2;
-    word-break: break-word; /* Allows "SLEEVE" to properly stay in bounds */
+    word-break: break-word;
+    /* Allows "SLEEVE" to properly stay in bounds */
 }
 
 .hh-cat-cta {

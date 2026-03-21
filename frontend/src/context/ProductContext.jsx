@@ -173,6 +173,10 @@ export function ProductProvider({ children }) {
         loadData()
     }
 
+    const loadAdminData = () => {
+        return loadData({ _admin: true })
+    }
+
     const hasMore = pagination.page < pagination.pages
 
     const value = {
@@ -193,6 +197,7 @@ export function ProductProvider({ children }) {
         updateCategory,
         deleteCategory,
         refreshData,
+        loadAdminData,
         loadMore
     }
 

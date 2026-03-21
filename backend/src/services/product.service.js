@@ -1,4 +1,5 @@
 import Product from '../models/Product.js';
+import Offer from '../models/Offer.js';
 import ApiError from '../utils/ApiError.js';
 
 // ─── In-Memory Cache ─────────────────────────────────────────────────────────
@@ -126,10 +127,42 @@ class ProductService {
 
         if (projection) dbQuery.select(projection);
 
-        const [products, total] = await Promise.all([
+        const [products, total, activeOffers] = await Promise.all([
             dbQuery,
-            Product.countDocuments(query)
+            Product.countDocuments(query),
+            Offer.findActive()
         ]);
+
+        // Evaluate and apply automatic discounts
+        if (activeOffers && activeOffers.length > 0) {
+            for (const product of products) {
+                let bestDiscount = 0;
+                let bestOffer = null;
+
+                for (const offer of activeOffers) {
+                    if (offer.isEligibleFor(product._id, product.category)) {
+                        const discount = offer.calculateDiscount(product.price);
+                        if (discount > bestDiscount) {
+                            bestDiscount = discount;
+                            bestOffer = offer;
+                        }
+                    }
+                }
+
+                if (bestDiscount > 0) {
+                    // Set original price if it doesn't exist or is incorrectly lower
+                    if (!product.originalPrice || product.originalPrice <= product.price) {
+                        product.originalPrice = product.price;
+                    }
+                    product.price = product.price - bestDiscount;
+                    product.activeOffer = {
+                        description: bestOffer.description,
+                        isAutomatic: true,
+                        value: bestOffer.discountValue
+                    };
+                }
+            }
+        }
 
         const result = {
             data: products,
@@ -151,6 +184,35 @@ class ProductService {
         if (!product) {
             throw ApiError.notFound('Product not found');
         }
+
+        const activeOffers = await Offer.findActive();
+        if (activeOffers && activeOffers.length > 0) {
+            let bestDiscount = 0;
+            let bestOffer = null;
+
+            for (const offer of activeOffers) {
+                if (offer.isEligibleFor(product._id, product.category)) {
+                    const discount = offer.calculateDiscount(product.price);
+                    if (discount > bestDiscount) {
+                        bestDiscount = discount;
+                        bestOffer = offer;
+                    }
+                }
+            }
+
+            if (bestDiscount > 0) {
+                if (!product.originalPrice || product.originalPrice <= product.price) {
+                    product.originalPrice = product.price;
+                }
+                product.price = product.price - bestDiscount;
+                product.activeOffer = {
+                    description: bestOffer.description,
+                    isAutomatic: true,
+                    value: bestOffer.discountValue
+                };
+            }
+        }
+
         return product;
     }
 

@@ -38,6 +38,7 @@ const StockManager = lazy(() => import('./pages/admin/StockManager'))
 const DropsManager = lazy(() => import('./pages/admin/DropsManager'))
 const PredictionsManager = lazy(() => import('./pages/admin/PredictionsManager'))
 const StoryManager = lazy(() => import('./pages/admin/StoryManager'))
+const OffersManager = lazy(() => import('./pages/admin/OffersManager'))
 
 
 function AdminFallback() {
@@ -206,6 +207,13 @@ function App() {
                     <ProtectedRoute>
                         <Suspense fallback={<AdminFallback />}>
                             <StoryManager />
+                        </Suspense>
+                    </ProtectedRoute>
+                } />
+                <Route path="/admin/offers" element={
+                    <ProtectedRoute>
+                        <Suspense fallback={<AdminFallback />}>
+                            <OffersManager />
                         </Suspense>
                     </ProtectedRoute>
                 } />

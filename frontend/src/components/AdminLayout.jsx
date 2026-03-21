@@ -3,7 +3,7 @@ import { NavLink, Link, useNavigate } from 'react-router-dom'
 import {
     FiHome, FiPackage, FiLayers, FiLogOut, FiShoppingBag,
     FiFileText, FiTrendingUp, FiMenu, FiGift, FiBriefcase,
-    FiBarChart2, FiX, FiExternalLink
+    FiBarChart2, FiX, FiExternalLink, FiTag
 } from 'react-icons/fi'
 import { useAuth } from '../context/AuthContext'
 import AdminBottomNav from './AdminBottomNav'
@@ -15,6 +15,7 @@ const NAV_ITEMS = [
     { to: '/admin/categories', icon: <FiLayers />, label: 'Categories' },
     { to: '/admin/stock', icon: <FiBarChart2 />, label: 'Stock' },
     { to: '/admin/coupons', icon: <FiGift />, label: 'Coupons' },
+    { to: '/admin/offers', icon: <FiTag />, label: 'Offers' },
     { to: '/admin/orders', icon: <FiFileText />, label: 'Invoices' },
     { to: '/admin/guest-orders', icon: <FiShoppingBag />, label: 'Guest Orders' },
     { to: '/admin/guest-inquiries', icon: <FiBriefcase />, label: 'Inquiries' },

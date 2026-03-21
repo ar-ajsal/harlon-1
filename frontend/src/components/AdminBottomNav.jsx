@@ -17,6 +17,7 @@ const MORE_ITEMS = [
     { to: '/admin/predictions', label: '⚽ Predictions' },
     { to: '/admin/story', label: '📖 Stories' },
     { to: '/admin/coupons', label: '🎁 Coupons' },
+    { to: '/admin/offers', label: '🏷️ Offers' },
     { to: '/admin/orders', label: '🧾 Invoices' },
     { to: '/admin/guest-inquiries', label: '💬 Inquiries' },
 ]

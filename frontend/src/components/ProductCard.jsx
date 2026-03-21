@@ -73,7 +73,12 @@ function ProductCard({ product, priority = false }) {
                         {product.bestSeller && (
                             <span className="product-badge bestseller">⭐ Best Seller</span>
                         )}
-                        {!product.bestSeller && discount >= 5 && (
+                        {!product.bestSeller && product.activeOffer && (
+                            <span className="product-badge" style={{ background: '#7c3aed', color: '#fff' }}>
+                                ✨ {product.activeOffer.description}
+                            </span>
+                        )}
+                        {!product.bestSeller && !product.activeOffer && discount >= 5 && (
                             <span className="product-badge">{discount}% OFF</span>
                         )}
                     </>
@@ -99,7 +104,19 @@ function ProductCard({ product, priority = false }) {
                     {product.originalPrice && product.originalPrice > product.price && (
                         <span className="price-original">{formatPrice(product.originalPrice)}</span>
                     )}
-                    {discount >= 5 && (
+                    {product.activeOffer ? (
+                        <span style={{
+                            marginLeft: 4,
+                            fontSize: 11,
+                            fontWeight: 700,
+                            color: 'var(--success, #16a34a)',
+                            background: 'var(--success-bg, #f0fdf4)',
+                            padding: '2px 7px',
+                            borderRadius: 99,
+                        }}>
+                            {product.activeOffer.description}
+                        </span>
+                    ) : discount >= 5 ? (
                         <span style={{
                             marginLeft: 4,
                             fontSize: 11,
@@ -111,7 +128,7 @@ function ProductCard({ product, priority = false }) {
                         }}>
                             {discount}% off
                         </span>
-                    )}
+                    ) : null}
                 </div>
             </div>
         </Link>

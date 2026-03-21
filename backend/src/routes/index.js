@@ -17,6 +17,7 @@ import vitalsRoutes from './vitals.routes.js';
 import dropRoutes from './drop.routes.js';
 import predictionRoutes from './prediction.routes.js';
 import fanCollectionRoutes from './fanCollection.routes.js';
+import offerRoutes from './offer.routes.js';
 
 const router = Router();
 
@@ -38,6 +39,8 @@ router.use('/vitals', vitalsRoutes);
 router.use('/drops', dropRoutes);
 router.use('/predictions', predictionRoutes);
 router.use('/fan', fanCollectionRoutes);
+// ── Offer / Promo Management ───────────────────────────────────────────────────
+router.use('/offers', offerRoutes);
 
 export default router;
 

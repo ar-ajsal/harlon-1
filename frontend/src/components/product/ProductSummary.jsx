@@ -25,10 +25,10 @@ function ProductSummary({
     const prefersReduced = useReducedMotion()
     const sizesRef = useRef(null)
 
-    const discountedPrice = product.discountedPrice || product.price
-    const hasDiscount = product.discountedPrice && product.discountedPrice < product.price
+    const currentPrice = product.price
+    const hasDiscount = product.originalPrice && product.price < product.originalPrice
     const discountPct = hasDiscount
-        ? Math.round(((product.price - discountedPrice) / product.price) * 100)
+        ? Math.round((1 - product.price / product.originalPrice) * 100)
         : 0
 
     const handleBuyClick = useCallback(() => {
@@ -62,10 +62,10 @@ function ProductSummary({
 
             {/* Price row */}
             <div className="pd-price-row">
-                <span className="pd-price">₹{fmt(discountedPrice)}</span>
+                <span className="pd-price">₹{fmt(currentPrice)}</span>
                 {hasDiscount && (
                     <>
-                        <span className="pd-price-orig">₹{fmt(product.price)}</span>
+                        <span className="pd-price-orig">₹{fmt(product.originalPrice)}</span>
                         <span className="pd-price-off">{discountPct}% OFF</span>
                     </>
                 )}
@@ -128,7 +128,7 @@ function ProductSummary({
                     aria-label="Buy now"
                 >
                     <FiShoppingBag style={{ fontSize: 18 }} />
-                    {soldOut ? 'Sold Out' : `Buy Now — ₹${fmt(discountedPrice)}`}
+                    {soldOut ? 'Sold Out' : `Buy Now — ₹${fmt(currentPrice)}`}
                 </motion.button>
 
                 <motion.button

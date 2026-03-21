@@ -1,13 +1,14 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { toast } from 'react-toastify'
 import { FaWhatsapp } from 'react-icons/fa'
-import { FiChevronDown, FiChevronUp } from 'react-icons/fi'
+import { FiChevronDown, FiChevronUp, FiTag, FiX } from 'react-icons/fi'
 import { useProducts } from '../context/ProductContext'
 import { createOrder } from '../api/guestOrder.api'
 import { WHATSAPP_NUMBER } from '../config/constants'
 import OrderSuccess from '../components/order/OrderSuccess'
+import { offersApi } from '../api/offers.api'
 import '../styles/checkout.css'
 
 const RAZORPAY_SCRIPT = 'https://checkout.razorpay.com/v1/checkout.js'
@@ -96,6 +97,12 @@ function Checkout() {
     const [success, setSuccess] = useState(null)
     const [paymentMethod, setPaymentMethod] = useState('razorpay')
 
+    // ── Promo / Offer code ───────────────────────────────────────────────────
+    const [promoCode, setPromoCode] = useState('')
+    const [promoInput, setPromoInput] = useState('')
+    const [promoValidating, setPromoValidating] = useState(false)
+    const [appliedOffer, setAppliedOffer] = useState(null)  // { code, description, discountAmount, discountType }
+
     // ── Load product ────────────────────────────────────────────────────────
     useEffect(() => {
         if (products.length > 0 && productId) {
@@ -144,6 +151,42 @@ function Checkout() {
         return true
     }, [form])
 
+    // ── Promo code handlers ──────────────────────────────────────────────────
+    const handleApplyPromo = useCallback(async () => {
+        const code = promoInput.trim().toUpperCase()
+        if (!code) { toast.error('Enter a promo code'); return }
+        if (!product) { toast.error('Please select a product first'); return }
+
+        try {
+            setPromoValidating(true)
+            const res = await offersApi.validate(code, product.price, product._id, product.category)
+            const offer = res.data?.data
+            if (!offer) throw new Error('Invalid response')
+
+            setAppliedOffer({
+                code: offer.code,
+                description: offer.description,
+                discountAmount: offer.discountAmount ?? 0,
+                discountType: offer.discountType,
+            })
+            setPromoCode(code)
+            toast.success(`✅ "${offer.code}" applied! ${offer.discountType === 'freeship' ? 'Free shipping unlocked' : `₹${offer.discountAmount} saved`}`)
+        } catch (err) {
+            const msg = err.response?.data?.message || err.message || 'Invalid promo code'
+            toast.error(msg)
+            setAppliedOffer(null)
+        } finally {
+            setPromoValidating(false)
+        }
+    }, [promoInput, product])
+
+    const removePromo = () => {
+        setAppliedOffer(null)
+        setPromoCode('')
+        setPromoInput('')
+        toast.info('Promo code removed')
+    }
+
     // ── Submit ───────────────────────────────────────────────────────────────
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -158,6 +201,8 @@ function Checkout() {
                 productId,
                 size: form.size,
                 paymentMethod,
+                promoCode: appliedOffer?.code || undefined,
+                discountAmount: appliedOffer?.discountAmount || 0,
                 customer: {
                     firstName, lastName,
                     company: '',
@@ -263,11 +308,13 @@ function Checkout() {
     }
 
     const price = product.price
+    const discountAmt = appliedOffer?.discountAmount ?? 0
+    const finalPrice = Math.max(0, price - discountAmt)
     const submitLabel = loading
         ? 'Processing…'
         : paymentMethod === 'whatsapp'
             ? '💬 Place WhatsApp Order'
-            : `🔒 Pay Securely — ₹${fmt(price)}`
+            : `🔒 Pay Securely — ₹${fmt(finalPrice)}`
 
     const tap = prefersReduced ? {} : { scale: 0.97 }
     const hover = prefersReduced ? {} : { scale: 1.01 }
@@ -295,7 +342,7 @@ function Checkout() {
                         {summaryOpen ? 'Hide' : 'Show'} order summary
                         {summaryOpen ? <FiChevronUp /> : <FiChevronDown />}
                     </span>
-                    <span className="co-summary-toggle-price">₹{fmt(price)}</span>
+                    <span className="co-summary-toggle-price">₹{fmt(finalPrice)}</span>
                 </div>
 
                 <AnimatePresence>
@@ -307,7 +354,7 @@ function Checkout() {
                             transition={{ duration: 0.22 }}
                             style={{ overflow: 'hidden', marginBottom: 12 }}
                         >
-                            <SummaryPanel product={product} form={form} setForm={setForm} fmt={fmt} prefersReduced={prefersReduced} />
+                            <SummaryPanel product={product} form={form} setForm={setForm} fmt={fmt} prefersReduced={prefersReduced} appliedOffer={appliedOffer} />
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -536,6 +583,65 @@ function Checkout() {
                             )}
                         </AnimatePresence>
 
+                        {/* ── Promo Code ── */}
+                        <div style={{ marginTop: 8, marginBottom: 4 }}>
+                            <p className="co-section-label">Promo Code</p>
+                            {appliedOffer ? (
+                                <div style={{
+                                    display: 'flex', alignItems: 'center', gap: 10,
+                                    background: '#f0fdf4', border: '1px solid #bbf7d0',
+                                    borderRadius: 10, padding: '10px 14px',
+                                }}>
+                                    <FiTag color="#16a34a" />
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: 700, fontSize: 13, color: '#15803d', fontFamily: 'monospace', letterSpacing: '0.06em' }}>
+                                            {appliedOffer.code}
+                                        </div>
+                                        <div style={{ fontSize: 12, color: '#166534' }}>
+                                            {appliedOffer.description}
+                                            {appliedOffer.discountAmount > 0 && (
+                                                <span style={{ fontWeight: 700 }}> — ₹{fmt(appliedOffer.discountAmount)} saved</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={removePromo}
+                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', padding: 4 }}
+                                        aria-label="Remove promo code"
+                                    >
+                                        <FiX size={16} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <div style={{ display: 'flex', gap: 8 }}>
+                                    <input
+                                        className="co-input"
+                                        style={{ flex: 1, fontFamily: 'monospace', letterSpacing: '0.06em', textTransform: 'uppercase' }}
+                                        placeholder="Enter promo code"
+                                        value={promoInput}
+                                        onChange={e => setPromoInput(e.target.value.toUpperCase())}
+                                        onKeyDown={e => e.key === 'Enter' && handleApplyPromo()}
+                                        disabled={promoValidating}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleApplyPromo}
+                                        disabled={promoValidating || !promoInput.trim()}
+                                        style={{
+                                            padding: '0 20px', borderRadius: 10, border: 'none',
+                                            background: '#0A0A0A', color: '#fff',
+                                            fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13,
+                                            cursor: promoValidating ? 'wait' : 'pointer',
+                                            whiteSpace: 'nowrap', minHeight: 44,
+                                        }}
+                                    >
+                                        {promoValidating ? '…' : 'Apply'}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
                         {/* ── Submit ── */}
                         <motion.button
                             type="submit"
@@ -554,7 +660,7 @@ function Checkout() {
 
                     {/* ── Order summary (desktop sticky) ── */}
                     <div className="co-summary-card-wrap">
-                        <SummaryPanel product={product} form={form} setForm={setForm} fmt={fmt} prefersReduced={prefersReduced} />
+                        <SummaryPanel product={product} form={form} setForm={setForm} fmt={fmt} prefersReduced={prefersReduced} appliedOffer={appliedOffer} />
                     </div>
                 </div>
             </div>
@@ -563,9 +669,11 @@ function Checkout() {
 }
 
 // ── Order summary panel (shared: mobile collapsible + desktop sticky) ─────────
-function SummaryPanel({ product, form, setForm, fmt, prefersReduced }) {
+function SummaryPanel({ product, form, setForm, fmt, prefersReduced, appliedOffer }) {
     const price = product.price
     const hasDiscount = product.originalPrice && product.originalPrice > product.price
+    const promoDiscount = appliedOffer?.discountAmount ?? 0
+    const finalTotal = Math.max(0, price - promoDiscount)
 
     return (
         <div className="co-summary-card">
@@ -614,16 +722,22 @@ function SummaryPanel({ product, form, setForm, fmt, prefersReduced }) {
                     <span>−₹{fmt(product.originalPrice - price)}</span>
                 </div>
             )}
+            {promoDiscount > 0 && (
+                <div className="co-price-row free">
+                    <span>Promo ({appliedOffer.code})</span>
+                    <span style={{ color: '#16a34a', fontWeight: 700 }}>−₹{fmt(promoDiscount)}</span>
+                </div>
+            )}
             <div className="co-price-row free">
                 <span>Delivery</span>
-                <span>FREE 🎉</span>
+                <span>{appliedOffer?.discountType === 'freeship' ? 'FREE 🎁' : 'FREE 🎉'}</span>
             </div>
 
             <div className="co-summary-divider" />
 
             <div className="co-price-total">
                 <span>Total</span>
-                <span className="co-price-total-num">₹{fmt(price)}</span>
+                <span className="co-price-total-num">₹{fmt(finalTotal)}</span>
             </div>
 
             <div style={{ marginTop: 12, fontSize: 11, color: '#aaa', fontFamily: 'Inter, sans-serif', textAlign: 'center' }}>
