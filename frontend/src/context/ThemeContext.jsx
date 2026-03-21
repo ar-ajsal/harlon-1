@@ -7,23 +7,14 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ children }) {
-    const [theme, setTheme] = useState(() => {
-        try {
-            return localStorage.getItem('harlon_theme') || 'light'
-        } catch {
-            return 'light'
-        }
-    })
+    const theme = 'light'
 
     useEffect(() => {
-        document.documentElement.setAttribute('data-theme', theme)
-        document.documentElement.classList.toggle('dark', theme === 'dark')
-        try {
-            localStorage.setItem('harlon_theme', theme)
-        } catch (_) {}
-    }, [theme])
+        document.documentElement.setAttribute('data-theme', 'light')
+        document.documentElement.classList.remove('dark')
+    }, [])
 
-    const toggleTheme = () => setTheme(t => (t === 'light' ? 'dark' : 'light'))
+    const toggleTheme = () => {}
 
     return (
         <ThemeContext.Provider value={{ theme, toggleTheme }}>

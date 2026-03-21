@@ -144,28 +144,11 @@ function Header() {
                         )}
                     </NavLink>
 
-                    {/* Theme toggle */}
-                    <button
-                        type="button"
-                        className="theme-toggle-btn"
-                        onClick={toggleTheme}
-                        aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-                    >
-                        {theme === 'dark' ? <FiSun size={18} /> : <FiMoon size={18} />}
-                    </button>
                 </nav>
 
                 {/* ── Mobile controls ── */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    {/* Theme toggle (mobile) */}
-                    <button
-                        type="button"
-                        className="theme-toggle-btn mobile-theme-btn"
-                        onClick={toggleTheme}
-                        aria-label={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-                    >
-                        {theme === 'dark' ? <FiSun size={18} /> : <FiMoon size={18} />}
-                    </button>
+
 
                     {/* Hamburger */}
                     <button
