@@ -1715,6 +1715,145 @@ label {
     overflow: hidden;
 }
 
+/* ================================================================
+   DARK MODE — Admin token overrides
+   ================================================================ */
+[data-theme="dark"] {
+    --adm-bg: hsl(240, 6%, 8%);
+    --adm-surface: hsl(240, 5%, 13%);
+    --adm-border: hsl(240, 4%, 22%);
+    --adm-border-subtle: hsl(240, 4%, 17%);
+    --noir-100: hsl(240, 8%, 95%);
+    --noir-80: hsl(240, 5%, 78%);
+    --noir-60: hsl(240, 4%, 56%);
+    --noir-40: hsl(240, 3%, 38%);
+    --noir-20: hsl(240, 3%, 24%);
+    --noir-10: hsl(240, 4%, 16%);
+}
+
+/* Dark mode — admin layout surfaces */
+[data-theme="dark"] .admin-layout {
+    background: var(--adm-bg);
+}
+
+[data-theme="dark"] .content-card,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .admin-main-card,
+[data-theme="dark"] .dashboard-section {
+    background: var(--adm-surface);
+    border-color: var(--adm-border);
+}
+
+[data-theme="dark"] .admin-table th {
+    background: var(--adm-bg);
+    color: var(--noir-60);
+    border-color: var(--adm-border);
+}
+
+[data-theme="dark"] .admin-table td {
+    border-color: var(--adm-border-subtle);
+    color: var(--noir-80);
+}
+
+[data-theme="dark"] .admin-table tr:hover {
+    background: hsla(240, 5%, 100%, 0.03);
+}
+
+/* Dark mode — modals */
+[data-theme="dark"] .modal-overlay {
+    background: rgba(0, 0, 0, 0.75);
+}
+
+[data-theme="dark"] .modal-content {
+    background: var(--adm-surface);
+    border: 1px solid var(--adm-border);
+}
+
+[data-theme="dark"] .modal-header {
+    background: var(--adm-surface);
+    border-bottom-color: var(--adm-border);
+}
+
+[data-theme="dark"] .modal-footer {
+    background: var(--adm-surface);
+    border-top-color: var(--adm-border);
+}
+
+[data-theme="dark"] .modal-close {
+    background: var(--adm-border-subtle);
+    color: var(--noir-60);
+}
+
+[data-theme="dark"] .modal-close:hover {
+    background: var(--adm-border);
+    color: var(--noir-100);
+}
+
+/* Dark mode — form elements */
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] .form-textarea {
+    background: var(--adm-bg);
+    border-color: var(--adm-border);
+    color: var(--noir-100);
+}
+
+[data-theme="dark"] .form-input:focus,
+[data-theme="dark"] .form-select:focus,
+[data-theme="dark"] .form-textarea:focus {
+    background: var(--adm-surface);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.12);
+}
+
+[data-theme="dark"] .size-chip {
+    background: var(--adm-bg);
+    border-color: var(--adm-border);
+    color: var(--noir-80);
+}
+
+[data-theme="dark"] .size-chip:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+[data-theme="dark"] .size-chip.active {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #1a1209;
+}
+
+[data-theme="dark"] .switches-container {
+    background: var(--adm-bg) !important;
+    border-color: var(--adm-border) !important;
+}
+
+[data-theme="dark"] .search-bar {
+    background: var(--adm-bg);
+    border-color: var(--adm-border);
+}
+
+[data-theme="dark"] .search-bar input {
+    background: transparent;
+    color: var(--noir-100);
+}
+
+[data-theme="dark"] .mobile-search-input {
+    background: var(--adm-bg);
+    border-color: var(--adm-border);
+    color: var(--noir-100);
+}
+
+[data-theme="dark"] .table-actions {
+    background: var(--adm-surface);
+    border-color: var(--adm-border);
+}
+
+[data-theme="dark"] .mobile-card-item {
+    background: var(--adm-surface);
+    border-color: var(--adm-border);
+}
+
 /* ── Product Search Picker (Invoice Pages) ─────────────────── */
 .product-search-wrapper {
     position: relative;

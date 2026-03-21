@@ -145,6 +145,90 @@
     --border-radius-full: 9999px;
 }
 
+/* ===== Dark Mode ===== */
+[data-theme="dark"] {
+    --noir-100: hsl(240, 8%, 95%);
+    /* Light text on dark — headings */
+    --noir-80: hsl(240, 6%, 80%);
+    /* Body text */
+    --noir-60: hsl(240, 4%, 60%);
+    /* Secondary text */
+    --noir-40: hsl(240, 3%, 42%);
+    /* Muted text */
+    --noir-20: hsl(240, 3%, 25%);
+    /* Borders */
+    --noir-10: hsl(240, 4%, 16%);
+    /* Subtle backgrounds / inputs */
+    --white: hsl(240, 6%, 10%);
+    /* Page background (deep dark) */
+
+    --shadow-card: 0 2px 12px hsla(0, 0%, 0%, 0.3);
+    --shadow-hover: 0 8px 24px hsla(0, 0%, 0%, 0.4);
+    --shadow-elevated: 0 16px 48px hsla(0, 0%, 0%, 0.5);
+    --shadow-float: 0 24px 64px hsla(0, 0%, 0%, 0.6);
+}
+
+/* Dark mode footer — force it to stay dark since its text uses hardcoded rgba whites */
+[data-theme="dark"] .footer {
+    background: hsl(240, 8%, 7%);
+}
+
+[data-theme="dark"] .footer-section h3,
+[data-theme="dark"] .footer-section h4 {
+    color: hsl(0, 0%, 90%);
+}
+
+[data-theme="dark"] .footer-section p,
+[data-theme="dark"] .footer-links a,
+[data-theme="dark"] .footer-section a {
+    color: hsla(0, 0%, 90%, 0.65);
+}
+
+[data-theme="dark"] .footer-links a:hover,
+[data-theme="dark"] .footer-section a:hover {
+    color: hsl(0, 0%, 95%);
+}
+
+[data-theme="dark"] .footer-bottom {
+    color: hsla(0, 0%, 90%, 0.45);
+    border-color: hsla(0, 0%, 90%, 0.12);
+}
+
+[data-theme="dark"] .social-link {
+    background: hsla(0, 0%, 100%, 0.08);
+    color: hsl(0, 0%, 85%);
+}
+
+[data-theme="dark"] .social-link:hover {
+    background: hsla(0, 0%, 100%, 0.15);
+}
+
+/* Dark mode — product cards: bg-removed images need a dark surface, not white */
+[data-theme="dark"] .product-image-wrapper {
+    background: hsl(240, 6%, 18%);
+}
+
+[data-theme="dark"] .product-card {
+    background: hsl(240, 5%, 13%);
+    border-color: hsl(240, 4%, 22%);
+}
+
+[data-theme="dark"] .product-card:hover {
+    border-color: hsl(240, 4%, 32%);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] .product-name {
+    color: hsl(240, 8%, 92%);
+}
+
+[data-theme="dark"] .price-current {
+    color: hsl(240, 8%, 92%);
+}
+
+[data-theme="dark"] .product-category {
+    color: hsl(240, 4%, 56%);
+}
 
 
 /* ===== Theme Toggle Button ===== */

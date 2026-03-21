@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiMenu, FiX, FiSearch, FiSun, FiMoon, FiHeart } from 'react-icons/fi'
+import ThemeToggle from './ThemeToggle'
 import { useTheme } from '../context/ThemeContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 
@@ -144,11 +145,12 @@ function Header() {
                         )}
                     </NavLink>
 
+                    <ThemeToggle />
                 </nav>
 
                 {/* ── Mobile controls ── */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-
+                    <ThemeToggle />
 
                     {/* Hamburger */}
                     <button
