@@ -6,6 +6,9 @@
 /* ── Page Shell ──────────────────────────────────────────────── */
 .shop-page-v2 {
     min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
     background: var(--surface);
     padding-top: 64px;      /* height of fixed navbar */
     padding-bottom: 80px;   /* room for mobile sticky bar */
@@ -297,7 +300,8 @@
 
 /* Product cards take 1 col, interrupters span full */
 .shop-feed-card {
-    /* default: 1 column */
+    min-width: 0; /* Prevents grid blowout */
+    width: 100%;
 }
 
 .shop-feed-interrupter {
