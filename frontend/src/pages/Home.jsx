@@ -394,27 +394,24 @@ function FooterCTA() {
 }
 
 /* ─── CATEGORY SECTION ───────────────────────────────────── */
-const CATEGORIES = [
-    { id: 'retro', label: 'Retro Classics', sub: '90s & 00s Legends' },
-    { id: 'full sleeve', label: 'Full Sleeve', sub: 'Long sleeve editions' },
-    { id: 'half sleeve', label: 'Half Sleeve', sub: 'Modern & Classic' }
-]
-
 function CategorySection() {
+    const { categories } = useProducts()
+
+    if (!categories || categories.length === 0) return null
+
     return (
         <section className="cvt-categories">
             <div className="cvt-container">
                 <div className="cvt-section-header">
-                    <h2 className="cvt-title">SHOP BY ERA</h2>
+                    <h2 className="cvt-title">SHOP BY CATEGORY</h2>
                     <p className="cvt-subtitle">Find your exact style</p>
                 </div>
                 <div className="cvt-cat-grid">
-                    {CATEGORIES.map((cat, i) => (
-                        <Link to={`/shop?chip=${encodeURIComponent(cat.id)}`} key={cat.id} className="cvt-cat-card">
+                    {categories.map((cat, i) => (
+                        <Link to={`/shop?chip=${encodeURIComponent(cat.name.toLowerCase())}`} key={cat._id || cat.name} className="cvt-cat-card">
                             <div className="cvt-cat-bg-glow" />
-                            <span className="cvt-cat-eyebrow">Collection 0{i+1}</span>
-                            <h3 className="cvt-cat-title">{cat.label}</h3>
-                            <p className="cvt-cat-sub">{cat.sub}</p>
+                            <span className="cvt-cat-eyebrow">Collection 0{i + 1}</span>
+                            <h3 className="cvt-cat-title">{cat.name}</h3>
                             <span className="cvt-cat-btn">Explore <FiArrowRight /></span>
                         </Link>
                     ))}
