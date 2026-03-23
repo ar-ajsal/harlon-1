@@ -13,7 +13,6 @@ import { useWishlist } from '../context/WishlistContext'
 import { useCart } from '../context/CartContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 import Skeleton from '../components/ui/Skeleton'
-import CategoryStories from '../components/CategoryStories'
 import '../styles/home.css'
 
 const fmt = (n) => `₹${Number(n).toLocaleString('en-IN')}`
@@ -28,15 +27,6 @@ const stagger = (delay = 0.08) => ({
     visible: { opacity: 1, transition: { staggerChildren: delay, delayChildren: 0.05 } },
 })
 
-/* ─── Iconic Moments data (static storytelling cards) ─────── */
-const ICONIC_MOMENTS = [
-    { label: 'MESSI 2011', story: 'Wembley. The night football changed.', tag: 'BARCELONA', color: '#a50044' },
-    { label: 'RONALDO 2016', story: 'Lisbon. A nation held its breath.', tag: 'PORTUGAL', color: '#006600' },
-    { label: 'ZIDANE 1998', story: 'Paris. The greatest final ever played.', tag: 'FRANCE', color: '#003189' },
-    { label: 'HENRY 2004', story: 'Highbury. He made it look effortless.', tag: 'ARSENAL', color: '#db0007' },
-    { label: 'RONALDINHO 2005', story: 'Old Trafford. Even their fans applauded.', tag: 'BARCELONA', color: '#a50044' },
-    { label: 'TOTTI 2001', story: 'Rome. The eternal city, the eternal king.', tag: 'AS ROMA', color: '#8B1538' },
-]
 
 /* ─── Branded Error State ──────────────────────────────────── */
 function LegendaryError({ onRetry }) {
@@ -156,20 +146,27 @@ function TrustMarquee() {
     )
 }
 
-/* ─── Iconic Moments Section ───────────────────────────────── */
-function IconicMomentsSection({ products, reduced }) {
-    const cards = ICONIC_MOMENTS.map((m, i) => ({
-        ...m,
-        img: products[i]?.images?.[0] || null,
-        id: products[i]?._id,
-    }))
+/* ─── Category Cards Section ───────────────────────────────── */
+function CategoryCardsSection({ categories, products, reduced }) {
+    if (!categories || categories.length === 0) return null
+
+    // Build cards based on real DB categories
+    const cards = categories.map(cat => {
+        // Use category image if available, else find a product image in that category
+        const fallbackProduct = products?.find(p => p.category === cat.name && p.images?.length > 0)
+        return {
+            id: encodeURIComponent(cat.name.toLowerCase()),
+            name: cat.name,
+            img: cat.image || fallbackProduct?.images?.[0] || null,
+        }
+    })
 
     return (
-        <section className="cvt-moments" aria-label="Iconic Moments">
+        <section className="cvt-moments" aria-label="Shop by Category">
             <div className="cvt-section-header">
                 <span className="cvt-section-eyebrow">THE COLLECTION</span>
-                <h2 className="cvt-section-title">Iconic<br /><em>Moments.</em></h2>
-                <p className="cvt-section-desc">Each jersey carries a story. Each story is a legend.</p>
+                <h2 className="cvt-section-title">Shop by<br /><em>Category.</em></h2>
+                <p className="cvt-section-desc">Find the exact era, club, or legend you're looking for.</p>
             </div>
             <div className="cvt-moments-track">
                 {cards.map((card, i) => (
@@ -184,21 +181,19 @@ function IconicMomentsSection({ products, reduced }) {
                     >
                         <div className="cvt-moment-img-wrap">
                             {card.img ? (
-                                <img src={card.img} alt={card.label} className="cvt-moment-img" />
+                                <img src={card.img} alt={card.name} className="cvt-moment-img" />
                             ) : (
-                                <div className="cvt-moment-placeholder" style={{ background: card.color + '22' }}>
-                                    <span style={{ color: card.color, fontSize: 32 }}>⚽</span>
+                                <div className="cvt-moment-placeholder" style={{ background: '#222' }}>
+                                    <span style={{ color: '#555', fontSize: 32 }}>⚽</span>
                                 </div>
                             )}
                             <div className="cvt-moment-overlay">
-                                <span className="cvt-moment-tag">{card.tag}</span>
-                                <h3 className="cvt-moment-label">{card.label}</h3>
-                                <p className="cvt-moment-story">{card.story}</p>
-                                {card.id && (
-                                    <Link to={`/product/${card.id}`} className="cvt-moment-cta">
-                                        View Jersey <FiArrowRight size={12} />
-                                    </Link>
-                                )}
+                                <span className="cvt-moment-tag">CATEGORY</span>
+                                <h3 className="cvt-moment-label">{card.name}</h3>
+                                <p className="cvt-moment-story">Authentic retro drops.</p>
+                                <Link to={`/shop?chip=${card.id}`} className="cvt-moment-cta">
+                                    Explore <FiArrowRight size={12} />
+                                </Link>
                             </div>
                         </div>
                     </motion.div>
@@ -408,8 +403,7 @@ export default function Home() {
         <main className="home">
             <HeroSection products={products} reduced={reduced} />
             <TrustMarquee />
-            <CategoryStories categories={categories} products={products} />
-            <IconicMomentsSection products={products} reduced={reduced} />
+            <CategoryCardsSection categories={categories} products={products} reduced={reduced} />
             <LimitedDropSection products={products} loading={loading} reduced={reduced} />
             <SocialProof products={products} />
             <FooterCTA />
