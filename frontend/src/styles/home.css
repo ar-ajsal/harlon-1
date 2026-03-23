@@ -323,27 +323,45 @@
     margin: 0 auto 36px;
 }
 
-.cvt-moments-track {
-    display: flex;
-    gap: 20px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    padding: 8px 24px 20px;
-    scrollbar-width: none;
-    cursor: grab;
+.cvt-moments-scroll-wrap {
+    overflow: hidden;
+    width: 100%;
 }
 
-.cvt-moments-track::-webkit-scrollbar { display: none; }
-.cvt-moments-track:active { cursor: grabbing; }
+.cvt-moments-track.cvt-auto-slider {
+    display: inline-flex;
+    padding: 8px 0 20px;
+    animation: cvt-marquee-slow 50s linear infinite;
+    will-change: transform;
+}
+
+.cvt-moments-track.cvt-auto-slider:hover {
+    animation-play-state: paused;
+}
+
+.cvt-moments-group {
+    display: inline-flex;
+    gap: 20px;
+    padding-right: 20px; /* Crucial gap for seamless CSS loop */
+}
+
+@keyframes cvt-marquee-slow {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
 
 .cvt-moment-card {
-    flex: 0 0 calc(80vw);
-    max-width: 320px;
-    scroll-snap-align: start;
+    flex: 0 0 clamp(240px, 60vw, 320px);
     border-radius: 20px;
     overflow: hidden;
     display: block;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    text-decoration: none;
+    color: inherit;
+}
+
+.cvt-moment-card:hover {
+    transform: translateY(-8px);
 }
 
 .cvt-moment-img-wrap {
@@ -920,7 +938,6 @@
    ==================================================== */
 @media (min-width: 768px) {
     .cvt-hero-inner { padding: 120px 40px 80px; }
-    .cvt-moments-track { padding: 8px 40px 20px; }
     .cvt-section-header { padding: 0 40px; }
     .cvt-drops-header { padding: 0 40px; }
 }

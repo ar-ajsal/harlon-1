@@ -161,6 +161,9 @@ function CategoryCardsSection({ categories, products, reduced }) {
         }
     })
 
+    // Ensure we have enough cards to fill the screen twice over for seamless looping
+    const infiniteCards = [...cards, ...cards, ...cards, ...cards]
+
     return (
         <section className="cvt-moments" aria-label="Shop by Category">
             <div className="cvt-section-header">
@@ -168,36 +171,61 @@ function CategoryCardsSection({ categories, products, reduced }) {
                 <h2 className="cvt-section-title">Shop by<br /><em>Category.</em></h2>
                 <p className="cvt-section-desc">Find the exact era, club, or legend you're looking for.</p>
             </div>
-            <div className="cvt-moments-track">
-                {cards.map((card, i) => (
-                    <motion.div
-                        key={i}
-                        className="cvt-moment-card"
-                        initial={reduced ? {} : { opacity: 0, y: 24 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: '-80px' }}
-                        transition={{ duration: 0.5, delay: i * 0.07 }}
-                        whileHover={{ y: -8 }}
-                    >
-                        <div className="cvt-moment-img-wrap">
-                            {card.img ? (
-                                <img src={card.img} alt={card.name} className="cvt-moment-img" />
-                            ) : (
-                                <div className="cvt-moment-placeholder" style={{ background: '#222' }}>
-                                    <span style={{ color: '#555', fontSize: 32 }}>⚽</span>
+            
+            <div className="cvt-moments-scroll-wrap">
+                <div className="cvt-moments-track cvt-auto-slider">
+                    
+                    {/* First continuous group */}
+                    <div className="cvt-moments-group">
+                        {infiniteCards.map((card, i) => (
+                            <Link to={`/shop?chip=${card.id}`} key={`g1-${i}`} className="cvt-moment-card">
+                                <div className="cvt-moment-img-wrap">
+                                    {card.img ? (
+                                        <img src={card.img} alt={card.name} className="cvt-moment-img" />
+                                    ) : (
+                                        <div className="cvt-moment-placeholder" style={{ background: '#222' }}>
+                                            <span style={{ color: '#555', fontSize: 32 }}>⚽</span>
+                                        </div>
+                                    )}
+                                    <div className="cvt-moment-overlay">
+                                        <span className="cvt-moment-tag">CATEGORY</span>
+                                        <h3 className="cvt-moment-label">{card.name}</h3>
+                                        <p className="cvt-moment-story">Authentic retro drops.</p>
+                                        <span className="cvt-moment-cta">
+                                            Explore <FiArrowRight size={12} />
+                                        </span>
+                                    </div>
                                 </div>
-                            )}
-                            <div className="cvt-moment-overlay">
-                                <span className="cvt-moment-tag">CATEGORY</span>
-                                <h3 className="cvt-moment-label">{card.name}</h3>
-                                <p className="cvt-moment-story">Authentic retro drops.</p>
-                                <Link to={`/shop?chip=${card.id}`} className="cvt-moment-cta">
-                                    Explore <FiArrowRight size={12} />
-                                </Link>
-                            </div>
-                        </div>
-                    </motion.div>
-                ))}
+                            </Link>
+                        ))}
+                    </div>
+
+                    {/* Identical cloned group for seamless CSS infinite translation */}
+                    <div className="cvt-moments-group" aria-hidden="true">
+                        {infiniteCards.map((card, i) => (
+                            <Link to={`/shop?chip=${card.id}`} key={`g2-${i}`} className="cvt-moment-card" tabIndex="-1">
+                                <div className="cvt-moment-img-wrap">
+                                    {card.img ? (
+                                        <img src={card.img} alt={card.name} className="cvt-moment-img" />
+                                    ) : (
+                                        <div className="cvt-moment-placeholder" style={{ background: '#222' }}>
+                                            <span style={{ color: '#555', fontSize: 32 }}>⚽</span>
+                                        </div>
+                                    )}
+                                    <div className="cvt-moment-overlay">
+                                        <span className="cvt-moment-tag">CATEGORY</span>
+                                        <h3 className="cvt-moment-label">{card.name}</h3>
+                                        <p className="cvt-moment-story">Authentic retro drops.</p>
+                                        <span className="cvt-moment-cta">
+                                            Explore <FiArrowRight size={12} />
+                                        </span>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+
+                </div>
             </div>
         </section>
     )
