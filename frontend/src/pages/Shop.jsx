@@ -138,6 +138,13 @@ function filterProducts(products, chipId, search, categories) {
             result = result.filter(p => (p.stock ?? 99) < 20 || p.dropEnabled)
             break
         default:
+            // Check if chipId matches a real category
+            if (chipId !== 'all') {
+                result = result.filter(p =>
+                    p.category?.toLowerCase() === chipId.toLowerCase() ||
+                    p.category?.toLowerCase().includes(chipId.toLowerCase())
+                )
+            }
             break
     }
 
@@ -394,7 +401,7 @@ export default function Shop() {
                     )}
                 </div>
 
-                {/* Smart filter chips — horizontal scroll */}
+                {/* Smart filter chips + real categories — horizontal scroll */}
                 <div className="shop-chips">
                     {FILTER_CHIPS.map(chip => (
                         <button
@@ -403,6 +410,20 @@ export default function Shop() {
                             onClick={() => handleChip(chip.id)}
                         >
                             {chip.label}
+                        </button>
+                    ))}
+                    {/* Divider */}
+                    {categories?.length > 0 && (
+                        <span className="shop-chip-divider">|</span>
+                    )}
+                    {/* Real DB categories */}
+                    {(categories || []).map(cat => (
+                        <button
+                            key={cat._id || cat.name}
+                            className={`shop-chip${activeChip === cat.name.toLowerCase() ? ' active' : ''}`}
+                            onClick={() => handleChip(cat.name.toLowerCase())}
+                        >
+                            {cat.name}
                         </button>
                     ))}
                 </div>
