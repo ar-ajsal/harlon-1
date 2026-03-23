@@ -1,0 +1,241 @@
+/* ============================================================
+   HARLON — SHOP PAGE STYLES
+   All hh-* classes used by Shop.jsx and ShopCard
+   ============================================================ */
+
+/* ── Page shell ─────────────────────────────────────────────── */
+.shop-page {
+    min-height: 100vh;
+    background: var(--surface);
+}
+
+/* ── Section eyebrow ────────────────────────────────────────── */
+.hh-section-eyebrow {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: hsl(38, 65%, 55%);
+}
+
+/* ── Product grid ───────────────────────────────────────────── */
+.hh-product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+@media (min-width: 640px)  { .hh-product-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1024px) { .hh-product-grid { grid-template-columns: repeat(4, 1fr); } }
+
+/* ── Product card ───────────────────────────────────────────── */
+.hh-product-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--surface);
+    transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.hh-product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.11);
+}
+
+/* Image */
+.hh-product-img-wrap {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: var(--surface-2, #f3f4f6);
+}
+
+.hh-product-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    transition: transform 0.45s ease;
+}
+
+.hh-product-card:hover .hh-product-img-wrap img {
+    transform: scale(1.06);
+}
+
+/* Badge */
+.hh-product-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    padding: 4px 10px;
+    border-radius: 99px;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.hh-product-badge--sold   { background: rgba(0,0,0,0.8); color: #fff; backdrop-filter: blur(4px); }
+.hh-product-badge--best   { background: hsl(38, 65%, 55%); color: #0A0A0A; }
+.hh-product-badge--sale   { background: #ef4444; color: #fff; }
+
+/* Wishlist button */
+.hh-wish-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(8px);
+    border: none;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 3;
+    opacity: 0;
+    transition: opacity 0.2s, background 0.15s;
+}
+
+.hh-product-card:hover .hh-wish-btn { opacity: 1; }
+.hh-wish-btn.wishlisted { opacity: 1; color: hsl(38, 65%, 55%); }
+.hh-wish-btn:hover { background: rgba(255,255,255,0.3); }
+
+/* Sold ribbon overlay */
+.hh-sold-ribbon {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: #fff;
+    letter-spacing: 0.04em;
+    z-index: 2;
+}
+
+/* Quick-add hover button */
+.hh-quick-btn {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    background: hsl(38, 65%, 55%);
+    color: #0A0A0A;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 99px;
+    opacity: 0;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 3;
+    white-space: nowrap;
+}
+
+.hh-product-card:hover .hh-quick-btn {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Info */
+.hh-product-info {
+    padding: 12px 14px 16px;
+    background: var(--surface);
+}
+
+.hh-product-cat {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--noir-60, #9ca3af);
+    margin: 0 0 4px;
+}
+
+.hh-product-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ink);
+    margin: 0 0 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+}
+
+.hh-product-price-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.hh-price {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--ink);
+}
+
+.hh-price-orig {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--noir-40, #9ca3af);
+    text-decoration: line-through;
+}
+
+.hh-price-off {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #16a34a;
+    background: #f0fdf4;
+    padding: 2px 6px;
+    border-radius: 99px;
+}
+
+/* ── Primary button ─────────────────────────────────────────── */
+.hh-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    background: hsl(38, 65%, 55%);
+    color: #0A0A0A;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 14px 28px;
+    border-radius: 99px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    box-shadow: 0 4px 20px hsl(38, 65%, 55%, 0.3);
+}
+
+.hh-btn-primary:hover {
+    background: hsl(38, 80%, 50%);
+    transform: translateY(-2px);
+}

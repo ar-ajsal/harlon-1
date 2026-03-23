@@ -13,8 +13,8 @@ import { productsApi } from '../services/api'
 import { useWishlist } from '../context/WishlistContext'
 import Skeleton from '../components/ui/Skeleton'
 
-/* Premium home-page card re-used here */
-import '../styles/home.css'
+/* Shop-specific styles */
+import '../styles/shop.css'
 
 /* ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ helpers ÔöÇÔöÇ */
 const PRODUCTS_PER_PAGE = 12
