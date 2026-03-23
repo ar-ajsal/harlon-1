@@ -328,7 +328,9 @@ export default function Shop() {
     const { products, categories, loading } = useProducts()
     const { totalItems, openCart } = useCart()
 
-    const [activeChip, setActiveChip] = useState(searchParams.get('chip') || 'all')
+    const [activeChip, setActiveChip] = useState(
+        searchParams.get('chip') || decodeURIComponent(searchParams.get('category') || '') || 'all'
+    )
     const [search, setSearch] = useState(searchParams.get('search') || '')
     const [showFilterBar, setShowFilterBar] = useState(false)
     const [displayCount, setDisplayCount] = useState(PRODUCTS_PER_PAGE)

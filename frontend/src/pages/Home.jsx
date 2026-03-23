@@ -13,6 +13,7 @@ import { useWishlist } from '../context/WishlistContext'
 import { useCart } from '../context/CartContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 import Skeleton from '../components/ui/Skeleton'
+import CategoryStories from '../components/CategoryStories'
 import '../styles/home.css'
 
 const fmt = (n) => `₹${Number(n).toLocaleString('en-IN')}`
@@ -393,37 +394,10 @@ function FooterCTA() {
     )
 }
 
-/* ─── CATEGORY SECTION ───────────────────────────────────── */
-function CategorySection() {
-    const { categories } = useProducts()
-
-    if (!categories || categories.length === 0) return null
-
-    return (
-        <section className="cvt-categories">
-            <div className="cvt-container">
-                <div className="cvt-section-header">
-                    <h2 className="cvt-title">SHOP BY CATEGORY</h2>
-                    <p className="cvt-subtitle">Find your exact style</p>
-                </div>
-                <div className="cvt-cat-grid">
-                    {categories.map((cat, i) => (
-                        <Link to={`/shop?chip=${encodeURIComponent(cat.name.toLowerCase())}`} key={cat._id || cat.name} className="cvt-cat-card">
-                            <div className="cvt-cat-bg-glow" />
-                            <span className="cvt-cat-eyebrow">Collection 0{i + 1}</span>
-                            <h3 className="cvt-cat-title">{cat.name}</h3>
-                            <span className="cvt-cat-btn">Explore <FiArrowRight /></span>
-                        </Link>
-                    ))}
-                </div>
-            </div>
-        </section>
-    )
-}
 
 /* ─── HOME PAGE ────────────────────────────────────────────── */
 export default function Home() {
-    const { products, loading, error, refreshData } = useProducts()
+    const { products, categories, loading, error, refreshData } = useProducts()
     const reduced = useReducedMotion()
 
     if (error) {
@@ -434,7 +408,7 @@ export default function Home() {
         <main className="home">
             <HeroSection products={products} reduced={reduced} />
             <TrustMarquee />
-            <CategorySection />
+            <CategoryStories categories={categories} products={products} />
             <IconicMomentsSection products={products} reduced={reduced} />
             <LimitedDropSection products={products} loading={loading} reduced={reduced} />
             <SocialProof products={products} />
