@@ -3,15 +3,15 @@
  * Strategy: Sell the MOMENT, not the jersey.
  * Psychology: Urgency + Scarcity + Emotional Identity
  */
-import { useRef, useEffect, useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { FaWhatsapp } from 'react-icons/fa'
 import { FiArrowRight, FiShoppingBag, FiHeart, FiZap, FiAlertTriangle } from 'react-icons/fi'
 import { useProducts } from '../context/ProductContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useCart } from '../context/CartContext'
-import { WHATSAPP_NUMBER, buildWhatsAppUrl } from '../config/constants'
+import { WHATSAPP_NUMBER } from '../config/constants'
 import Skeleton from '../components/ui/Skeleton'
 import '../styles/home.css'
 
@@ -210,7 +210,7 @@ function IconicMomentsSection({ products, reduced }) {
 /* ─── Drop Product Card ─────────────────────────────────────── */
 function DropCard({ product, reduced }) {
     const { addItem } = useCart()
-    const { addToWishlist, isInWishlist } = useWishlist()
+    const { addToWishlist, isWishlisted } = useWishlist()
     const img = product.images?.[0] || ''
     const price = product.discountedPrice || product.price
     const mrp = product.price
@@ -221,7 +221,7 @@ function DropCard({ product, reduced }) {
     const sellingFast = inStock && stock <= 5
     const sizes = product.sizes?.filter(s => s.stock > 0) || []
     const firstSize = sizes[0]?.size || 'M'
-    const wishlisted = isInWishlist(product._id)
+    const wishlisted = isWishlisted(product._id)
 
     const handleAddCart = useCallback((e) => {
         e.preventDefault()
@@ -313,12 +313,7 @@ function LimitedDropSection({ products, loading, reduced }) {
                 {loading
                     ? Array(8).fill(0).map((_, i) => (
                         <div key={i} className="cvt-drop-card">
-                            <Skeleton height={340} borderRadius={16} />
-                            <div style={{ padding: '12px 0 0', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                                <Skeleton height={12} width="60%" />
-                                <Skeleton height={16} width="90%" />
-                                <Skeleton height={14} width="40%" />
-                            </div>
+                            <Skeleton.Card />
                         </div>
                     ))
                     : drops.map(p => (
@@ -385,7 +380,7 @@ function FooterCTA() {
                         CLAIM YOUR JERSEY <FiArrowRight />
                     </Link>
                     <a
-                        href={buildWhatsAppUrl(WHATSAPP_NUMBER, 'Hi HARLON! I want to find my jersey.')}
+                        href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hi HARLON! I want to find my jersey.')}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="cvt-cta-wa"
