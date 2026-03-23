@@ -18,9 +18,7 @@
     overflow: hidden;
     white-space: nowrap;
     border-bottom: 1px solid rgba(255,255,255,0.06);
-    position: sticky;
-    top: 64px; /* below navbar */
-    z-index: 99;
+    /* Not sticky — it scrolls away, hero takes over */
 }
 
 .shop-urgency-track {
@@ -49,7 +47,7 @@
    ==================================================== */
 .shop-hero {
     background: #0A0A0A;
-    padding: 48px 24px 40px;
+    padding: 36px 20px 32px;
     text-align: center;
 }
 
@@ -123,15 +121,12 @@
    3. CONTROLS: SEARCH + CHIPS + COUNT
    ==================================================== */
 .shop-controls {
-    padding: 24px 16px 0;
+    padding: 16px 16px 12px;
     max-width: 1280px;
     margin: 0 auto;
-    position: sticky;
-    top: 93px; /* below urgency bar */
-    z-index: 90;
+    /* Not sticky on mobile — saves space */
     background: var(--surface);
     border-bottom: 1px solid var(--noir-10, #f3f4f6);
-    padding-bottom: 16px;
 }
 
 /* Search */
@@ -757,7 +752,12 @@
    RESPONSIVE TWEAKS
    ==================================================== */
 @media (min-width: 768px) {
-    .shop-controls { padding: 20px 40px 16px; }
+    .shop-controls {
+        padding: 20px 40px 16px;
+        position: sticky;
+        top: 64px;
+        z-index: 90;
+    }
     .shop-feed-wrap { padding: 28px 40px; }
     .shop-hero { padding: 60px 40px 48px; }
     .shop-page-v2 { padding-bottom: 0; }
