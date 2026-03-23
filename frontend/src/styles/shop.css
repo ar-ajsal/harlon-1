@@ -192,6 +192,8 @@
     scrollbar-width: none;
     padding-bottom: 4px;
     margin-bottom: 10px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
 }
 
 .shop-chips::-webkit-scrollbar { display: none; }
@@ -211,6 +213,7 @@
     transition: all 0.16s ease;
     letter-spacing: 0.01em;
     -webkit-tap-highlight-color: transparent;
+    scroll-snap-align: start;
 }
 
 .shop-chip:hover {
