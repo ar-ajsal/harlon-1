@@ -8,6 +8,7 @@ import {
 } from 'react-icons/fi'
 import { useAuth } from '../context/AuthContext'
 import AdminBottomNav from './AdminBottomNav'
+import ThemeToggle from './ThemeToggle'
 import '../styles/admin-responsive.css'
 
 const NAV_ITEMS = [
@@ -101,6 +102,9 @@ function AdminLayout({ title, subtitle, headerRight, children }) {
 
                 {/* Sidebar footer brand */}
                 <div className="sidebar-footer">
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+                        <ThemeToggle />
+                    </div>
                     <div className="sidebar-footer-brand">Harlon © {new Date().getFullYear()}</div>
                 </div>
             </aside>
