@@ -125,11 +125,16 @@
    3. CONTROLS: SEARCH + CHIPS + COUNT
    ==================================================== */
 .shop-controls {
-    padding: 14px 16px 10px;
+    padding-top: 14px;
+    padding-bottom: 10px;
     width: 100%;
     box-sizing: border-box;
     background: var(--surface);
     border-bottom: 1px solid var(--noir-10, #f3f4f6);
+}
+.shop-controls > :not(.shop-chips) {
+    padding-left: 16px;
+    padding-right: 16px;
 }
 
 /* Search */
@@ -137,6 +142,7 @@
     position: relative;
     width: 100%;
     margin-bottom: 10px;
+    box-sizing: border-box;
 }
 
 .shop-search-icon {
@@ -194,16 +200,8 @@
     margin-bottom: 10px;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    /* Edge bleed so chips slide smoothly off the very edge of the screen */
-    margin-left: -16px;
-    margin-right: -16px;
     padding-left: 16px;
     padding-right: 16px;
-}
-.shop-chips::after {
-    /* Safari fix for right padding on flex scrolling containers */
-    content: '';
-    padding-right: 1px;
 }
 
 .shop-chips::-webkit-scrollbar { display: none; }
@@ -254,10 +252,16 @@
         padding-bottom: 0;
     }
     .shop-controls {
-        padding: 20px 40px 16px;
+        padding-top: 20px;
+        padding-bottom: 16px;
         position: sticky;
         top: 70px;
         z-index: 90;
+    }
+    .shop-controls > :not(.shop-chips),
+    .shop-chips {
+        padding-left: 40px;
+        padding-right: 40px;
     }
     .shop-feed-wrap { padding: 28px 40px; }
     .shop-hero { padding: 48px 40px 40px; }
