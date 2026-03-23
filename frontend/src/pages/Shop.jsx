@@ -53,6 +53,10 @@ function ShopCard({ product }) {
                     loading="lazy"
                     width={300} height={400}
                     style={sold ? { opacity: 0.48, filter: 'grayscale(50%)' } : undefined}
+                    onError={e => {
+                        e.target.style.display = 'none'
+                        e.target.parentNode.setAttribute('data-empty', 'true')
+                    }}
                 />
                 {sold
                     ? <span className="hh-product-badge hh-product-badge--sold">Sold Out</span>
