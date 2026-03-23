@@ -122,10 +122,8 @@
    3. CONTROLS: SEARCH + CHIPS + COUNT
    ==================================================== */
 .shop-controls {
-    padding: 16px 16px 12px;
-    max-width: 1280px;
-    margin: 0 auto;
-    /* Not sticky on mobile — saves space */
+    padding: 14px 16px 10px;
+    width: 100%;
     background: var(--surface);
     border-bottom: 1px solid var(--noir-10, #f3f4f6);
 }
@@ -134,8 +132,7 @@
 .shop-search-wrap {
     position: relative;
     width: 100%;
-    max-width: 600px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
 }
 
 .shop-search-icon {
@@ -198,9 +195,9 @@
 .shop-chip {
     flex-shrink: 0;
     font-family: 'Inter', sans-serif;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
-    padding: 8px 16px;
+    padding: 9px 18px;
     border-radius: 99px;
     border: 1.5px solid var(--noir-15, #e5e5e5);
     background: var(--surface);
@@ -209,6 +206,7 @@
     white-space: nowrap;
     transition: all 0.16s ease;
     letter-spacing: 0.01em;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .shop-chip:hover {
