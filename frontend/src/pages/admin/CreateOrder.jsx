@@ -38,7 +38,7 @@ function CreateOrder() {
     const [customDropLabel, setCustomDropLabel] = useState('')
     const searchRef = useRef(null)
 
-    const DROP_OPTIONS = ['Drop 1', 'Drop 2', 'Drop 3', 'Drop 4', 'Custom']
+    const DROP_OPTIONS = [...Array.from({length: 15}, (_, i) => `Drop ${i + 1}`), 'Custom']
 
     useEffect(() => {
         const handleClickOutside = (e) => {

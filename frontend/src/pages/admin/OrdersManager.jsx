@@ -39,12 +39,12 @@ function OrdersManager() {
                     d && d !== 'All Drops' && d !== 'WhatsApp' && d !== 'Cash' && d !== 'UPI'
                 )
                 // Ensure the standard drops always exist, preventing an empty dropdown UI bug
-                const standardDrops = ['Drop 1', 'Drop 2', 'Drop 3', 'Drop 4', 'Custom']
+                const standardDrops = [...Array.from({length: 15}, (_, i) => `Drop ${i + 1}`), 'Custom']
                 const merged = Array.from(new Set([...standardDrops, ...validOptions]))
                 setDropOnOptions(merged)
             })
             .catch(() => {
-                setDropOnOptions(['Drop 1', 'Drop 2', 'Drop 3', 'Drop 4', 'Custom'])
+                setDropOnOptions([...Array.from({length: 15}, (_, i) => `Drop ${i + 1}`), 'Custom'])
             })
     }, [])
 

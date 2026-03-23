@@ -42,7 +42,8 @@ function EditOrder() {
     const [customDropLabel, setCustomDropLabel] = useState('')
     const searchRef = useRef(null)
 
-    const DROP_OPTIONS = ['Drop 1', 'Drop 2', 'Drop 3', 'Drop 4', 'Custom']
+    const STANDARD_DROPS = Array.from({length: 15}, (_, i) => `Drop ${i + 1}`)
+    const DROP_OPTIONS = [...STANDARD_DROPS, 'Custom']
 
     const handleLogout = () => {
         logout()
@@ -471,7 +472,7 @@ function EditOrder() {
                                                 <td style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                                                     <select
                                                         className="dropon-select-inline"
-                                                        value={['Drop 1', 'Drop 2', 'Drop 3', 'Drop 4'].includes(item.dropOn) ? item.dropOn : 'Custom'}
+                                                        value={STANDARD_DROPS.includes(item.dropOn) ? item.dropOn : 'Custom'}
                                                         onChange={(e) => {
                                                             const val = e.target.value
                                                             setFormData(prev => ({
@@ -486,7 +487,7 @@ function EditOrder() {
                                                             <option key={opt} value={opt}>{opt}</option>
                                                         ))}
                                                     </select>
-                                                    {!['Drop 1', 'Drop 2', 'Drop 3', 'Drop 4'].includes(item.dropOn) && (
+                                                    {!STANDARD_DROPS.includes(item.dropOn) && (
                                                         <input
                                                             type="text"
                                                             className="dropon-custom-input"
