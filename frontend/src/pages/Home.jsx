@@ -1,757 +1,420 @@
 /**
- * Harlon — Home Page
- * Nike-level, mobile-first premium experience
- * Concept B: "The Legend Wears This"
- *
- * Sections:
- *  1. Hero         — gold headline, floating chips, scroll indicator
- *  2. TrustMarquee — dark CSS-animated strip, zero JS
- *  3. CategoryStrip — horizontal scroll snap
- *  4. FeaturedDrops — 2-col mobile / 4-col desktop stagger grid
- *  5. SocialProof  — 3 animated stats on black
- *  6. UrgencyBand  — pulsing gold strip
- *  7. FooterCTA    — dark full-width shop CTA
- *  +  StickyBar    — mobile bottom bar (IntersectionObserver)
+ * HARLON — CONVERSION-FIRST HOME PAGE
+ * Strategy: Sell the MOMENT, not the jersey.
+ * Psychology: Urgency + Scarcity + Emotional Identity
  */
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { FaWhatsapp } from 'react-icons/fa'
-import { FiArrowRight, FiShoppingBag, FiHeart } from 'react-icons/fi'
+import { FiArrowRight, FiShoppingBag, FiHeart, FiZap, FiAlertTriangle } from 'react-icons/fi'
 import { useProducts } from '../context/ProductContext'
 import { useWishlist } from '../context/WishlistContext'
+import { useCart } from '../context/CartContext'
 import { WHATSAPP_NUMBER, buildWhatsAppUrl } from '../config/constants'
 import Skeleton from '../components/ui/Skeleton'
-import CategoryStories from '../components/CategoryStories'
-import JerseyOfTheDay from '../components/JerseyOfTheDay'
 import '../styles/home.css'
 
-/* ─── Animation helpers ────────────────────────────────────── */
+const fmt = (n) => `₹${Number(n).toLocaleString('en-IN')}`
+const discount = (p, o) => o && p < o ? Math.round((1 - p / o) * 100) : 0
+
 const mk = (y = 24, duration = 0.5) => ({
     hidden: { opacity: 0, y },
     visible: { opacity: 1, y: 0, transition: { duration, ease: [0.16, 1, 0.3, 1] } },
 })
-
 const stagger = (delay = 0.08) => ({
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: delay, delayChildren: 0.05 } },
 })
 
-const chipAnim = {
-    hidden: { opacity: 0, scale: 0.8, y: 10 },
-    visible: {
-        opacity: 1, scale: 1, y: 0,
-        transition: { type: 'spring', stiffness: 300, damping: 18, delay: 0.55 }
-    },
+/* ─── Iconic Moments data (static storytelling cards) ─────── */
+const ICONIC_MOMENTS = [
+    { label: 'MESSI 2011', story: 'Wembley. The night football changed.', tag: 'BARCELONA', color: '#a50044' },
+    { label: 'RONALDO 2016', story: 'Lisbon. A nation held its breath.', tag: 'PORTUGAL', color: '#006600' },
+    { label: 'ZIDANE 1998', story: 'Paris. The greatest final ever played.', tag: 'FRANCE', color: '#003189' },
+    { label: 'HENRY 2004', story: 'Highbury. He made it look effortless.', tag: 'ARSENAL', color: '#db0007' },
+    { label: 'RONALDINHO 2005', story: 'Old Trafford. Even their fans applauded.', tag: 'BARCELONA', color: '#a50044' },
+    { label: 'TOTTI 2001', story: 'Rome. The eternal city, the eternal king.', tag: 'AS ROMA', color: '#8B1538' },
+]
+
+/* ─── Branded Error State ──────────────────────────────────── */
+function LegendaryError({ onRetry }) {
+    return (
+        <div className="home-error-state">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                className="home-error-inner"
+            >
+                <div className="home-error-logo">HARLON</div>
+                <div className="home-error-icon">⚽</div>
+                <h1 className="home-error-title">Even legends rest.</h1>
+                <p className="home-error-sub">We'll be back. The drop is worth the wait.</p>
+                <button className="home-error-retry" onClick={onRetry}>
+                    <FiZap size={16} /> Try Again
+                </button>
+            </motion.div>
+        </div>
+    )
 }
 
-/* ─── Price formatter ──────────────────────────────────────── */
-const fmt = (n) => `₹${Number(n).toLocaleString('en-IN')}`
-const discount = (p, o) => o && p < o ? Math.round((1 - p / o) * 100) : 0
-
-/* ===================================================================
-   SECTION COMPONENTS
-   =================================================================== */
-
-/* 1. HERO ────────────────────────────────────────────────────────── */
-function HeroSection({ products, shouldReduceMotion }) {
-    const heroImage = products.find(p => p.featured && p.images?.[0])?.images?.[0]
-        || products[0]?.images?.[0]
-        || '/images/placeholder.jpg'
-
-    const visible = visibleCount(products)
+/* ─── Hero Section ─────────────────────────────────────────── */
+function HeroSection({ products, reduced }) {
+    const featuredImg = products.find(p => p.featured && p.images?.[0])?.images?.[0] || products[0]?.images?.[0]
+    const totalDropping = products.filter(p => p.stock > 0).length
 
     return (
-        <section className="hh-hero" aria-label="Hero">
-            <div className="hh-hero-inner">
+        <section className="cvt-hero" aria-label="Hero">
+            {/* Cinematic background */}
+            {featuredImg && (
+                <div className="cvt-hero-bg">
+                    <img src={featuredImg} alt="" aria-hidden="true" className="cvt-hero-bg-img" />
+                    <div className="cvt-hero-bg-overlay" />
+                    <div className="cvt-hero-grain" />
+                </div>
+            )}
+            {!featuredImg && <div className="cvt-hero-fallback-bg" />}
 
-                {/* ── Left: copy ── */}
+            <div className="cvt-hero-inner">
                 <motion.div
                     initial="hidden"
                     animate="visible"
-                    variants={shouldReduceMotion ? {} : stagger(0.1)}
+                    variants={reduced ? {} : stagger(0.12)}
+                    className="cvt-hero-content"
                 >
-                    <motion.span
-                        variants={shouldReduceMotion ? {} : mk(16, 0.4)}
-                        className="hh-eyebrow"
-                    >
-                        <span className="hh-eyebrow-dot" aria-hidden="true" />
-                        India's No.1 Retro Jersey Store
-                    </motion.span>
+                    {/* Live badge */}
+                    <motion.div variants={reduced ? {} : mk(12)} className="cvt-live-badge">
+                        <span className="cvt-live-dot" />
+                        DROP LIVE NOW
+                    </motion.div>
 
-                    <motion.h1
-                        variants={shouldReduceMotion ? {} : mk(32, 0.55)}
-                        className="hh-headline"
-                    >
-                        The Legend
-                        <span className="hh-headline-gold">Wears This.</span>
+                    {/* Headline */}
+                    <motion.h1 variants={reduced ? {} : mk(24, 0.6)} className="cvt-hero-headline">
+                        NOT FOR<br />
+                        <span className="cvt-hero-gold">CASUAL FANS.</span>
                     </motion.h1>
 
-                    <motion.p
-                        variants={shouldReduceMotion ? {} : mk(24, 0.5)}
-                        className="hh-sub"
-                    >
-                        Authentic retro football jerseys. Handpicked.
-                        India-shipped. Yours.
+                    {/* Subtext */}
+                    <motion.p variants={reduced ? {} : mk(20, 0.55)} className="cvt-hero-sub">
+                        Only legends wear legends.
                     </motion.p>
 
-                    <motion.div
-                        variants={shouldReduceMotion ? {} : mk(20, 0.45)}
-                        className="hh-ctas"
-                    >
-                        <Link to="/shop" className="hh-btn-primary" id="hero-shop-cta">
-                            Explore Drops <FiArrowRight aria-hidden="true" />
+                    {/* Scarcity line */}
+                    <motion.p variants={reduced ? {} : mk(16)} className="cvt-hero-scarcity">
+                        <FiAlertTriangle size={13} />
+                        Limited stock. No restocks. Once it's gone, it's gone.
+                    </motion.p>
+
+                    {/* CTA */}
+                    <motion.div variants={reduced ? {} : mk(16)} className="cvt-hero-ctas">
+                        <Link to="/shop" className="cvt-cta-primary">
+                            SHOP THE DROP
+                            <FiArrowRight />
                         </Link>
-                        <a
-                            href={`https://wa.me/${WHATSAPP_NUMBER}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hh-btn-wa"
-                            aria-label="Order on WhatsApp"
-                        >
-                            <FaWhatsapp aria-hidden="true" /> Order Now
-                        </a>
-                    </motion.div>
-
-                    <motion.div
-                        variants={shouldReduceMotion ? {} : mk(16, 0.4)}
-                        className="hh-trust-chips"
-                        aria-label="Trust badges"
-                    >
-                        {[
-                            { icon: '🔒', text: 'Secure' },
-                            { icon: '🚚', text: 'Free Delivery ₹999+' },
-                            { icon: '↩️', text: '7-Day Returns' },
-                            { icon: '✅', text: '100% Authentic' },
-                        ].map(({ icon, text }) => (
-                            <span key={text} className="hh-trust-chip">
-                                <span aria-hidden="true">{icon}</span> {text}
+                        {totalDropping > 0 && (
+                            <span className="cvt-cta-note">
+                                {totalDropping} jerseys · While they last
                             </span>
-                        ))}
-                    </motion.div>
-                </motion.div>
-
-                {/* ── Right: image ── */}
-                <motion.div
-                    className="hh-hero-media"
-                    initial={shouldReduceMotion ? {} : { opacity: 0, x: 32, scale: 0.94 }}
-                    animate={{ opacity: 1, x: 0, scale: 1 }}
-                    transition={{ duration: 0.75, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                >
-                    <div className="hh-hero-image-frame">
-                        {/* LCP — eager, no animation wrapper */}
-                        <img
-                            src={heroImage}
-                            alt="Premium retro football jersey"
-                            loading="eager"
-                            fetchPriority="high"
-                            width={440}
-                            height={550}
-                        />
-                    </div>
-
-                    {/* Floating stat chips */}
-                    <motion.div
-                        className="hh-float-chip hh-float-chip-stock"
-                        variants={shouldReduceMotion ? {} : chipAnim}
-                        initial="hidden"
-                        animate="visible"
-                        aria-label={`${visible} jerseys in stock`}
-                    >
-                        <span className="hh-float-chip-dot" aria-hidden="true" />
-                        {visible > 0 ? `${visible} in stock` : 'Live inventory'}
-                    </motion.div>
-
-                    <motion.div
-                        className="hh-float-chip hh-float-chip-ship"
-                        variants={shouldReduceMotion ? {} : { ...chipAnim, visible: { ...chipAnim.visible, transition: { ...chipAnim.visible.transition, delay: 0.7 } } }}
-                        initial="hidden"
-                        animate="visible"
-                        aria-label="Ships in 24 hours"
-                    >
-                        <span className="hh-float-chip-lightning" aria-hidden="true">⚡</span>
-                        Ships in 24h
+                        )}
                     </motion.div>
                 </motion.div>
             </div>
 
-            {/* Scroll indicator */}
-            <div className="hh-scroll-indicator" aria-hidden="true">
-                <svg width={20} height={20} fill="none" viewBox="0 0 24 24">
-                    <path d="M12 5v14M5 12l7 7 7-7" stroke="currentColor" strokeWidth={1.8}
-                        strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                <span>scroll</span>
-            </div>
+            {/* Scroll arrow */}
+            <motion.div
+                className="cvt-hero-scroll"
+                animate={reduced ? {} : { y: [0, 8, 0] }}
+                transition={{ repeat: Infinity, duration: 1.8 }}
+            >
+                <span>↓</span>
+            </motion.div>
         </section>
     )
 }
 
-/* 2. TRUST MARQUEE ────────────────────────────────────────────────── */
+/* ─── Trust Marquee ────────────────────────────────────────── */
 const TRUST_ITEMS = [
-    { icon: '🔒', text: 'Secure Payments' },
-    { icon: '🚚', text: 'Free Delivery ₹999+' },
-    { icon: '⚽', text: '100% Authentic' },
-    { icon: '↩️', text: '7-Day Easy Returns' },
-    { icon: '⚡', text: 'Ships in 24 Hours' },
-    { icon: '🇮🇳', text: 'Made for India' },
+    '🏆 India\'s No.1 Retro Jersey Store',
+    '⚡ 10,000+ Fans Suited Up',
+    '🔒 100% Authentic Fabrics',
+    '🚀 Ships Pan India',
+    '💬 WhatsApp Support',
+    '✅ Zero Fake Prints',
 ]
 
 function TrustMarquee() {
-    // Duplicate items for seamless loop
-    const doubled = [...TRUST_ITEMS, ...TRUST_ITEMS]
     return (
-        <div className="hh-trust-bar" aria-label="Trust signals" role="complementary">
-            <div className="hh-trust-track" aria-hidden="true">
-                {[1, 2].map((pass) => (
-                    <div key={pass} className="hh-trust-inner">
-                        {TRUST_ITEMS.map(({ icon, text }, i) => (
-                            <div key={i} className="hh-trust-item">
-                                <span className="hh-trust-item-icon">{icon}</span>
-                                {text}
-                            </div>
-                        ))}
-                        <span className="hh-trust-item-sep">◆</span>
-                    </div>
+        <div className="cvt-marquee-bar">
+            <div className="cvt-marquee-track">
+                {[...TRUST_ITEMS, ...TRUST_ITEMS].map((t, i) => (
+                    <span key={i} className="cvt-marquee-item">{t}</span>
                 ))}
             </div>
-            {/* Screen-reader version */}
-            <ul style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', height: 0 }}>
-                {TRUST_ITEMS.map(({ text }) => <li key={text}>{text}</li>)}
-            </ul>
         </div>
     )
 }
 
-/* 3. CATEGORY STRIP ───────────────────────────────────────────────── */
-function CategoryStrip({ categories, products, shouldReduceMotion }) {
-    if (!categories?.length) return null
+/* ─── Iconic Moments Section ───────────────────────────────── */
+function IconicMomentsSection({ products, reduced }) {
+    const cards = ICONIC_MOMENTS.map((m, i) => ({
+        ...m,
+        img: products[i]?.images?.[0] || null,
+        id: products[i]?._id,
+    }))
 
     return (
-        <section className="hh-categories">
-            <div className="hh-categories-header">
-                <div>
-                    <p className="hh-section-eyebrow">Collections</p>
-                    <h2 className="hh-section-title">Shop by Category</h2>
-                </div>
-                <Link to="/shop" className="hh-view-all" aria-label="View all categories">
-                    All Categories <FiArrowRight aria-hidden="true" />
-                </Link>
+        <section className="cvt-moments" aria-label="Iconic Moments">
+            <div className="cvt-section-header">
+                <span className="cvt-section-eyebrow">THE COLLECTION</span>
+                <h2 className="cvt-section-title">Iconic<br /><em>Moments.</em></h2>
+                <p className="cvt-section-desc">Each jersey carries a story. Each story is a legend.</p>
             </div>
-
-            <div className="hh-cat-strip" role="list">
-                {categories.map((cat, i) => {
-                    const img = cat.image
-                        || products.find(p => p.category === cat.name && !p.soldOut)?.images?.[0]
-                        || '/images/placeholder.jpg'
-                    return (
-                        <motion.div
-                            key={cat._id}
-                            role="listitem"
-                            initial={shouldReduceMotion ? {} : { opacity: 0, y: 24 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, amount: 0.2 }}
-                            transition={{ duration: 0.45, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
-                        >
-                            <Link
-                                to={`/shop?category=${encodeURIComponent(cat.name.toLowerCase())}`}
-                                className="hh-cat-card"
-                                aria-label={`Browse ${cat.name}`}
-                            >
-                                <img
-                                    src={img}
-                                    alt={cat.name}
-                                    loading="lazy"
-                                    width={300}
-                                    height={400}
-                                />
-                                <div className="hh-cat-overlay">
-                                    <h3 className="hh-cat-name">{cat.name}</h3>
-                                    <span className="hh-cat-cta">
-                                        Shop Now <FiArrowRight size={11} aria-hidden="true" />
-                                    </span>
-                                </div>
-                            </Link>
-                        </motion.div>
-                    )
-                })}
-            </div>
-        </section>
-    )
-}
-
-/* 4. PRODUCT GRID (reusable for both Featured + All) ──────────────── */
-function ProductCard({ product, shouldReduceMotion }) {
-    const disc = discount(product.price, product.originalPrice)
-    const isSoldOut = !!product.soldOut
-    const { isWishlisted, toggleWishlist } = useWishlist()
-    const wishlisted = isWishlisted(product._id)
-
-    return (
-        <Link
-            to={`/product/${product._id}`}
-            className="hh-product-card"
-            aria-label={`${product.name}${isSoldOut ? ' — Sold Out' : ''}, ${fmt(product.price)}`}
-            tabIndex={0}
-        >
-            <div className="hh-product-img-wrap">
-                <img
-                    src={product.images?.[0] || '/images/placeholder.jpg'}
-                    alt={product.name}
-                    loading="lazy"
-                    width={300}
-                    height={400}
-                    style={isSoldOut ? { opacity: 0.5, filter: 'grayscale(50%)' } : undefined}
-                />
-
-                {/* Badges */}
-                {isSoldOut
-                    ? <span className="hh-product-badge hh-product-badge--sold">Sold Out</span>
-                    : product.bestSeller
-                        ? <span className="hh-product-badge hh-product-badge--best">⭐ Best Seller</span>
-                        : disc >= 8
-                            ? <span className="hh-product-badge hh-product-badge--sale">{disc}% OFF</span>
-                            : null
-                }
-
-                {/* Wishlist heart */}
-                <button
-                    className={`hh-wish-btn${wishlisted ? ' wishlisted' : ''}`}
-                    onClick={(e) => { e.preventDefault(); toggleWishlist(product) }}
-                    aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-                >
-                    <FiHeart size={14} />
-                </button>
-
-                {/* Sold-out bottom strip */}
-                {isSoldOut && (
-                    <div className="hh-sold-ribbon" aria-hidden="true">⛔ Sold Out</div>
-                )}
-
-                {/* Quick-view tap hint (desktop hover only) */}
-                {!isSoldOut && (
-                    <span className="hh-quick-btn" aria-hidden="true">
-                        <FiShoppingBag size={15} />
-                    </span>
-                )}
-            </div>
-
-            <div className="hh-product-info">
-                <p className="hh-product-cat">{product.category}</p>
-                <h3 className="hh-product-name">{product.name}</h3>
-                <div className="hh-product-price-row">
-                    <span className="hh-price">{fmt(product.price)}</span>
-                    {product.originalPrice > product.price && (
-                        <span className="hh-price-orig">{fmt(product.originalPrice)}</span>
-                    )}
-                    {disc >= 5 && !isSoldOut && (
-                        <span className="hh-price-off">{disc}% off</span>
-                    )}
-                </div>
-            </div>
-        </Link>
-    )
-}
-
-function ProductSection({ title, products, eyebrow, bg, id, shouldReduceMotion }) {
-    return (
-        <section id={id} className={`hh-section${bg ? ' hh-section--alt' : ''}`}>
-            <div className="hh-section-inner">
-                <div className="hh-section-head">
-                    <div>
-                        {eyebrow && <p className="hh-section-eyebrow">{eyebrow}</p>}
-                        <motion.h2
-                            className="hh-section-title"
-                            initial={shouldReduceMotion ? {} : { opacity: 0, x: -16 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.4 }}
-                        >
-                            {title}
-                        </motion.h2>
-                    </div>
-                    <Link to="/shop" className="hh-view-all">
-                        View All <FiArrowRight aria-hidden="true" />
-                    </Link>
-                </div>
-
-                <motion.div
-                    className="hh-product-grid"
-                    initial={shouldReduceMotion ? {} : 'hidden'}
-                    whileInView="visible"
-                    viewport={{ once: true, amount: 0.05 }}
-                    variants={stagger(0.07)}
-                >
-                    {products.map(p => (
-                        <motion.div
-                            key={p._id}
-                            variants={shouldReduceMotion ? {} : mk(28, 0.45)}
-                        >
-                            <ProductCard product={p} shouldReduceMotion={shouldReduceMotion} />
-                        </motion.div>
-                    ))}
-                </motion.div>
-            </div>
-        </section>
-    )
-}
-
-/* 5. SOCIAL PROOF ─────────────────────────────────────────────────── */
-function SocialProof({ productCount, shouldReduceMotion }) {
-    const stats = [
-        { num: `${Math.max(productCount, 1)}+`, label: 'Jerseys in Collection' },
-        { num: '500+', label: 'Happy Indian Fans' },
-        { num: '4.9★', label: 'Customer Rating' },
-    ]
-    return (
-        <section className="hh-social-strip" aria-label="Social proof stats">
-            <motion.div
-                className="hh-social-inner"
-                initial={shouldReduceMotion ? {} : 'hidden'}
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.4 }}
-                variants={stagger(0.12)}
-            >
-                {stats.map(({ num, label }, i) => (
+            <div className="cvt-moments-track">
+                {cards.map((card, i) => (
                     <motion.div
-                        key={label}
-                        className="hh-social-stat"
-                        variants={shouldReduceMotion ? {} : mk(20, 0.5)}
+                        key={i}
+                        className="cvt-moment-card"
+                        initial={reduced ? {} : { opacity: 0, y: 24 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: '-80px' }}
+                        transition={{ duration: 0.5, delay: i * 0.07 }}
+                        whileHover={{ y: -8 }}
                     >
-                        <span className="hh-social-stat-num" aria-label={num}>{num}</span>
-                        <span className="hh-social-stat-label">{label}</span>
+                        <div className="cvt-moment-img-wrap">
+                            {card.img ? (
+                                <img src={card.img} alt={card.label} className="cvt-moment-img" />
+                            ) : (
+                                <div className="cvt-moment-placeholder" style={{ background: card.color + '22' }}>
+                                    <span style={{ color: card.color, fontSize: 32 }}>⚽</span>
+                                </div>
+                            )}
+                            <div className="cvt-moment-overlay">
+                                <span className="cvt-moment-tag">{card.tag}</span>
+                                <h3 className="cvt-moment-label">{card.label}</h3>
+                                <p className="cvt-moment-story">{card.story}</p>
+                                {card.id && (
+                                    <Link to={`/product/${card.id}`} className="cvt-moment-cta">
+                                        View Jersey <FiArrowRight size={12} />
+                                    </Link>
+                                )}
+                            </div>
+                        </div>
                     </motion.div>
                 ))}
-            </motion.div>
-        </section>
-    )
-}
-
-/* 6. URGENCY BAND ─────────────────────────────────────────────────── */
-function UrgencyBand() {
-    return (
-        <div className="hh-urgency" role="alert" aria-live="polite">
-            <span className="hh-urgency-emoji" aria-hidden="true">⚡</span>
-            <p className="hh-urgency-text">
-                Limited Stock — Jerseys selling fast this week
-            </p>
-            <Link to="/shop" className="hh-urgency-link">
-                Shop Now →
-            </Link>
-        </div>
-    )
-}
-
-/* 7. PLATFORM FEATURES ─────────────────────────────────────────────── */
-const PLATFORM_CARDS = [
-    {
-        to: '/mystery-box',
-        emoji: '🎁',
-        tag: 'SURPRISE',
-        title: 'Mystery Box',
-        sub: 'Rare retro jersey inside. Animated unboxing reveal.',
-        color: '#a855f7',
-        bg: 'linear-gradient(135deg, rgba(168,85,247,0.08) 0%, rgba(109,40,217,0.04) 100%)',
-        border: 'rgba(168,85,247,0.2)',
-    }
-]
-
-function PlatformFeatures({ shouldReduceMotion }) {
-    return (
-        <section style={{ padding: '64px 0', background: 'var(--bg, #0a0e1a)' }} aria-label="Platform features">
-            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px' }}>
-                <div style={{ textAlign: 'center', marginBottom: 40 }}>
-                    <p className="hh-section-eyebrow" style={{ color: '#FFD700', marginBottom: 8 }}>Fan Universe</p>
-                    <h2 className="hh-section-title" style={{ margin: 0 }}>More Than a Store</h2>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
-                    {PLATFORM_CARDS.map(({ to, emoji, tag, title, sub, color, bg, border }, i) => (
-                        <motion.div
-                            key={to}
-                            initial={shouldReduceMotion ? {} : { opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.45, delay: i * 0.1 }}
-                            whileHover={{ y: -6, scale: 1.02 }}
-                        >
-                            <Link
-                                to={to}
-                                style={{
-                                    display: 'block', background: bg,
-                                    border: `1px solid ${border}`,
-                                    borderRadius: 20, padding: '28px 24px',
-                                    textDecoration: 'none', color: 'inherit',
-                                    transition: 'box-shadow 0.25s',
-                                    boxShadow: `0 4px 24px ${border}`,
-                                    height: '100%',
-                                }}
-                            >
-                                <div style={{ fontSize: 36, marginBottom: 12 }}>{emoji}</div>
-                                <span style={{
-                                    fontSize: 10, fontWeight: 800, letterSpacing: '2px',
-                                    color, background: `${color}18`,
-                                    padding: '3px 10px', borderRadius: 99, textTransform: 'uppercase'
-                                }}>
-                                    {tag}
-                                </span>
-                                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: '12px 0 8px', color: '#fff' }}>
-                                    {title}
-                                </h3>
-                                <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.55)', lineHeight: 1.65, margin: 0 }}>
-                                    {sub}
-                                </p>
-                                <div style={{ marginTop: 20, display: 'flex', alignItems: 'center', gap: 6, color, fontWeight: 700, fontSize: '0.83rem' }}>
-                                    Explore <span>→</span>
-                                </div>
-                            </Link>
-                        </motion.div>
-                    ))}
-                </div>
             </div>
         </section>
     )
 }
 
-/* 8. FOOTER CTA BAND ──────────────────────────────────────────────── */
-function FooterCTABand({ shouldReduceMotion }) {
-    return (
-        <section className="hh-footer-cta" aria-label="Final call to action" id="footer-cta">
-            <motion.div
-                className="hh-footer-cta-inner"
-                initial={shouldReduceMotion ? {} : { opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.4 }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            >
-                <span className="hh-footer-cta-eyebrow">Your jersey is waiting</span>
-                <h2 className="hh-footer-cta-title">
-                    Find Your <span>Jersey.</span>
-                </h2>
-                <p className="hh-footer-cta-sub">
-                    Browse the full collection. India-shipped, fast.
-                </p>
-                <div className="hh-footer-cta-btns">
-                    <Link to="/shop" className="hh-footer-btn-primary">
-                        Explore All Jerseys <FiArrowRight aria-hidden="true" />
-                    </Link>
-                    <a
-                        href={`https://wa.me/${WHATSAPP_NUMBER}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hh-footer-btn-ghost"
-                        aria-label="Order directly on WhatsApp"
-                    >
-                        <FaWhatsapp aria-hidden="true" /> WhatsApp Order
-                    </a>
-                </div>
-            </motion.div>
-        </section>
-    )
-}
+/* ─── Drop Product Card ─────────────────────────────────────── */
+function DropCard({ product, reduced }) {
+    const { addItem } = useCart()
+    const { addToWishlist, isInWishlist } = useWishlist()
+    const img = product.images?.[0] || ''
+    const price = product.discountedPrice || product.price
+    const mrp = product.price
+    const disc = discount(price, mrp)
+    const stock = product.stock ?? 99
+    const inStock = product.inStock !== false && stock > 0
+    const lowStock = inStock && stock < 10
+    const sellingFast = inStock && stock <= 5
+    const sizes = product.sizes?.filter(s => s.stock > 0) || []
+    const firstSize = sizes[0]?.size || 'M'
+    const wishlisted = isInWishlist(product._id)
 
-/* STICKY BOTTOM BAR ───────────────────────────────────────────────── */
-function StickyBar({ show }) {
+    const handleAddCart = useCallback((e) => {
+        e.preventDefault()
+        addItem(product, firstSize)
+    }, [product, firstSize, addItem])
+
     return (
-        <AnimatePresence>
-            {show && (
-                <motion.div
-                    className="hh-sticky-cta"
-                    role="complementary"
-                    aria-label="Shop CTA"
-                    initial={{ y: 80, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: 80, opacity: 0 }}
-                    transition={{ type: 'spring', stiffness: 280, damping: 28 }}
-                >
-                    <div className="hh-sticky-cta-text">
-                        <span className="hh-sticky-cta-label">Premium Retro Jerseys</span>
-                        <span className="hh-sticky-cta-sub">Free delivery ₹999+</span>
+        <motion.div
+            className="cvt-drop-card"
+            initial={reduced ? {} : { opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.45 }}
+        >
+            <Link to={`/product/${product._id}`} className="cvt-drop-card-link">
+                <div className="cvt-drop-img-wrap">
+                    {img && <img src={img} alt={product.name} className="cvt-drop-img" loading="lazy" />}
+
+                    {/* Scarcity badges */}
+                    {sellingFast && (
+                        <span className="cvt-badge cvt-badge--fire">🔥 Selling Fast</span>
+                    )}
+                    {!inStock && (
+                        <span className="cvt-badge cvt-badge--sold">SOLD OUT</span>
+                    )}
+                    {disc > 0 && inStock && !sellingFast && (
+                        <span className="cvt-badge cvt-badge--sale">−{disc}%</span>
+                    )}
+
+                    {/* Quick actions overlay */}
+                    <div className="cvt-drop-overlay">
+                        <button
+                            className="cvt-drop-wl-btn"
+                            onClick={e => { e.preventDefault(); addToWishlist(product) }}
+                            aria-label="Save to wishlist"
+                        >
+                            <FiHeart size={16} fill={wishlisted ? 'currentColor' : 'none'} />
+                        </button>
+                        {inStock && (
+                            <button className="cvt-drop-add-btn" onClick={handleAddCart}>
+                                <FiShoppingBag size={14} />
+                                Add to Drop
+                            </button>
+                        )}
                     </div>
-                    <Link to="/shop" className="hh-sticky-cta-btn">
-                        Shop <FiArrowRight aria-hidden="true" />
-                    </Link>
-                    <a
-                        href={`https://wa.me/${WHATSAPP_NUMBER}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="hh-sticky-cta-wa"
-                        aria-label="Order on WhatsApp"
-                    >
-                        <FaWhatsapp aria-hidden="true" />
-                    </a>
-                </motion.div>
-            )}
-        </AnimatePresence>
+                </div>
+
+                <div className="cvt-drop-info">
+                    {lowStock && (
+                        <span className="cvt-stock-pill">
+                            ⚡ Only {stock} left
+                        </span>
+                    )}
+                    <p className="cvt-drop-category">{product.category}</p>
+                    <h3 className="cvt-drop-name">{product.name}</h3>
+                    <div className="cvt-drop-price-row">
+                        <span className="cvt-drop-price">{fmt(price)}</span>
+                        {disc > 0 && <span className="cvt-drop-mrp">{fmt(mrp)}</span>}
+                    </div>
+                </div>
+            </Link>
+        </motion.div>
     )
 }
 
-/* ─── Helper ───────────────────────────────────────────────── */
-function visibleCount(products) {
-    return products.filter(p => p.isVisible !== false && !p.soldOut).length
-}
+/* ─── Limited Drop Section ─────────────────────────────────── */
+function LimitedDropSection({ products, loading, reduced }) {
+    const drops = products.slice(0, 8)
 
-/* ===================================================================
-   MAIN PAGE
-   =================================================================== */
-export default function Home() {
-    const { products, categories, loading, error } = useProducts()
-    const shouldReduceMotion = useReducedMotion()
+    return (
+        <section className="cvt-drops" aria-label="Limited Drop">
+            <div className="cvt-drops-header">
+                <div>
+                    <span className="cvt-section-eyebrow">LIMITED DROP</span>
+                    <h2 className="cvt-section-title">The Drop.<br /><em>Right Now.</em></h2>
+                </div>
+                <div className="cvt-drops-urgency">
+                    <div className="cvt-urgency-pill">
+                        <span className="cvt-urgency-dot" />
+                        No restocks. Ever.
+                    </div>
+                    <Link to="/shop" className="cvt-view-all">
+                        See All Drops <FiArrowRight size={14} />
+                    </Link>
+                </div>
+            </div>
 
-    // Sticky CTA — shown when hero CTA has scrolled out of view
-    // Hidden again when footer CTA enters view
-    const [showSticky, setShowSticky] = useState(false)
-    const heroCTARef = useRef(null)
-    const footerCTARef = useRef(null)
-
-    useEffect(() => {
-        const heroCTAEl = document.getElementById('hero-shop-cta')
-        const footerCTAEl = document.getElementById('footer-cta')
-        if (!heroCTAEl || !footerCTAEl) return
-
-        const io = new IntersectionObserver((entries) => {
-            const heroCTA = entries.find(e => e.target === heroCTAEl)
-            const footerCTA = entries.find(e => e.target === footerCTAEl)
-
-            if (heroCTA) setShowSticky(v => heroCTA.isIntersecting ? false : v)
-            if (footerCTA) setShowSticky(v => footerCTA.isIntersecting ? false : v)
-
-            // When hero CTA leaves view — show bar
-            if (heroCTA && !heroCTA.isIntersecting) setShowSticky(true)
-            // When footer enters — hide bar
-            if (footerCTA && footerCTA.isIntersecting) setShowSticky(false)
-        }, { threshold: 0.1 })
-
-        io.observe(heroCTAEl)
-        io.observe(footerCTAEl)
-        return () => io.disconnect()
-    }, [loading])
-
-    /* ── Loading ── */
-    if (loading) {
-        return (
-            <div className="home">
-                <section className="hh-hero" aria-busy="true">
-                    <div className="hh-hero-inner">
-                        {/* Text skeleton */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                            <div className="hl-shimmer" style={{ height: 24, width: 160, borderRadius: 99 }} />
-                            <div className="hl-shimmer" style={{ height: 72, width: '85%', borderRadius: 10 }} />
-                            <div className="hl-shimmer" style={{ height: 72, width: '55%', borderRadius: 10 }} />
-                            <div className="hl-shimmer" style={{ height: 20, width: '70%', borderRadius: 6 }} />
-                            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                                <div className="hl-shimmer" style={{ height: 52, width: 180, borderRadius: 99 }} />
-                                <div className="hl-shimmer" style={{ height: 52, width: 190, borderRadius: 99 }} />
+            <div className="cvt-drops-grid">
+                {loading
+                    ? Array(8).fill(0).map((_, i) => (
+                        <div key={i} className="cvt-drop-card">
+                            <Skeleton height={340} borderRadius={16} />
+                            <div style={{ padding: '12px 0 0', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                <Skeleton height={12} width="60%" />
+                                <Skeleton height={16} width="90%" />
+                                <Skeleton height={14} width="40%" />
                             </div>
                         </div>
-                        {/* Image skeleton */}
-                        <div>
-                            <div className="hl-shimmer" style={{
-                                width: '100%', maxWidth: 400, aspectRatio: '4/5',
-                                borderRadius: 32, margin: '0 auto'
-                            }} />
-                        </div>
-                    </div>
-                </section>
-                <section className="hh-section hh-section--alt">
-                    <div className="hh-section-inner">
-                        <div className="hl-shimmer" style={{ height: 36, width: 200, borderRadius: 8, marginBottom: 28 }} />
-                        <Skeleton.ProductGrid count={4} />
-                    </div>
-                </section>
+                    ))
+                    : drops.map(p => (
+                        <DropCard key={p._id} product={p} reduced={reduced} />
+                    ))
+                }
             </div>
-        )
-    }
 
-    /* ── Error ── */
-    if (error) {
-        return (
-            <div style={{ textAlign: 'center', padding: '100px 20px' }}>
-                <p style={{ fontSize: 40, marginBottom: 12 }}>⚠️</p>
-                <h2 style={{
-                    fontFamily: "'Syne', sans-serif",
-                    fontWeight: 800, fontSize: 28,
-                    marginBottom: 8, color: '#0A0A0A'
-                }}>
-                    Cannot connect
+            {!loading && drops.length > 0 && (
+                <div className="cvt-drops-footer">
+                    <p className="cvt-drops-footer-txt">
+                        Miss this — it's gone forever.
+                    </p>
+                    <Link to="/shop" className="cvt-cta-primary cvt-cta-primary--outline">
+                        View All Drops <FiArrowRight />
+                    </Link>
+                </div>
+            )}
+        </section>
+    )
+}
+
+/* ─── Social Strip ─────────────────────────────────────────── */
+function SocialProof({ products }) {
+    return (
+        <section className="cvt-social-strip">
+            <div className="cvt-social-inner">
+                {[
+                    { num: '10,000+', label: 'Fans\nSuited Up' },
+                    { num: '50+', label: 'Iconic\nJerseys' },
+                    { num: '4.9★', label: 'Average\nRating' },
+                ].map(s => (
+                    <div key={s.num} className="cvt-stat">
+                        <span className="cvt-stat-num">{s.num}</span>
+                        <span className="cvt-stat-label">{s.label}</span>
+                    </div>
+                ))}
+            </div>
+        </section>
+    )
+}
+
+/* ─── Footer CTA ───────────────────────────────────────────── */
+function FooterCTA() {
+    return (
+        <section className="cvt-footer-cta">
+            <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="cvt-footer-cta-inner"
+            >
+                <span className="cvt-section-eyebrow">THE IDENTITY</span>
+                <h2 className="cvt-footer-headline">
+                    Not a fan.<br />
+                    <span className="cvt-hero-gold">A Legend.</span>
                 </h2>
-                <p style={{ color: '#777', marginBottom: 28 }}>{error}</p>
-                <button className="hh-btn-primary" onClick={() => window.location.reload()}>
-                    Retry
-                </button>
-            </div>
-        )
-    }
+                <p className="cvt-footer-sub">
+                    Every jersey tells a story. What's yours?
+                </p>
+                <div className="cvt-footer-ctas">
+                    <Link to="/shop" className="cvt-cta-primary">
+                        CLAIM YOUR JERSEY <FiArrowRight />
+                    </Link>
+                    <a
+                        href={buildWhatsAppUrl(WHATSAPP_NUMBER, 'Hi HARLON! I want to find my jersey.')}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="cvt-cta-wa"
+                    >
+                        <FaWhatsapp size={20} /> Need help choosing?
+                    </a>
+                </div>
+            </motion.div>
+        </section>
+    )
+}
 
-    /* ── Derived data ── */
-    const visible = products.filter(p => p.isVisible !== false)
-    const featured = visible.filter(p => p.featured).slice(0, 4)
-    const allShow = visible.filter(p => !featured.includes(p)).slice(0, 4)
+/* ─── HOME PAGE ────────────────────────────────────────────── */
+export default function Home() {
+    const { products, loading, error, refreshData } = useProducts()
+    const reduced = useReducedMotion()
+
+    if (error) {
+        return <LegendaryError onRetry={refreshData} />
+    }
 
     return (
-        <div className="home">
-
-            {/* 1 ── Hero */}
-            <HeroSection
-                products={visible}
-                shouldReduceMotion={shouldReduceMotion}
-            />
-
-            {/* 2 ── Trust Marquee */}
+        <main className="home">
+            <HeroSection products={products} reduced={reduced} />
             <TrustMarquee />
-
-            {/* 🆕 Stories — category circles */}
-            <CategoryStories categories={categories} products={visible} />
-
-            {/* 3 ── Categories */}
-            <CategoryStrip
-                categories={categories}
-                products={visible}
-                shouldReduceMotion={shouldReduceMotion}
-            />
-
-            {/* 4 ── Featured Drops */}
-            {featured.length > 0 && (
-                <ProductSection
-                    id="featured-drops"
-                    title="Featured Drops"
-                    eyebrow="🔥 Crowd Favourites"
-                    products={featured}
-                    shouldReduceMotion={shouldReduceMotion}
-                />
-            )}
-
-            {/* 🆕 Jersey of the Day */}
-            <JerseyOfTheDay products={visible} />
-
-            {/* 5 ── Social Proof */}
-            <SocialProof
-                productCount={visible.length}
-                shouldReduceMotion={shouldReduceMotion}
-            />
-
-            {/* 6 ── Urgency */}
-            <UrgencyBand />
-
-            {/* 4b ── More Jerseys */}
-            {allShow.length > 0 && (
-                <ProductSection
-                    title="More Jerseys"
-                    eyebrow="Browse the Collection"
-                    products={allShow}
-                    bg
-                    shouldReduceMotion={shouldReduceMotion}
-                />
-            )}
-
-            {/* 7 ── Platform Features (Drops / Mystery Box / Predictions) */}
-            <PlatformFeatures shouldReduceMotion={shouldReduceMotion} />
-
-            {/* 8 ── Footer CTA Band */}
-            <FooterCTABand shouldReduceMotion={shouldReduceMotion} />
-
-            {/* Sticky Bottom CTA (mobile) */}
-            {!shouldReduceMotion && <StickyBar show={showSticky} />}
-
-        </div>
+            <IconicMomentsSection products={products} reduced={reduced} />
+            <LimitedDropSection products={products} loading={loading} reduced={reduced} />
+            <SocialProof products={products} />
+            <FooterCTA />
+        </main>
     )
 }

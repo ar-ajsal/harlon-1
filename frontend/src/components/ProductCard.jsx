@@ -29,6 +29,12 @@ function ProductCard({ product, priority = false }) {
         product.dropStartTime && new Date(product.dropStartTime) > now
     const dropRemaining = isDropLive ? (product.dropQuantity || 0) - (product.dropSold || 0) : 0
 
+    // Scarcity
+    const stock = product.stock ?? 99
+    const inStock = product.inStock !== false && !product.soldOut
+    const lowStock = inStock && stock < 10 && stock > 0
+    const sellingFast = inStock && stock <= 5 && stock > 0
+
     return (
         <Link
             to={`/product/${product._id}`}
@@ -92,6 +98,17 @@ function ProductCard({ product, priority = false }) {
 
             {/* Info */}
             <div className="product-info">
+                {/* Scarcity labels */}
+                {sellingFast && !product.soldOut && (
+                    <span style={{ display: 'block', fontSize: 10, fontWeight: 800, color: '#ef4444', letterSpacing: '0.04em', marginBottom: 2 }}>
+                        🔥 Selling fast — {stock} left
+                    </span>
+                )}
+                {lowStock && !sellingFast && !product.soldOut && (
+                    <span style={{ display: 'block', fontSize: 10, fontWeight: 700, color: '#f97316', letterSpacing: '0.04em', marginBottom: 2 }}>
+                        ⚡ Only {stock} left
+                    </span>
+                )}
                 <span className="product-category">{product.category}</span>
                 <h3 className="product-name">{product.name}</h3>
                 {product.isPreOrder && product.expectedShipDate && (

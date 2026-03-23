@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiMenu, FiX, FiSearch, FiSun, FiMoon, FiHeart } from 'react-icons/fi'
+import { FiMenu, FiX, FiSearch, FiShoppingBag, FiHeart } from 'react-icons/fi'
 import ThemeToggle from './ThemeToggle'
 import { useTheme } from '../context/ThemeContext'
+import { useCart } from '../context/CartContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 
 const NAV_LINKS = [
@@ -18,6 +19,7 @@ function Header() {
     const [scrolled, setScrolled] = useState(false)
     const navigate = useNavigate()
     const { theme, toggleTheme } = useTheme()
+    const { totalItems, openCart } = useCart()
 
     /* Glassmorphism kicks in after 20px scroll */
     useEffect(() => {
@@ -145,11 +147,40 @@ function Header() {
                         )}
                     </NavLink>
 
+                    {/* Cart icon */}
+                    <button
+                        type="button"
+                        onClick={openCart}
+                        style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', display: 'flex', alignItems: 'center', padding: 8, marginLeft: 4 }}
+                        aria-label="Open cart"
+                    >
+                        <FiShoppingBag size={18} />
+                        {totalItems > 0 && (
+                            <span style={{ position: 'absolute', top: 2, right: 2, background: 'hsl(38,65%,55%)', color: '#0A0A0A', borderRadius: '50%', width: 16, height: 16, fontSize: 9, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {totalItems}
+                            </span>
+                        )}
+                    </button>
+
                     <ThemeToggle />
                 </nav>
 
                 {/* ── Mobile controls ── */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    {/* Cart icon (mobile) */}
+                    <button
+                        type="button"
+                        onClick={openCart}
+                        style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', display: 'flex', alignItems: 'center', padding: 8 }}
+                        aria-label="Open cart"
+                    >
+                        <FiShoppingBag size={20} />
+                        {totalItems > 0 && (
+                            <span style={{ position: 'absolute', top: 2, right: 2, background: 'hsl(38,65%,55%)', color: '#0A0A0A', borderRadius: '50%', width: 16, height: 16, fontSize: 9, fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {totalItems}
+                            </span>
+                        )}
+                    </button>
                     <ThemeToggle className="mobile-theme-btn" />
 
                     {/* Hamburger */}

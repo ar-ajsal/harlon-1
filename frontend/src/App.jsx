@@ -10,6 +10,8 @@ import Footer from './components/Footer'
 import MobileNav from './components/MobileNav'
 import ProtectedRoute from './components/ProtectedRoute'
 import FlashSaleBanner from './components/FlashSaleBanner'
+import CartDrawer from './components/CartDrawer'
+import { CartProvider } from './context/CartContext'
 
 // ── Customer pages — lazy (route-split) ─────────────────────────────────────
 const Home = lazy(() => import('./pages/Home'))
@@ -89,8 +91,10 @@ function App() {
     }
 
     return (
+        <CartProvider>
         <div className="app">
             {showLoader && <HarlonLoader onDone={handleLoaderDone} />}
+            <CartDrawer />
             <Routes>
                 {/* ── Admin Routes ─────────────────────────────────────── */}
                 <Route path="/admin" element={
@@ -269,6 +273,7 @@ function App() {
                 theme="light"
             />
         </div>
+        </CartProvider>
     )
 }
 
