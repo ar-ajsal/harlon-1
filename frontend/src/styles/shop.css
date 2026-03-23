@@ -7,7 +7,8 @@
 .shop-page-v2 {
     min-height: 100vh;
     background: var(--surface);
-    padding-bottom: 80px; /* room for mobile sticky bar */
+    padding-top: 64px;      /* height of fixed navbar */
+    padding-bottom: 80px;   /* room for mobile sticky bar */
 }
 
 /* ====================================================
@@ -47,7 +48,7 @@
    ==================================================== */
 .shop-hero {
     background: #0A0A0A;
-    padding: 36px 20px 32px;
+    padding: 28px 20px 24px;
     text-align: center;
 }
 
@@ -132,8 +133,9 @@
 /* Search */
 .shop-search-wrap {
     position: relative;
-    max-width: 440px;
-    margin-bottom: 14px;
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 12px;
 }
 
 .shop-search-icon {
@@ -231,7 +233,24 @@
     user-select: none;
 }
 
-/* Result count */
+@media (min-width: 768px) {
+    .shop-page-v2 {
+        padding-top: 70px;
+        padding-bottom: 0;
+    }
+    .shop-controls {
+        padding: 20px 40px 16px;
+        position: sticky;
+        top: 70px;
+        z-index: 90;
+    }
+    .shop-feed-wrap { padding: 28px 40px; }
+    .shop-hero { padding: 48px 40px 40px; }
+}
+
+@media (min-width: 1024px) {
+    .shop-hero { padding: 60px 80px 52px; }
+}
 .shop-result-count {
     font-family: 'Inter', sans-serif;
     font-size: 12px;
@@ -751,17 +770,7 @@
 /* ====================================================
    RESPONSIVE TWEAKS
    ==================================================== */
-@media (min-width: 768px) {
-    .shop-controls {
-        padding: 20px 40px 16px;
-        position: sticky;
-        top: 64px;
-        z-index: 90;
-    }
-    .shop-feed-wrap { padding: 28px 40px; }
-    .shop-hero { padding: 60px 40px 48px; }
-    .shop-page-v2 { padding-bottom: 0; }
-}
+/* padding-bottom 0 on desktop handled in 768px block above */
 
 /* Keep old hh-* classes available for any legacy refs */
 .hh-btn-primary {
