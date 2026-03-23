@@ -124,6 +124,7 @@
 .shop-controls {
     padding: 14px 16px 10px;
     width: 100%;
+    box-sizing: border-box;
     background: var(--surface);
     border-bottom: 1px solid var(--noir-10, #f3f4f6);
 }
@@ -689,81 +690,7 @@
 
 .shop-empty-btn:hover { opacity: 0.8; }
 
-/* ====================================================
-   9. MOBILE STICKY BOTTOM BAR
-   ==================================================== */
-.shop-mobile-bar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 200;
-    background: var(--surface);
-    border-top: 1px solid var(--noir-10, #eee);
-    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
-    box-shadow: 0 -4px 24px rgba(0,0,0,0.08);
-}
-
-@media (min-width: 768px) {
-    .shop-mobile-bar { display: none; }
-}
-
-.shop-mobile-filter {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    background: var(--surface);
-    border: 1.5px solid var(--noir-15, #e5e5e5);
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--ink);
-    padding: 12px;
-    border-radius: 12px;
-    cursor: pointer;
-}
-
-.shop-mobile-cart {
-    flex: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: #0A0A0A;
-    color: hsl(38, 75%, 58%);
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    padding: 12px;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
-    position: relative;
-    transition: background 0.15s;
-}
-
-.shop-mobile-cart-badge {
-    position: absolute;
-    top: 8px;
-    right: 48px;
-    background: hsl(38,65%,55%);
-    color: #0A0A0A;
-    border-radius: 50%;
-    width: 16px;
-    height: 16px;
-    font-size: 9px;
-    font-weight: 900;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+/* Shop mobile bar removed to allow the global MobileNav to show */
 
 /* ====================================================
    RESPONSIVE TWEAKS

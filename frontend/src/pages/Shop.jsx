@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
-import { FiSearch, FiX, FiShoppingBag, FiHeart, FiSliders, FiZap } from 'react-icons/fi'
+import { FiSearch, FiX, FiShoppingBag, FiHeart, FiZap } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useProducts } from '../context/ProductContext'
 import { productsApi } from '../services/api'
@@ -488,19 +488,7 @@ export default function Shop() {
                 )}
             </div>
 
-            {/* ── Mobile sticky bottom bar ── */}
-            <div className="shop-mobile-bar">
-                <button className="shop-mobile-filter" onClick={() => searchRef.current?.focus()}>
-                    <FiSliders size={16} /> Filters
-                </button>
-                <button className="shop-mobile-cart" onClick={openCart}>
-                    <FiShoppingBag size={18} />
-                    {totalItems > 0 && (
-                        <span className="shop-mobile-cart-badge">{totalItems}</span>
-                    )}
-                    Your Drop
-                </button>
-            </div>
+            {/* End of content */}
         </div>
     )
 }
