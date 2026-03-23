@@ -21,15 +21,7 @@ const fmt = (n) => `₹${Number(n).toLocaleString('en-IN')}`
 const calcDisc = (p, o) => o && p < o ? Math.round((1 - p / o) * 100) : 0
 
 /* ── Smart filter chip definitions ─────────────────────────── */
-const FILTER_CHIPS = [
-    { id: 'all',         label: '⚡ All Drops' },
-    { id: 'trending',    label: '🔥 Trending' },
-    { id: 'almostgone',  label: '💀 Almost Gone' },
-    { id: 'messi',       label: 'MESSI ERA' },
-    { id: 'ronaldo',     label: 'RONALDO ERA' },
-    { id: 'retro90s',    label: 'RETRO 90s' },
-    { id: 'limited',     label: '💎 LIMITED' },
-]
+// Using real categories from context exclusively
 
 /* ── Story / interrupter blocks ─────────────────────────────── */
 const STORY_BLOCKS = [
@@ -104,48 +96,11 @@ function filterProducts(products, chipId, search, categories) {
     }
 
     // Smart chip filters
-    switch (chipId) {
-        case 'trending':
-            result = result.filter(p => p.bestSeller || p.featured)
-            break
-        case 'almostgone':
-            result = result.filter(p => (p.stock ?? 99) < 10 && p.inStock !== false)
-            break
-        case 'messi':
-            result = result.filter(p =>
-                p.name?.toLowerCase().includes('messi') ||
-                p.name?.toLowerCase().includes('barcelona') ||
-                p.description?.toLowerCase().includes('messi')
-            )
-            break
-        case 'ronaldo':
-            result = result.filter(p =>
-                p.name?.toLowerCase().includes('ronaldo') ||
-                p.name?.toLowerCase().includes('real madrid') ||
-                p.name?.toLowerCase().includes('juventus') ||
-                p.name?.toLowerCase().includes('manchester united') ||
-                p.description?.toLowerCase().includes('ronaldo')
-            )
-            break
-        case 'retro90s':
-            result = result.filter(p =>
-                p.name?.match(/199\d|'9\d|90s/i) ||
-                p.description?.match(/199\d|'9\d|90s/i) ||
-                p.category?.toLowerCase().includes('retro')
-            )
-            break
-        case 'limited':
-            result = result.filter(p => (p.stock ?? 99) < 20 || p.dropEnabled)
-            break
-        default:
-            // Check if chipId matches a real category
-            if (chipId !== 'all') {
-                result = result.filter(p =>
-                    p.category?.toLowerCase() === chipId.toLowerCase() ||
-                    p.category?.toLowerCase().includes(chipId.toLowerCase())
-                )
-            }
-            break
+    if (chipId !== 'all') {
+        result = result.filter(p =>
+            p.category?.toLowerCase() === chipId.toLowerCase() ||
+            p.category?.toLowerCase().includes(chipId.toLowerCase())
+        )
     }
 
     return result
@@ -405,19 +360,12 @@ export default function Shop() {
 
                 {/* Smart filter chips + real categories — horizontal scroll */}
                 <div className="shop-chips">
-                    {FILTER_CHIPS.map(chip => (
-                        <button
-                            key={chip.id}
-                            className={`shop-chip${activeChip === chip.id ? ' active' : ''}`}
-                            onClick={() => handleChip(chip.id)}
-                        >
-                            {chip.label}
-                        </button>
-                    ))}
-                    {/* Divider */}
-                    {categories?.length > 0 && (
-                        <span className="shop-chip-divider">|</span>
-                    )}
+                    <button
+                        className={`shop-chip${activeChip === 'all' ? ' active' : ''}`}
+                        onClick={() => handleChip('all')}
+                    >
+                        ⚡ All Drops
+                    </button>
                     {/* Real DB categories */}
                     {(categories || []).map(cat => (
                         <button
