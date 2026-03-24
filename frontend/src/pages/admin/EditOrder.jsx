@@ -388,7 +388,14 @@ function EditOrder() {
                                                         setShowProductDropdown(false)
                                                     }}
                                                 >
-                                                    <span className="psi-name">{product.name}</span>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <img 
+                                                            src={product.images && product.images.length > 0 ? product.images[0] : '/images/placeholder.jpg'} 
+                                                            alt="" 
+                                                            style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '4px', backgroundColor: '#2a2a2a', flexShrink: 0 }} 
+                                                        />
+                                                        <span className="psi-name">{product.name}</span>
+                                                    </div>
                                                     <span className="psi-price">₹{product.price}</span>
                                                 </div>
                                             ))
