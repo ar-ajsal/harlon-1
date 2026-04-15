@@ -19,6 +19,7 @@ function ProductSummary({
     soldOut = false,
     deliveryEstimate = '',
     onSizeGuideClick,
+    orderSettings = { whatsappOrderEnabled: true, onlinePaymentEnabled: true },
 }) {
     if (!product) return null
 
@@ -118,31 +119,43 @@ function ProductSummary({
 
             {/* CTA block */}
             <div className="pd-cta-block">
-                <motion.button
-                    type="button"
-                    className="pd-btn-buy"
-                    onClick={handleBuyClick}
-                    disabled={soldOut}
-                    whileHover={soldOut ? {} : hover}
-                    whileTap={soldOut ? {} : tap}
-                    aria-label="Buy now"
-                >
-                    <FiShoppingBag style={{ fontSize: 18 }} />
-                    {soldOut ? 'Sold Out' : `Buy Now — ₹${fmt(currentPrice)}`}
-                </motion.button>
+                {!orderSettings.onlinePaymentEnabled && !orderSettings.whatsappOrderEnabled ? (
+                    <div style={{ textAlign: 'center', padding: '16px', background: '#ffe4e6', color: '#be123c', borderRadius: 12, fontWeight: 600, fontSize: 13, border: '1px solid #fda4af' }}>
+                        🚫 Orders are currently disabled. Check back soon.
+                    </div>
+                ) : (
+                    <>
+                        {orderSettings.onlinePaymentEnabled && (
+                            <motion.button
+                                type="button"
+                                className="pd-btn-buy"
+                                onClick={handleBuyClick}
+                                disabled={soldOut}
+                                whileHover={soldOut ? {} : hover}
+                                whileTap={soldOut ? {} : tap}
+                                aria-label="Buy now"
+                            >
+                                <FiShoppingBag style={{ fontSize: 18 }} />
+                                {soldOut ? 'Sold Out' : `Buy Now — ₹${fmt(currentPrice)}`}
+                            </motion.button>
+                        )}
 
-                <motion.button
-                    type="button"
-                    className="pd-btn-wa"
-                    onClick={onWhatsApp}
-                    disabled={soldOut}
-                    whileHover={soldOut ? {} : hover}
-                    whileTap={soldOut ? {} : tap}
-                    aria-label="Order on WhatsApp"
-                >
-                    <FaWhatsapp style={{ fontSize: 20 }} />
-                    {soldOut ? 'Sold Out' : 'Order via WhatsApp'}
-                </motion.button>
+                        {orderSettings.whatsappOrderEnabled && (
+                            <motion.button
+                                type="button"
+                                className="pd-btn-wa"
+                                onClick={onWhatsApp}
+                                disabled={soldOut}
+                                whileHover={soldOut ? {} : hover}
+                                whileTap={soldOut ? {} : tap}
+                                aria-label="Order on WhatsApp"
+                            >
+                                <FaWhatsapp style={{ fontSize: 20 }} />
+                                {soldOut ? 'Sold Out' : 'Order via WhatsApp'}
+                            </motion.button>
+                        )}
+                    </>
+                )}
 
                 {soldOut && (
                     <button type="button" className="pd-btn-waitlist">

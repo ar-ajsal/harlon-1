@@ -18,6 +18,8 @@ import dropRoutes from './drop.routes.js';
 import predictionRoutes from './prediction.routes.js';
 import fanCollectionRoutes from './fanCollection.routes.js';
 import offerRoutes from './offer.routes.js';
+import settingsRoutes from './settings.routes.js';
+
 
 const router = Router();
 
@@ -41,6 +43,9 @@ router.use('/predictions', predictionRoutes);
 router.use('/fan', fanCollectionRoutes);
 // ── Offer / Promo Management ───────────────────────────────────────────────────
 router.use('/offers', offerRoutes);
+// ── App Settings (payment/order toggles) ───────────────────────────────────────────
+router.use('/settings', settingsRoutes);
+
 
 export default router;
 

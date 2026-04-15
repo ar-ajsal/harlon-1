@@ -7,6 +7,7 @@ import { useProducts } from '../context/ProductContext'
 import { useWishlist } from '../context/WishlistContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 import { couponsApi, couponSalesApi } from '../api/coupons.api'
+import { settingsApi } from '../api/settings.api'
 import { toast } from 'react-toastify'
 import InquiryModal from '../components/InquiryModal'
 import SizeQuiz from '../components/SizeQuiz'
@@ -103,6 +104,9 @@ function ProductDetail() {
     const [showTryOn, setShowTryOn] = useState(false)
     const [collectionSaved, setCollectionSaved] = useState(false)
 
+    const [orderSettings, setOrderSettings] = useState({ whatsappOrderEnabled: true, onlinePaymentEnabled: true })
+    const [settingsLoaded, setSettingsLoaded] = useState(false)
+
     const { h, m, s } = useCountdown()
     const dates = getDeliveryDates()
 
@@ -116,6 +120,22 @@ function ProductDetail() {
             if (found?.sizes?.length > 0) setSelectedSize(found.sizes[0])
         }
     }, [id, products])
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await settingsApi.getSettings()
+                if (res.success) {
+                    setOrderSettings(res.data)
+                }
+            } catch (err) {
+                console.error('Error fetching settings:', err)
+            } finally {
+                setSettingsLoaded(true)
+            }
+        }
+        if (!settingsLoaded) fetchSettings()
+    }, [settingsLoaded])
 
     // Reset state & scroll on product change
     useEffect(() => {
@@ -296,6 +316,7 @@ function ProductDetail() {
                                 soldOut={product.soldOut}
                                 deliveryEstimate={`Estimated by ${dates.rangeLabel}`}
                                 onSizeGuideClick={() => setActiveTab('sizeChart')}
+                                orderSettings={orderSettings}
                             />
                         </div>
 
@@ -657,14 +678,16 @@ function ProductDetail() {
                             <span className="pd-sticky-name">{product.name}</span>
                             <span className="pd-sticky-price">₹{fmt(currentPrice)}</span>
                         </div>
-                        <button
-                            type="button"
-                            className="pd-sticky-buy"
-                            onClick={handleBuy}
-                            disabled={product.soldOut}
-                        >
-                            {product.soldOut ? 'Sold Out' : 'Buy Now'}
-                        </button>
+                        {orderSettings?.onlinePaymentEnabled !== false && (
+                            <button
+                                type="button"
+                                className="pd-sticky-buy"
+                                onClick={handleBuy}
+                                disabled={product.soldOut}
+                            >
+                                {product.soldOut ? 'Sold Out' : 'Buy Now'}
+                            </button>
+                        )}
                     </motion.div>
                 )}
             </AnimatePresence>

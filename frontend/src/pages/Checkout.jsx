@@ -9,6 +9,7 @@ import { createOrder } from '../api/guestOrder.api'
 import { WHATSAPP_NUMBER } from '../config/constants'
 import OrderSuccess from '../components/order/OrderSuccess'
 import { offersApi } from '../api/offers.api'
+import { settingsApi } from '../api/settings.api'
 import '../styles/checkout.css'
 
 const RAZORPAY_SCRIPT = 'https://checkout.razorpay.com/v1/checkout.js'
@@ -102,6 +103,32 @@ function Checkout() {
     const [promoInput, setPromoInput] = useState('')
     const [promoValidating, setPromoValidating] = useState(false)
     const [appliedOffer, setAppliedOffer] = useState(null)  // { code, description, discountAmount, discountType }
+
+    // ── Global Order Settings ───────────────────────────────────────────────
+    const [orderSettings, setOrderSettings] = useState({ whatsappOrderEnabled: true, onlinePaymentEnabled: true })
+    const [loadingSettings, setLoadingSettings] = useState(true)
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await settingsApi.getSettings()
+                if (res.success) {
+                    const settings = res.data
+                    setOrderSettings(settings)
+                    
+                    // Adjust default payment method if "razorpay" is disabled
+                    if (!settings.onlinePaymentEnabled && settings.whatsappOrderEnabled) {
+                        setPaymentMethod('whatsapp')
+                    }
+                }
+            } catch (err) {
+                console.error('Error fetching settings:', err)
+            } finally {
+                setLoadingSettings(false)
+            }
+        }
+        fetchSettings()
+    }, [])
 
     // ── Load product ────────────────────────────────────────────────────────
     useEffect(() => {
@@ -374,29 +401,40 @@ function Checkout() {
 
                         {/* ── Payment method (FIRST) ── */}
                         <p className="co-section-label">Payment Method</p>
-                        <div className="co-pay-grid">
-                            <button
-                                type="button"
-                                className={`co-pay-card${paymentMethod === 'razorpay' ? ' selected' : ''}`}
-                                onClick={() => setPaymentMethod('razorpay')}
-                                aria-pressed={paymentMethod === 'razorpay'}
-                            >
-                                <span className="co-pay-icon">💳</span>
-                                <span className="co-pay-label">Pay Online</span>
-                                <span className="co-pay-sub">UPI · Cards · Netbanking</span>
-                                <span className="co-pay-badge">⚡ Recommended</span>
-                            </button>
-                            <button
-                                type="button"
-                                className={`co-pay-card${paymentMethod === 'whatsapp' ? ' selected' : ''}`}
-                                onClick={() => setPaymentMethod('whatsapp')}
-                                aria-pressed={paymentMethod === 'whatsapp'}
-                            >
-                                <span className="co-pay-icon"><FaWhatsapp style={{ color: '#25D366' }} /></span>
-                                <span className="co-pay-label">WhatsApp</span>
-                                <span className="co-pay-sub">Confirm manually</span>
-                            </button>
-                        </div>
+                        
+                        {!orderSettings.onlinePaymentEnabled && !orderSettings.whatsappOrderEnabled ? (
+                            <div className="co-wa-notice" style={{ marginBottom: 16 }}>
+                                🚫 <strong>Orders are currently disabled.</strong> We are not accepting any new orders at the moment. Please check back later.
+                            </div>
+                        ) : (
+                            <div className="co-pay-grid">
+                                {orderSettings.onlinePaymentEnabled && (
+                                    <button
+                                        type="button"
+                                        className={`co-pay-card${paymentMethod === 'razorpay' ? ' selected' : ''}`}
+                                        onClick={() => setPaymentMethod('razorpay')}
+                                        aria-pressed={paymentMethod === 'razorpay'}
+                                    >
+                                        <span className="co-pay-icon">💳</span>
+                                        <span className="co-pay-label">Pay Online</span>
+                                        <span className="co-pay-sub">UPI · Cards · Netbanking</span>
+                                        <span className="co-pay-badge">⚡ Recommended</span>
+                                    </button>
+                                )}
+                                {orderSettings.whatsappOrderEnabled && (
+                                    <button
+                                        type="button"
+                                        className={`co-pay-card${paymentMethod === 'whatsapp' ? ' selected' : ''}`}
+                                        onClick={() => setPaymentMethod('whatsapp')}
+                                        aria-pressed={paymentMethod === 'whatsapp'}
+                                    >
+                                        <span className="co-pay-icon"><FaWhatsapp style={{ color: '#25D366' }} /></span>
+                                        <span className="co-pay-label">WhatsApp</span>
+                                        <span className="co-pay-sub">Confirm manually</span>
+                                    </button>
+                                )}
+                            </div>
+                        )}
 
                         <AnimatePresence mode="wait">
                             {paymentMethod === 'razorpay' && (
@@ -646,9 +684,9 @@ function Checkout() {
                         <motion.button
                             type="submit"
                             className={`co-submit${paymentMethod === 'whatsapp' ? ' co-submit-wa' : ''}`}
-                            disabled={loading}
-                            whileHover={loading ? {} : hover}
-                            whileTap={loading ? {} : tap}
+                            disabled={loading || (!orderSettings.onlinePaymentEnabled && !orderSettings.whatsappOrderEnabled)}
+                            whileHover={loading || (!orderSettings.onlinePaymentEnabled && !orderSettings.whatsappOrderEnabled) ? {} : hover}
+                            whileTap={loading || (!orderSettings.onlinePaymentEnabled && !orderSettings.whatsappOrderEnabled) ? {} : tap}
                         >
                             {submitLabel}
                         </motion.button>

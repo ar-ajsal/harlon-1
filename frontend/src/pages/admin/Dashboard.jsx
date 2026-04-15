@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { FiDollarSign, FiTrendingUp, FiPackage, FiPlus, FiClipboard, FiShoppingBag } from 'react-icons/fi'
 import {
@@ -7,6 +7,7 @@ import {
 } from 'recharts'
 import { useProducts } from '../../context/ProductContext'
 import { ordersAPI } from '../../api/orders.api'
+import { settingsApi } from '../../api/settings.api'
 import AdminLayout from '../../components/AdminLayout'
 import '../../styles/admin-responsive.css'
 
@@ -33,6 +34,10 @@ function Dashboard() {
         } catch { return '' }
     })
 
+    // Global Order Settings
+    const [orderSettings, setOrderSettings] = useState({ whatsappOrderEnabled: true, onlinePaymentEnabled: true })
+    const [loadingSettings, setLoadingSettings] = useState(true)
+
     useEffect(() => {
         const fetchStats = async () => {
             try {
@@ -58,9 +63,36 @@ function Dashboard() {
             } catch (err) {
                 console.error('Error fetching dashboard stats:', err)
             }
+
+            try {
+                const settingsRes = await settingsApi.getSettings()
+                if (settingsRes.success) {
+                    setOrderSettings({
+                        whatsappOrderEnabled: settingsRes.data.whatsappOrderEnabled,
+                        onlinePaymentEnabled: settingsRes.data.onlinePaymentEnabled
+                    })
+                }
+            } catch (err) {
+                console.error('Error fetching settings:', err)
+            } finally {
+                setLoadingSettings(false)
+            }
         }
         fetchStats()
     }, [])
+
+    const toggleSetting = async (key) => {
+        const newVal = !orderSettings[key]
+        setOrderSettings(prev => ({ ...prev, [key]: newVal }))
+        try {
+            await settingsApi.updateSettings({ [key]: newVal })
+        } catch (err) {
+            console.error('Error updating setting:', err)
+            // revert on failure
+            setOrderSettings(prev => ({ ...prev, [key]: !newVal }))
+            alert('Failed to update settings')
+        }
+    }
 
     const totalProductCost = products.reduce((sum, p) => sum + (p.costPrice || 0), 0)
     const fmt = (val) => `₹${(val || 0).toLocaleString('en-IN')}`
@@ -358,6 +390,52 @@ function Dashboard() {
                         </button>
                         <p style={{ fontSize: 12, color: '#9ca3af' }}>Resets daily. Shows on homepage hero section.</p>
                     </div>
+                </div>
+            </div>
+
+            {/* Global Order Settings */}
+            <div className="dashboard-grid-2" style={{ marginTop: 24 }}>
+                <div className="dashboard-card">
+                    <h3 style={{ marginBottom: 16 }}>⚙️ Order Settings</h3>
+                    {loadingSettings ? (
+                        <div style={{ color: '#9ca3af', fontSize: 13 }}>Loading settings...</div>
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', border: '1.5px solid #e5e7eb', borderRadius: 8 }}>
+                                <div>
+                                    <div style={{ fontWeight: 600, color: '#0f0f11', fontSize: 14 }}>WhatsApp Orders</div>
+                                    <div style={{ fontSize: 12, color: '#6b7280' }}>Allow customers to place orders via WhatsApp manual confirmation</div>
+                                </div>
+                                <button
+                                    onClick={() => toggleSetting('whatsappOrderEnabled')}
+                                    style={{
+                                        background: orderSettings.whatsappOrderEnabled ? '#10b981' : '#e5e7eb',
+                                        color: orderSettings.whatsappOrderEnabled ? '#fff' : '#6b7280',
+                                        border: 'none', borderRadius: 99, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s'
+                                    }}
+                                >
+                                    {orderSettings.whatsappOrderEnabled ? 'Enabled' : 'Disabled'}
+                                </button>
+                            </div>
+                            
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', border: '1.5px solid #e5e7eb', borderRadius: 8 }}>
+                                <div>
+                                    <div style={{ fontWeight: 600, color: '#0f0f11', fontSize: 14 }}>Online Payment</div>
+                                    <div style={{ fontSize: 12, color: '#6b7280' }}>Allow checkout via Razorpay (UPI, Cards, Netbanking)</div>
+                                </div>
+                                <button
+                                    onClick={() => toggleSetting('onlinePaymentEnabled')}
+                                    style={{
+                                        background: orderSettings.onlinePaymentEnabled ? '#10b981' : '#e5e7eb',
+                                        color: orderSettings.onlinePaymentEnabled ? '#fff' : '#6b7280',
+                                        border: 'none', borderRadius: 99, padding: '6px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s'
+                                    }}
+                                >
+                                    {orderSettings.onlinePaymentEnabled ? 'Enabled' : 'Disabled'}
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </AdminLayout >

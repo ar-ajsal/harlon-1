@@ -106,13 +106,73 @@ function filterProducts(products, chipId, search, categories) {
     return result
 }
 
+/* ── Auto-Cycling Image Carousel ───────────────────────────── */
+function ImageCarousel({ images, productName, soldOut }) {
+    const [activeIdx, setActiveIdx] = useState(0)
+    const [hovered, setHovered] = useState(false)
+    const intervalRef = useRef(null)
+    const imgs = images?.length > 0 ? images : []
+    const hasMultiple = imgs.length > 1
+
+    // Auto-cycle: always cycle every 3s if multiple images, speed up on hover
+    useEffect(() => {
+        if (!hasMultiple) return
+        const delay = hovered ? 1800 : 3000
+        intervalRef.current = setInterval(() => {
+            setActiveIdx(prev => (prev + 1) % imgs.length)
+        }, delay)
+        return () => clearInterval(intervalRef.current)
+    }, [hasMultiple, hovered, imgs.length])
+
+    if (imgs.length === 0) {
+        return <div className="dsc-img-placeholder">👕</div>
+    }
+
+    return (
+        <div
+            className="dsc-carousel"
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+        >
+            <AnimatePresence mode="wait" initial={false}>
+                <motion.img
+                    key={activeIdx}
+                    src={imgs[activeIdx]}
+                    alt={`${productName} – view ${activeIdx + 1}`}
+                    className="dsc-img"
+                    loading="lazy"
+                    initial={{ opacity: 0, scale: 1.04 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.97 }}
+                    transition={{ duration: 0.45, ease: 'easeInOut' }}
+                    onError={e => { e.target.style.opacity = '0' }}
+                />
+            </AnimatePresence>
+
+            {/* Dot indicators */}
+            {hasMultiple && (
+                <div className="dsc-dots">
+                    {imgs.map((_, i) => (
+                        <button
+                            key={i}
+                            className={`dsc-dot${i === activeIdx ? ' active' : ''}`}
+                            onClick={e => { e.preventDefault(); e.stopPropagation(); setActiveIdx(i) }}
+                            aria-label={`View image ${i + 1}`}
+                        />
+                    ))}
+                </div>
+            )}
+        </div>
+    )
+}
+
 /* ── Product Card ───────────────────────────────────────────── */
 function DropShopCard({ product, index, reduced }) {
     const { addItem } = useCart()
     const { isWishlisted, toggleWishlist } = useWishlist()
     const wishlisted = isWishlisted(product._id)
 
-    const img = product.images?.[0] || ''
+    const images = product.images || []
     const price = product.discountedPrice || product.price
     const mrp = product.price
     const d = calcDisc(price, mrp)
@@ -146,11 +206,11 @@ function DropShopCard({ product, index, reduced }) {
         >
             <Link to={`/product/${product._id}`} className="dsc-link">
                 <div className="dsc-img-wrap">
-                    {img
-                        ? <img src={img} alt={product.name} loading="lazy" className="dsc-img"
-                               onError={e => { e.target.style.opacity = '0' }} />
-                        : <div className="dsc-img-placeholder">👕</div>
-                    }
+                    <ImageCarousel
+                        images={images}
+                        productName={product.name}
+                        soldOut={product.soldOut}
+                    />
 
                     {/* Stock warning TOP LEFT */}
                     {lowStock && inStock && (
