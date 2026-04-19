@@ -777,7 +777,39 @@ function Checkout() {
 
                     {/* ── Order summary (desktop sticky) ── */}
                     <div className="co-summary-card-wrap">
-                        <SummaryPanel product={product} form={form} setForm={setForm} fmt={fmt} prefersReduced={prefersReduced} appliedOffer={appliedOffer} />
+                        {/* Desktop sticky summary — cart mode shows item list, single-product shows SummaryPanel */}
+                        {isCartMode ? (
+                            <div className="co-summary-card">
+                                <h3 className="co-card-title">Order Summary</h3>
+                                {cartItems.map((item, i) => (
+                                    <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 0', borderBottom: i < cartItems.length - 1 ? '1px solid var(--noir-08, #f3f3f3)' : 'none' }}>
+                                        {(item.images?.[0] || item.image) && (
+                                            <img src={item.images?.[0] || item.image} alt={item.name} style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />
+                                        )}
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
+                                            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#888', marginTop: 2 }}>Size: {item.size} &nbsp;&middot;&nbsp; Qty: {item.qty}</div>
+                                        </div>
+                                        <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, flexShrink: 0 }}>₹{fmt(item.price * item.qty)}</span>
+                                    </div>
+                                ))}
+                                <div className="co-summary-divider" />
+                                {appliedOffer?.discountAmount > 0 && (
+                                    <div className="co-price-row free">
+                                        <span>Promo ({appliedOffer.code})</span>
+                                        <span style={{ color: '#16a34a', fontWeight: 700 }}>−₹{fmt(appliedOffer.discountAmount)}</span>
+                                    </div>
+                                )}
+                                <div className="co-price-row free"><span>Delivery</span><span>FREE 🎉</span></div>
+                                <div className="co-summary-divider" />
+                                <div className="co-price-total">
+                                    <span>Total</span>
+                                    <span className="co-price-total-num">₹{fmt(finalPrice)}</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <SummaryPanel product={product} form={form} setForm={setForm} fmt={fmt} prefersReduced={prefersReduced} appliedOffer={appliedOffer} />
+                        )}
                     </div>
                 </div>
             </div>
@@ -787,6 +819,7 @@ function Checkout() {
 
 // ── Order summary panel (shared: mobile collapsible + desktop sticky) ─────────
 function SummaryPanel({ product, form, setForm, fmt, prefersReduced, appliedOffer }) {
+    if (!product) return null  // Safety guard — should not reach here in cart mode
     const price = product.price
     const hasDiscount = product.originalPrice && product.originalPrice > product.price
     const promoDiscount = appliedOffer?.discountAmount ?? 0
