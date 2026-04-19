@@ -5,7 +5,7 @@ import ApiError from '../utils/ApiError.js';
 // ─── In-Memory Cache ─────────────────────────────────────────────────────────
 // Caches public product listing for 2 minutes — eliminates repeated DB hits on
 // the busiest endpoint without needing Redis.
-const CACHE_TTL_MS = 2 * 60 * 1000; // 2 minutes
+const CACHE_TTL_MS = 30 * 1000; // 30 seconds — fast visibility toggle propagation
 const cache = new Map(); // key → { data, expiresAt }
 
 function cacheKey(filters) {

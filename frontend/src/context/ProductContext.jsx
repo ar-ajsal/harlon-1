@@ -88,7 +88,7 @@ export function ProductProvider({ children }) {
         try {
             const response = await productsApi.update(id, updates)
             const updatedProduct = response.data || response
-            setProducts(prev => prev.map(p => p._id === id ? updatedProduct : p))
+            setProducts(prev => prev.map(p => p._id === id ? { ...p, ...updatedProduct } : p))
             return updatedProduct
         } catch (err) {
             console.error('Error updating product:', err)
