@@ -188,12 +188,13 @@ function Checkout() {
         setTouched(t => ({ ...t, ...newTouched }))
         setFieldErrors(errors)
 
-        if (!form.size) { toast.error('Please select a size'); return false }
+        // Size only required for single-product mode
+        if (!isCartMode && !form.size) { toast.error('Please select a size'); return false }
 
         const firstErr = Object.values(errors).find(Boolean)
         if (firstErr) { toast.error(firstErr); return false }
         return true
-    }, [form])
+    }, [form, isCartMode])
 
     // ── Promo code handlers ──────────────────────────────────────────────────
     const handleApplyPromo = useCallback(async () => {
@@ -242,8 +243,19 @@ function Checkout() {
             const lastName = rest.join(' ') || firstName
 
             const response = await createOrder({
-                productId,
-                size: form.size,
+                // Single product mode
+                ...((!isCartMode && productId) ? { productId, size: form.size } : {}),
+                // Cart mode — send all items
+                ...(isCartMode ? {
+                    items: cartItems.map(item => ({
+                        productId: item._id || item.productId,
+                        name: item.name,
+                        size: item.size,
+                        qty: item.qty,
+                        price: item.price,
+                        image: item.images?.[0] || item.image || '',
+                    }))
+                } : {}),
                 paymentMethod,
                 promoCode: appliedOffer?.code || undefined,
                 discountAmount: appliedOffer?.discountAmount || 0,
@@ -370,7 +382,12 @@ function Checkout() {
         )
     }
 
-    const price = product.price
+    // Cart mode totals
+    const cartTotal = isCartMode
+        ? cartItems.reduce((sum, item) => sum + item.price * item.qty, 0)
+        : 0
+
+    const price = isCartMode ? cartTotal : (product?.price || 0)
     const discountAmt = appliedOffer?.discountAmount ?? 0
     const finalPrice = Math.max(0, price - discountAmt)
     const submitLabel = loading
@@ -398,11 +415,16 @@ function Checkout() {
 
                 {/* ── Collapsible summary (mobile only) ── */}
                 <div className="co-summary-toggle" onClick={() => setSummaryOpen(o => !o)}>
-                    {product.images?.[0] && (
-                        <img src={product.images[0]} alt={product.name} className="co-summary-toggle-img" />
+                    {isCartMode ? (
+                        <span style={{ fontSize: 22 }}>🛒</span>
+                    ) : (
+                        product?.images?.[0] && (
+                            <img src={product.images[0]} alt={product.name} className="co-summary-toggle-img" />
+                        )
                     )}
                     <span className="co-summary-toggle-label">
                         {summaryOpen ? 'Hide' : 'Show'} order summary
+                        {isCartMode && ` (${cartItems.length} item${cartItems.length !== 1 ? 's' : ''})`}
                         {summaryOpen ? <FiChevronUp /> : <FiChevronDown />}
                     </span>
                     <span className="co-summary-toggle-price">₹{fmt(finalPrice)}</span>
@@ -417,7 +439,28 @@ function Checkout() {
                             transition={{ duration: 0.22 }}
                             style={{ overflow: 'hidden', marginBottom: 12 }}
                         >
-                            <SummaryPanel product={product} form={form} setForm={setForm} fmt={fmt} prefersReduced={prefersReduced} appliedOffer={appliedOffer} />
+                            {isCartMode ? (
+                                <div style={{ padding: '12px 16px', background: 'var(--surface)', borderRadius: 12, border: '1px solid var(--noir-10)' }}>
+                                    {cartItems.map((item, i) => (
+                                        <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '8px 0', borderBottom: i < cartItems.length - 1 ? '1px solid var(--noir-08, #f3f3f3)' : 'none' }}>
+                                            {(item.images?.[0] || item.image) && (
+                                                <img src={item.images?.[0] || item.image} alt={item.name} style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 8 }} />
+                                            )}
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
+                                                <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#888' }}>Size: {item.size} &nbsp;&middot;&nbsp; Qty: {item.qty}</div>
+                                            </div>
+                                            <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14 }}>₹{fmt(item.price * item.qty)}</span>
+                                        </div>
+                                    ))}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12, fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 15 }}>
+                                        <span>Total</span>
+                                        <span>₹{fmt(finalPrice)}</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <SummaryPanel product={product} form={form} setForm={setForm} fmt={fmt} prefersReduced={prefersReduced} appliedOffer={appliedOffer} />
+                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>
