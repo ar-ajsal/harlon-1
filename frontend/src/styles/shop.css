@@ -125,12 +125,11 @@
    3. CONTROLS: SEARCH + CHIPS + COUNT
    ==================================================== */
 .shop-controls {
-    padding-top: 14px;
-    padding-bottom: 10px;
+    padding: 14px 0 0;
     width: 100%;
     box-sizing: border-box;
     background: var(--surface);
-    border-bottom: 1px solid var(--noir-10, #f3f4f6);
+    border-bottom: 1px solid var(--noir-10, #f0f0f0);
 }
 
 /* Search */
@@ -186,60 +185,58 @@
     color: var(--noir-60);
 }
 
-/* Smart chips */
-.shop-chips {
+/* ── Filter chip row — uses pseudo-elements to avoid overflow-padding clipping ── */
+.shop-chips-row {
     display: flex;
-    gap: 8px;
+    align-items: center;
+    gap: 7px;
     overflow-x: auto;
     scrollbar-width: none;
-    padding-bottom: 4px;
-    margin-bottom: 10px;
-    scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    padding-left: 16px;
-    padding-right: 16px;
+    scroll-snap-type: x mandatory;
+    padding: 2px 0 12px;
 }
+.shop-chips-row::-webkit-scrollbar { display: none; }
 
-.shop-chips::-webkit-scrollbar { display: none; }
+/* Invisible spacers prevent first/last chip being visually clipped on scroll */
+.shop-chips-row::before,
+.shop-chips-row::after {
+    content: '';
+    flex-shrink: 0;
+    width: 16px;
+}
 
 .shop-chip {
     flex-shrink: 0;
     font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 9px 18px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 8px 16px;
     border-radius: 99px;
     border: 1.5px solid var(--noir-15, #e5e5e5);
     background: var(--surface);
-    color: var(--noir-60, #777);
+    color: var(--noir-50, #888);
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.16s ease;
-    letter-spacing: 0.01em;
+    transition: all 0.15s ease;
     -webkit-tap-highlight-color: transparent;
     scroll-snap-align: start;
+    line-height: 1;
 }
 
 .shop-chip:hover {
     border-color: hsl(38, 65%, 55%);
-    color: hsl(38, 55%, 40%);
+    color: hsl(38, 40%, 32%);
+    background: hsla(38, 65%, 55%, 0.07);
 }
 
 .shop-chip.active {
     background: #0A0A0A;
     border-color: #0A0A0A;
     color: #fff;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
-}
-
-.shop-chip-divider {
-    display: flex;
-    align-items: center;
-    color: var(--noir-20, #ddd);
-    font-size: 16px;
-    flex-shrink: 0;
-    padding: 0 4px;
-    user-select: none;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.2);
 }
 
 @media (min-width: 768px) {
@@ -248,51 +245,65 @@
         padding-bottom: 0;
     }
     .shop-controls {
-        padding-top: 20px;
-        padding-bottom: 16px;
+        padding-top: 18px;
         position: sticky;
         top: 70px;
         z-index: 90;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        background: rgba(var(--surface-rgb, 255,255,255), 0.92);
     }
     .shop-search-wrap {
         margin-left: 40px;
         margin-right: 40px;
     }
     .shop-result-count {
-        margin-left: 40px;
-        margin-right: 40px;
-    }
-    .shop-chips {
         padding-left: 40px;
         padding-right: 40px;
     }
+    .shop-chips-row::before,
+    .shop-chips-row::after { width: 40px; }
     .shop-feed-wrap { padding: 28px 40px; }
     .shop-hero { padding: 48px 40px 40px; }
 }
 
 @media (min-width: 1024px) {
     .shop-hero { padding: 60px 80px 52px; }
+    .shop-search-wrap { margin-left: 80px; margin-right: 80px; }
+    .shop-result-count { padding-left: 80px; padding-right: 80px; }
+    .shop-chips-row::before,
+    .shop-chips-row::after { width: 80px; }
 }
 .shop-result-count {
     font-family: 'Inter', sans-serif;
     font-size: 12px;
-    color: var(--noir-60, #999);
+    color: var(--noir-50, #999);
     margin: 0;
     display: flex;
     align-items: center;
     gap: 10px;
+    padding: 7px 16px 10px;
+    border-top: 1px solid var(--noir-08, #f3f3f3);
 }
 
 .shop-clear-link {
     background: none;
     border: none;
     font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
     color: hsl(38, 65%, 45%);
     cursor: pointer;
-    text-decoration: underline;
-    padding: 0;
+    text-decoration: none;
+    padding: 3px 10px;
+    border-radius: 99px;
+    border: 1.5px solid hsl(38, 65%, 55%);
+    transition: background 0.14s;
+}
+.shop-clear-link:hover {
+    background: hsla(38, 65%, 55%, 0.1);
 }
 
 /* ====================================================

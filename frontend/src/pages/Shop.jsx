@@ -418,15 +418,14 @@ export default function Shop() {
                     )}
                 </div>
 
-                {/* Smart filter chips + real categories — horizontal scroll */}
-                <div className="shop-chips">
+                {/* Filter chips — horizontal scroll with pseudo-element padding fix */}
+                <div className="shop-chips-row">
                     <button
                         className={`shop-chip${activeChip === 'all' ? ' active' : ''}`}
                         onClick={() => handleChip('all')}
                     >
-                        ⚡ All Drops
+                        ⚡ All
                     </button>
-                    {/* Real DB categories */}
                     {(categories || []).map(cat => (
                         <button
                             key={cat._id || cat.name}
