@@ -336,14 +336,31 @@ function Checkout() {
         )
     }
 
-    // ── Not found ─────────────────────────────────────────────────────────────
-    if (!product) {
+    // ── Not found — only block if NOT cart mode ──────────────────────────────
+    if (!isCartMode && !product) {
         return (
             <div className="co-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ textAlign: 'center', padding: 32 }}>
                     <div style={{ fontSize: 48, marginBottom: 12 }}>🛒</div>
                     <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, marginBottom: 12, fontSize: 24 }}>
                         No product selected
+                    </h2>
+                    <button className="co-submit" style={{ width: 'auto', padding: '14px 32px', display: 'inline-flex' }} onClick={() => navigate('/shop')}>
+                        Go to Shop
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
+    // Cart mode with empty cart — redirect to shop
+    if (isCartMode && cartItems.length === 0) {
+        return (
+            <div className="co-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ textAlign: 'center', padding: 32 }}>
+                    <div style={{ fontSize: 48, marginBottom: 12 }}>🛒</div>
+                    <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, marginBottom: 12, fontSize: 24 }}>
+                        Your cart is empty
                     </h2>
                     <button className="co-submit" style={{ width: 'auto', padding: '14px 32px', display: 'inline-flex' }} onClick={() => navigate('/shop')}>
                         Go to Shop
