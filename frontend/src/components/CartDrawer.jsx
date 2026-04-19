@@ -118,12 +118,19 @@ export default function CartDrawer() {
                                 {/* Primary: Checkout */}
                                 <motion.button
                                     whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                                    onClick={() => { closeCart(); navigate('/cart') }}
+                                    onClick={() => {
+                                        closeCart()
+                                        if (isLoggedIn) {
+                                            navigate('/checkout?cart=true')
+                                        } else {
+                                            navigate('/login?redirect=' + encodeURIComponent('/checkout?cart=true'))
+                                        }
+                                    }}
                                     className="cart-checkout-btn"
                                     style={{ background: 'hsl(38,65%,55%)', color: '#0a0a0a', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%', padding: '14px', borderRadius: 12, fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 15, marginBottom: 8 }}
                                 >
                                     <FiLock size={16} />
-                                    {isLoggedIn ? 'Checkout' : 'Sign In & Checkout'}
+                                    {isLoggedIn ? 'Checkout Securely' : 'Sign In & Checkout'}
                                 </motion.button>
 
                                 {/* Secondary: WhatsApp */}

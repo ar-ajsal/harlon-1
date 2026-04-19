@@ -16,13 +16,15 @@ export default function LoginPage() {
 
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
-    const next = searchParams.get('next') || '/'
+    // Support both ?redirect= (from UserProtectedRoute) and ?next= (legacy)
+    const redirectTo = searchParams.get('redirect') ? decodeURIComponent(searchParams.get('redirect')) : (searchParams.get('next') || '/')
+    const fromCheckout = redirectTo.includes('/checkout')
     const { userLogin, userSignup, isLoggedIn } = useAuth()
     const { onUserLogin } = useCart()
 
     useEffect(() => {
-        if (isLoggedIn) navigate(next, { replace: true })
-    }, [isLoggedIn, navigate, next])
+        if (isLoggedIn) navigate(redirectTo, { replace: true })
+    }, [isLoggedIn, navigate, redirectTo])
 
     const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }))
 
@@ -41,7 +43,7 @@ export default function LoginPage() {
             if (result.success) {
                 toast.success(tab === 'login' ? `Welcome back, ${result.user.name.split(' ')[0]}! 👋` : `Account created! Welcome, ${result.user.name.split(' ')[0]}! 🎉`)
                 onUserLogin(localStorage.getItem('harlon_user_token'))
-                navigate(next, { replace: true })
+                navigate(redirectTo, { replace: true })
             } else {
                 toast.error(result.error)
             }
@@ -87,6 +89,21 @@ export default function LoginPage() {
                 <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#888', fontSize: 13, textDecoration: 'none', marginBottom: 28, fontFamily: 'Inter, sans-serif' }}>
                     <FiArrowLeft size={14} /> Back to shop
                 </Link>
+
+                {/* Checkout banner */}
+                {fromCheckout && (
+                    <div style={{
+                        background: 'rgba(200,150,43,0.12)', border: '1px solid rgba(200,150,43,0.25)',
+                        borderRadius: 12, padding: '12px 16px', marginBottom: 24,
+                        display: 'flex', alignItems: 'center', gap: 10,
+                    }}>
+                        <span style={{ fontSize: 20 }}>🛒</span>
+                        <div>
+                            <div style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13, color: 'hsl(38,80%,65%)' }}>Sign in to complete your order</div>
+                            <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#888', marginTop: 2 }}>Your cart is saved — log in to checkout securely.</div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Logo + title */}
                 <div style={{ textAlign: 'center', marginBottom: 32 }}>

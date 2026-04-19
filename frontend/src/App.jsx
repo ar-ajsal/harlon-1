@@ -9,6 +9,7 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import MobileNav from './components/MobileNav'
 import ProtectedRoute from './components/ProtectedRoute'
+import UserProtectedRoute from './components/UserProtectedRoute'
 import FlashSaleBanner from './components/FlashSaleBanner'
 import CartDrawer from './components/CartDrawer'
 import { CartProvider } from './context/CartContext'
@@ -245,7 +246,9 @@ function App() {
                                     <Suspense fallback={<CustomerFallback />}><ProductDetailPage /></Suspense>
                                 } />
                                 <Route path="/checkout" element={
-                                    <Suspense fallback={<CustomerFallback />}><Checkout /></Suspense>
+                                    <UserProtectedRoute>
+                                        <Suspense fallback={<CustomerFallback />}><Checkout /></Suspense>
+                                    </UserProtectedRoute>
                                 } />
                                 <Route path="/track-order" element={
                                     <Suspense fallback={<CustomerFallback />}><TrackOrder /></Suspense>
