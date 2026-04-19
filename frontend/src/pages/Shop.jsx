@@ -418,24 +418,25 @@ export default function Shop() {
                     )}
                 </div>
 
-                {/* Smart filter chips + real categories — horizontal scroll */}
+                {/* Real categories from admin — only ones with an image */}
                 <div className="shop-chips">
                     <button
                         className={`shop-chip${activeChip === 'all' ? ' active' : ''}`}
                         onClick={() => handleChip('all')}
                     >
-                        ⚡ All Drops
+                        ⚡ All
                     </button>
-                    {/* Real DB categories */}
-                    {(categories || []).map(cat => (
-                        <button
-                            key={cat._id || cat.name}
-                            className={`shop-chip${activeChip === cat.name.toLowerCase() ? ' active' : ''}`}
-                            onClick={() => handleChip(cat.name.toLowerCase())}
-                        >
-                            {cat.name}
-                        </button>
-                    ))}
+                    {(categories || [])
+                        .filter(cat => cat.image && cat.image.trim() !== '')
+                        .map(cat => (
+                            <button
+                                key={cat._id || cat.name}
+                                className={`shop-chip${activeChip === cat.name.toLowerCase() ? ' active' : ''}`}
+                                onClick={() => handleChip(cat.name.toLowerCase())}
+                            >
+                                {cat.name}
+                            </button>
+                        ))}
                 </div>
 
                 {/* Result count */}
