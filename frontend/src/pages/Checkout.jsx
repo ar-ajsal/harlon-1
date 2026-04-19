@@ -5,6 +5,8 @@ import { toast } from 'react-toastify'
 import { FaWhatsapp } from 'react-icons/fa'
 import { FiChevronDown, FiChevronUp, FiTag, FiX } from 'react-icons/fi'
 import { useProducts } from '../context/ProductContext'
+import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import { createOrder } from '../api/guestOrder.api'
 import { WHATSAPP_NUMBER } from '../config/constants'
 import OrderSuccess from '../components/order/OrderSuccess'
@@ -72,24 +74,39 @@ function Checkout() {
     const [searchParams] = useSearchParams()
     const navigate = useNavigate()
     const { products } = useProducts()
+    const { items: cartItems, clearCart } = useCart()
+    const { user } = useAuth()
     const prefersReduced = useReducedMotion()
 
     const productId = searchParams.get('productId')
     const prefilledSize = searchParams.get('size') || ''
+    const isCartMode = searchParams.get('cart') === 'true'
 
     const [product, setProduct] = useState(null)
     const [summaryOpen, setSummaryOpen] = useState(false)
     const [showNotes, setShowNotes] = useState(false)
 
     const [form, setForm] = useState({
-        fullName: '',
+        fullName: user?.name || '',
         country: 'India',
         streetAddress: '', apartment: '',
         city: '', state: 'Delhi', pinCode: '',
-        phone: '', email: '',
+        phone: user?.phone || '', email: user?.email || '',
         orderNotes: '',
         size: prefilledSize,
     })
+
+    // Pre-fill form when user data loads
+    useEffect(() => {
+        if (user) {
+            setForm(f => ({
+                ...f,
+                fullName: f.fullName || user.name || '',
+                email: f.email || user.email || '',
+                phone: f.phone || user.phone || '',
+            }))
+        }
+    }, [user])
 
     const [touched, setTouched] = useState({})
     const [fieldErrors, setFieldErrors] = useState({})
@@ -247,6 +264,7 @@ function Checkout() {
 
             if (paymentMethod === 'whatsapp') {
                 setSuccess({ orderId: response.orderId, trackToken: response.trackToken, isWhatsapp: true })
+                if (isCartMode) clearCart()
                 return
             }
 
@@ -256,6 +274,7 @@ function Checkout() {
             }
 
             await handleRazorpay(response)
+            if (isCartMode) clearCart()
         } catch (err) {
             toast.error(err.message || 'Failed to place order. Please try again.')
         } finally {

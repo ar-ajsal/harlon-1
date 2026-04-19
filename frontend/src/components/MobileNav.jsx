@@ -1,56 +1,81 @@
 import { NavLink } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FiHome, FiShoppingBag, FiHeart, FiPackage } from 'react-icons/fi'
-import { FaWhatsapp } from 'react-icons/fa'
+import { FiHome, FiShoppingBag, FiHeart, FiShoppingCart, FiUser } from 'react-icons/fi'
 import { useWishlist } from '../context/WishlistContext'
-import { WHATSAPP_NUMBER } from '../config/constants'
+import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 
 function MobileNav() {
     const { wishlist } = useWishlist()
+    const { totalItems } = useCart()
+    const { isLoggedIn } = useAuth()
     const wishCount = wishlist.length
-
-    const LINKS = [
-        { to: '/', label: 'Home', icon: FiHome, exact: true },
-        { to: '/shop', label: 'Shop', icon: FiShoppingBag },
-        { to: '/track-order', label: 'Track', icon: FiPackage },
-    ]
 
     return (
         <nav className="mobile-nav" aria-label="Mobile navigation">
-            <ul className="mobile-nav-links" role="list">
-                {LINKS.map(({ to, label, icon: Icon, exact, isEmoji, emojiLabel }) => (
-                    <li key={to}>
-                        <NavLink
-                            to={to}
-                            end={exact}
-                            className={({ isActive }) =>
-                                `mobile-nav-link${isActive ? ' active' : ''}`
-                            }
-                            aria-label={emojiLabel || label}
-                        >
-                            {({ isActive }) => (
-                                <>
-                                    <motion.span
-                                        animate={isActive ? { scale: 1.18 } : { scale: 1 }}
-                                        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                                        style={{ fontSize: isEmoji ? 20 : undefined, lineHeight: 1 }}
-                                    >
-                                        {isEmoji ? label : <Icon size={22} aria-hidden="true" />}
-                                    </motion.span>
-                                    <span>{isEmoji ? emojiLabel : label}</span>
-                                </>
-                            )}
-                        </NavLink>
-                    </li>
-                ))}
+            <ul className="mobile-nav-links" role="list" style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', margin: 0, padding: 0, listStyle: 'none' }}>
 
-                {/* Wishlist — Jersey Wall */}
+                {/* Home */}
+                <li>
+                    <NavLink to="/" end className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`} aria-label="Home">
+                        {({ isActive }) => (
+                            <>
+                                <motion.span animate={isActive ? { scale: 1.18 } : { scale: 1 }} transition={{ type: 'spring', stiffness: 400, damping: 20 }}>
+                                    <FiHome size={22} aria-hidden="true" />
+                                </motion.span>
+                                <span>Home</span>
+                            </>
+                        )}
+                    </NavLink>
+                </li>
+
+                {/* Shop */}
+                <li>
+                    <NavLink to="/shop" className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`} aria-label="Shop">
+                        {({ isActive }) => (
+                            <>
+                                <motion.span animate={isActive ? { scale: 1.18 } : { scale: 1 }} transition={{ type: 'spring', stiffness: 400, damping: 20 }}>
+                                    <FiShoppingBag size={22} aria-hidden="true" />
+                                </motion.span>
+                                <span>Shop</span>
+                            </>
+                        )}
+                    </NavLink>
+                </li>
+
+                {/* Cart — centre, with badge */}
                 <li style={{ position: 'relative' }}>
-                    <NavLink
-                        to="/wishlist"
-                        className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`}
-                        aria-label={`Jersey Wall — ${wishCount} saved`}
-                    >
+                    <NavLink to="/cart" className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`} aria-label={`Cart — ${totalItems} items`}>
+                        {({ isActive }) => (
+                            <>
+                                <motion.span
+                                    style={{ position: 'relative' }}
+                                    animate={isActive ? { scale: 1.15 } : { scale: 1 }}
+                                    transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                                >
+                                    <FiShoppingCart size={22} aria-hidden="true" />
+                                    {totalItems > 0 && (
+                                        <span style={{
+                                            position: 'absolute', top: -7, right: -7,
+                                            background: 'hsl(38,65%,55%)', color: '#0a0a0a',
+                                            fontSize: 9, fontWeight: 900,
+                                            width: 16, height: 16, borderRadius: '50%',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            lineHeight: 1,
+                                        }}>
+                                            {totalItems > 9 ? '9+' : totalItems}
+                                        </span>
+                                    )}
+                                </motion.span>
+                                <span>Cart</span>
+                            </>
+                        )}
+                    </NavLink>
+                </li>
+
+                {/* Wishlist */}
+                <li style={{ position: 'relative' }}>
+                    <NavLink to="/wishlist" className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`} aria-label={`Wishlist — ${wishCount} saved`}>
                         {({ isActive }) => (
                             <>
                                 <motion.span
@@ -78,22 +103,24 @@ function MobileNav() {
                     </NavLink>
                 </li>
 
-                {/* WhatsApp */}
+                {/* Profile / Login */}
                 <li>
-                    <a
-                        href={`https://wa.me/${WHATSAPP_NUMBER}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mobile-nav-link"
-                        aria-label="Order on WhatsApp"
-                        style={{ color: 'var(--whatsapp, #25D366)' }}
+                    <NavLink
+                        to={isLoggedIn ? '/profile' : '/login'}
+                        className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`}
+                        aria-label={isLoggedIn ? 'My Profile' : 'Login'}
                     >
-                        <motion.span whileTap={{ scale: 0.85 }} transition={{ type: 'spring', stiffness: 400 }}>
-                            <FaWhatsapp size={22} aria-hidden="true" />
-                        </motion.span>
-                        <span>Order</span>
-                    </a>
+                        {({ isActive }) => (
+                            <>
+                                <motion.span animate={isActive ? { scale: 1.18 } : { scale: 1 }} transition={{ type: 'spring', stiffness: 400, damping: 20 }}>
+                                    <FiUser size={22} aria-hidden="true" />
+                                </motion.span>
+                                <span>{isLoggedIn ? 'Profile' : 'Login'}</span>
+                            </>
+                        )}
+                    </NavLink>
                 </li>
+
             </ul>
         </nav>
     )

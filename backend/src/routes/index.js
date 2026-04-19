@@ -19,6 +19,7 @@ import predictionRoutes from './prediction.routes.js';
 import fanCollectionRoutes from './fanCollection.routes.js';
 import offerRoutes from './offer.routes.js';
 import settingsRoutes from './settings.routes.js';
+import userRoutes from './user.routes.js';
 
 
 const router = Router();
@@ -45,6 +46,8 @@ router.use('/fan', fanCollectionRoutes);
 router.use('/offers', offerRoutes);
 // ── App Settings (payment/order toggles) ───────────────────────────────────────────
 router.use('/settings', settingsRoutes);
+// ── Customer User Auth + Cart ──────────────────────────────────────────────────
+router.use('/user', userRoutes);
 
 
 export default router;

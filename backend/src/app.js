@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import compression from 'compression';
+import session from 'express-session';
+import passport from 'passport';
 import routes from './routes/index.js';
 import errorHandler from './middleware/errorHandler.js';
 
@@ -40,6 +42,16 @@ app.use(cors(corsOptions));
 // Body parsing with increased limit for image uploads
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Session (required for Passport OAuth flow only; we use JWT for API auth)
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'fallback_session_secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false, httpOnly: true, maxAge: 10 * 60 * 1000 }, // 10 min (just for OAuth redirect)
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Health check endpoint (useful for Render)
 app.get('/health', (req, res) => {

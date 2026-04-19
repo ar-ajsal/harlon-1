@@ -4,6 +4,10 @@ dotenv.config();   // ← must be BEFORE any import that reads process.env
 import connectDB from './src/config/db.js';
 import { configureCloudinary } from './src/config/cloudinary.js';
 import app from './src/app.js';
+import { initPassport } from './src/config/passport.js';
+
+// Init Passport (must be after dotenv.config())
+initPassport();
 
 // Connect to Database
 connectDB();

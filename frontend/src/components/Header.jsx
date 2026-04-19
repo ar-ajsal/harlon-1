@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiMenu, FiX, FiSearch, FiShoppingBag, FiHeart } from 'react-icons/fi'
+import { FiMenu, FiX, FiSearch, FiShoppingBag, FiHeart, FiUser, FiLogOut } from 'react-icons/fi'
 import ThemeToggle from './ThemeToggle'
 import { useTheme } from '../context/ThemeContext'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 
 const NAV_LINKS = [
@@ -17,9 +18,11 @@ function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
     const [scrolled, setScrolled] = useState(false)
+    const [userMenuOpen, setUserMenuOpen] = useState(false)
     const navigate = useNavigate()
     const { theme, toggleTheme } = useTheme()
     const { totalItems, openCart } = useCart()
+    const { user, isLoggedIn, userLogout } = useAuth()
 
     /* Glassmorphism kicks in after 20px scroll */
     useEffect(() => {
@@ -161,6 +164,73 @@ function Header() {
                             </span>
                         )}
                     </button>
+
+                    {/* User button */}
+                    {isLoggedIn ? (
+                        <div style={{ position: 'relative' }}>
+                            <button
+                                onClick={() => setUserMenuOpen(o => !o)}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, padding: '6px 8px', borderRadius: 8, color: 'inherit' }}
+                                aria-label="User menu"
+                            >
+                                {user?.avatar
+                                    ? <img src={user.avatar} alt={user.name} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', border: '2px solid hsl(38,65%,55%)' }} />
+                                    : <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'hsl(38,65%,55%)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#0a0a0a' }}>{user?.name?.[0]?.toUpperCase()}</div>
+                                }
+                            </button>
+                            <AnimatePresence>
+                                {userMenuOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                                        transition={{ duration: 0.15 }}
+                                        style={{
+                                            position: 'absolute', right: 0, top: '110%', minWidth: 180,
+                                            background: 'var(--color-surface, #0a0a0a)',
+                                            border: '1px solid rgba(200,150,43,0.2)', borderRadius: 12,
+                                            padding: '8px', boxShadow: '0 12px 32px rgba(0,0,0,0.4)',
+                                            zIndex: 1000,
+                                        }}
+                                    >
+                                        <div style={{ padding: '8px 12px 12px', borderBottom: '1px solid rgba(128,128,128,0.1)', marginBottom: 6 }}>
+                                            <p style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 14, margin: 0, color: 'var(--color-text, #f5f0e8)' }}>{user?.name}</p>
+                                            <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, color: '#888', margin: '2px 0 0' }}>{user?.email}</p>
+                                        </div>
+                                        {[
+                                            { to: '/profile', label: '👤 My Profile' },
+                                            { to: '/profile', label: '📦 My Orders', state: { tab: 'orders' } },
+                                            { to: '/cart', label: '🛒 My Cart' },
+                                        ].map(({ to, label }) => (
+                                            <Link key={label} to={to} onClick={() => setUserMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', padding: '9px 12px', color: 'var(--color-text, #f5f0e8)', textDecoration: 'none', fontFamily: 'Inter, sans-serif', fontSize: 13, borderRadius: 8, transition: 'background 0.15s' }}>
+                                                {label}
+                                            </Link>
+                                        ))}
+                                        <div style={{ borderTop: '1px solid rgba(128,128,128,0.1)', marginTop: 6, paddingTop: 6 }}>
+                                            <button
+                                                onClick={() => { userLogout(); setUserMenuOpen(false) }}
+                                                style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', background: 'none', border: 'none', cursor: 'pointer', color: '#e74c3c', fontFamily: 'Inter, sans-serif', fontSize: 13, borderRadius: 8 }}
+                                            >
+                                                <FiLogOut size={14} /> Sign out
+                                            </button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    ) : (
+                        <Link
+                            to="/login"
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px',
+                                background: 'hsl(38,65%,55%)', color: '#0a0a0a', borderRadius: 8,
+                                fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 13,
+                                textDecoration: 'none', marginLeft: 4,
+                            }}
+                        >
+                            <FiUser size={14} /> Login
+                        </Link>
+                    )}
 
                     <ThemeToggle />
                 </nav>

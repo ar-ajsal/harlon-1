@@ -12,6 +12,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import FlashSaleBanner from './components/FlashSaleBanner'
 import CartDrawer from './components/CartDrawer'
 import { CartProvider } from './context/CartContext'
+import { AuthProvider } from './context/AuthContext'
 
 // ── Customer pages — lazy (route-split) ─────────────────────────────────────
 const Home = lazy(() => import('./pages/Home'))
@@ -21,6 +22,10 @@ const Checkout = lazy(() => import('./pages/Checkout'))
 const TrackOrder = lazy(() => import('./pages/TrackOrder'))
 const WishlistPage = lazy(() => import('./pages/WishlistPage'))
 const MysteryBox = lazy(() => import('./pages/MysteryBox'))
+const LoginPage = lazy(() => import('./pages/LoginPage'))
+const CartPage = lazy(() => import('./pages/CartPage'))
+const AuthCallback = lazy(() => import('./pages/AuthCallback'))
+const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 
 // ── Admin pages — lazy, separate chunk group ─────────────────────────────────
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'))
@@ -91,6 +96,7 @@ function App() {
     }
 
     return (
+        <AuthProvider>
         <CartProvider>
         <div className="app">
             {showLoader && <HarlonLoader onDone={handleLoaderDone} />}
@@ -253,6 +259,18 @@ function App() {
                                 <Route path="/mystery-box" element={
                                     <Suspense fallback={<CustomerFallback />}><MysteryBox /></Suspense>
                                 } />
+                                <Route path="/login" element={
+                                    <Suspense fallback={<CustomerFallback />}><LoginPage /></Suspense>
+                                } />
+                                <Route path="/cart" element={
+                                    <Suspense fallback={<CustomerFallback />}><CartPage /></Suspense>
+                                } />
+                                <Route path="/auth/callback" element={
+                                    <Suspense fallback={<CustomerFallback />}><AuthCallback /></Suspense>
+                                } />
+                                <Route path="/profile" element={
+                                    <Suspense fallback={<CustomerFallback />}><ProfilePage /></Suspense>
+                                } />
                             </Routes>
                         </main>
                         <Footer />
@@ -274,6 +292,7 @@ function App() {
             />
         </div>
         </CartProvider>
+        </AuthProvider>
     )
 }
 

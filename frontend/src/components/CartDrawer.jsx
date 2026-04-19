@@ -1,8 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { FiX, FiShoppingBag, FiMinus, FiPlus, FiTrash2, FiArrowRight } from 'react-icons/fi'
+import { FiX, FiShoppingBag, FiMinus, FiPlus, FiTrash2, FiArrowRight, FiLock } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 import '../styles/cart-drawer.css'
 
@@ -17,8 +18,9 @@ function buildWhatsAppMsg(items, total) {
 
 export default function CartDrawer() {
     const { items, isOpen, closeCart, removeItem, updateQty, totalItems, totalPrice } = useCart()
+    const { isLoggedIn } = useAuth()
+    const navigate = useNavigate()
 
-    const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${buildWhatsAppMsg(items, totalPrice)}`
 
     return (
         <AnimatePresence>
@@ -112,14 +114,26 @@ export default function CartDrawer() {
                                     <span className="cart-total-label">Total</span>
                                     <span className="cart-total-price">{fmt(totalPrice)}</span>
                                 </div>
+
+                                {/* Primary: Checkout */}
+                                <motion.button
+                                    whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                                    onClick={() => { closeCart(); navigate('/cart') }}
+                                    className="cart-checkout-btn"
+                                    style={{ background: 'hsl(38,65%,55%)', color: '#0a0a0a', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, width: '100%', padding: '14px', borderRadius: 12, fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 15, marginBottom: 8 }}
+                                >
+                                    <FiLock size={16} />
+                                    {isLoggedIn ? 'Checkout' : 'Sign In & Checkout'}
+                                </motion.button>
+
+                                {/* Secondary: WhatsApp */}
                                 <a
-                                    href={waUrl}
+                                    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${buildWhatsAppMsg(items, totalPrice)}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="cart-checkout-btn"
+                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px', borderRadius: 10, background: 'rgba(37,211,102,0.1)', color: '#25D366', textDecoration: 'none', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13 }}
                                 >
-                                    <FaWhatsapp size={20} />
-                                    Order via WhatsApp
+                                    <FaWhatsapp size={16} /> Order via WhatsApp
                                 </a>
                                 <p className="cart-secure-note">Stock reserved for 10 mins after you message us.</p>
                             </div>
