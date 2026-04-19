@@ -1,7 +1,7 @@
 import { useRef, useCallback } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { FaWhatsapp } from 'react-icons/fa'
-import { FiShoppingBag, FiZap } from 'react-icons/fi'
+import { FiShoppingBag, FiZap, FiShoppingCart } from 'react-icons/fi'
 
 const TRUST_ITEMS = [
     { icon: '🔒', label: 'Secure Payment' },
@@ -15,6 +15,7 @@ function ProductSummary({
     selectedSize,
     onSizeSelect,
     onBuy,
+    onAddToCart,
     onWhatsApp,
     soldOut = false,
     deliveryEstimate = '',
@@ -137,6 +138,29 @@ function ProductSummary({
                             >
                                 <FiShoppingBag style={{ fontSize: 18 }} />
                                 {soldOut ? 'Sold Out' : `Buy Now — ₹${fmt(currentPrice)}`}
+                            </motion.button>
+                        )}
+
+                        {/* ── Add to Cart ── */}
+                        {!soldOut && onAddToCart && (
+                            <motion.button
+                                type="button"
+                                onClick={onAddToCart}
+                                whileHover={hover}
+                                whileTap={tap}
+                                style={{
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                                    width: '100%', padding: '14px 20px', borderRadius: 12, cursor: 'pointer',
+                                    background: 'transparent',
+                                    border: '2px solid hsl(38,65%,55%)',
+                                    color: 'hsl(38,65%,55%)',
+                                    fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 15,
+                                    marginBottom: 0, transition: 'background 0.18s',
+                                }}
+                                aria-label="Add to cart"
+                            >
+                                <FiShoppingCart size={18} />
+                                Add to Cart
                             </motion.button>
                         )}
 

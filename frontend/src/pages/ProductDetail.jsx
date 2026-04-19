@@ -2,9 +2,10 @@ import { useState, useEffect, useMemo, useRef, useCallback, lazy, Suspense } fro
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { FaArrowLeft, FaTags, FaShoppingBag, FaCog, FaMapMarkerAlt, FaEnvelope } from 'react-icons/fa'
-import { FiHeart } from 'react-icons/fi'
+import { FiHeart, FiShoppingCart } from 'react-icons/fi'
 import { useProducts } from '../context/ProductContext'
 import { useWishlist } from '../context/WishlistContext'
+import { useCart } from '../context/CartContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 import { couponsApi, couponSalesApi } from '../api/coupons.api'
 import { settingsApi } from '../api/settings.api'
@@ -103,6 +104,7 @@ function ProductDetail() {
     const wishlisted = product ? isWishlisted(product._id) : false
     const [showTryOn, setShowTryOn] = useState(false)
     const [collectionSaved, setCollectionSaved] = useState(false)
+    const { addItem, openCart } = useCart()
 
     const [orderSettings, setOrderSettings] = useState({ whatsappOrderEnabled: true, onlinePaymentEnabled: true })
     const [settingsLoaded, setSettingsLoaded] = useState(false)
@@ -234,6 +236,13 @@ function ProductDetail() {
         navigate(`/checkout?productId=${product._id}&size=${selectedSize}&method=razorpay`)
     }, [product, selectedSize, navigate])
 
+    // ── Add to Cart ───────────────────────────────────────────────────────────
+    const handleAddToCart = useCallback(() => {
+        if (!selectedSize) { toast.error('Please select a size first'); return }
+        addItem(product, selectedSize)
+        toast.success(`🛒 ${product.name} (${selectedSize}) added to cart!`, { autoClose: 2000 })
+    }, [product, selectedSize, addItem])
+
     // ─── Loading ─────────────────────────────────────────────────────────────
     if (loading) {
         return (
@@ -312,6 +321,7 @@ function ProductDetail() {
                                 selectedSize={selectedSize}
                                 onSizeSelect={setSelectedSize}
                                 onBuy={handleBuy}
+                                onAddToCart={handleAddToCart}
                                 onWhatsApp={handleWhatsAppOrder}
                                 soldOut={product.soldOut}
                                 deliveryEstimate={`Estimated by ${dates.rangeLabel}`}
@@ -678,16 +688,35 @@ function ProductDetail() {
                             <span className="pd-sticky-name">{product.name}</span>
                             <span className="pd-sticky-price">₹{fmt(currentPrice)}</span>
                         </div>
-                        {orderSettings?.onlinePaymentEnabled !== false && (
-                            <button
-                                type="button"
-                                className="pd-sticky-buy"
-                                onClick={handleBuy}
-                                disabled={product.soldOut}
-                            >
-                                {product.soldOut ? 'Sold Out' : 'Buy Now'}
-                            </button>
-                        )}
+                        <div style={{ display: 'flex', gap: 8 }}>
+                            {!product.soldOut && (
+                                <button
+                                    type="button"
+                                    onClick={handleAddToCart}
+                                    style={{
+                                        padding: '10px 14px', borderRadius: 10,
+                                        background: 'transparent', border: '2px solid hsl(38,65%,55%)',
+                                        color: 'hsl(38,65%,55%)', cursor: 'pointer',
+                                        display: 'flex', alignItems: 'center', gap: 6,
+                                        fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 13,
+                                        whiteSpace: 'nowrap',
+                                    }}
+                                >
+                                    <FiShoppingCart size={15} /> Cart
+                                </button>
+                            )}
+                            {orderSettings?.onlinePaymentEnabled !== false && (
+                                <button
+                                    type="button"
+                                    className="pd-sticky-buy"
+                                    onClick={handleBuy}
+                                    disabled={product.soldOut}
+                                    style={{ flex: 1 }}
+                                >
+                                    {product.soldOut ? 'Sold Out' : 'Buy Now'}
+                                </button>
+                            )}
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
