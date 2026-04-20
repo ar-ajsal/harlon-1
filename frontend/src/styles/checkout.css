@@ -98,8 +98,13 @@
 .co-card {
     background: var(--surface);
     border-radius: 16px;
-    padding: 24px;
+    padding: 16px;        /* tight on mobile */
     border: 1px solid #EBEBEB;
+}
+
+/* Summary right-col: hidden on mobile (use toggle instead), shown on desktop */
+.co-summary-card-wrap {
+    display: none;
 }
 
 .co-card-title {
@@ -114,9 +119,15 @@
 /* ─── Payment method cards ─────────────────────────────────── */
 .co-pay-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;  /* stack on tiny phones */
     gap: 10px;
     margin-bottom: 20px;
+}
+
+@media (min-width: 400px) {
+    .co-pay-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
 .co-pay-card {
@@ -273,7 +284,7 @@
     color: hsl(38, 55%, 42%);
 }
 
-/* Input base */
+/* Input base — font-size 16px prevents iOS Safari auto-zoom on focus */
 .co-input,
 .co-select,
 .co-textarea {
@@ -283,7 +294,7 @@
     border-radius: 12px;
     background: var(--surface);
     font-family: 'Inter', sans-serif;
-    font-size: 15px;
+    font-size: 16px;   /* 16px = no iOS zoom */
     color: var(--ink);
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -775,16 +786,22 @@
         padding: 32px 48px 80px;
     }
 
+    .co-card {
+        padding: 28px;   /* more breathing room on desktop */
+    }
+
     .co-grid {
         grid-template-columns: 1fr 360px;
         gap: 24px;
     }
 
+    /* Show full summary on desktop, hide toggle */
     .co-summary-toggle {
         display: none;
     }
 
     .co-summary-card-wrap {
+        display: block;  /* visible on desktop */
         position: sticky;
         top: 90px;
     }
@@ -793,6 +810,10 @@
     .co-row {
         grid-template-columns: 1fr 1fr;
         gap: 10px;
+    }
+
+    .co-pay-grid {
+        grid-template-columns: 1fr 1fr;
     }
 }
 
