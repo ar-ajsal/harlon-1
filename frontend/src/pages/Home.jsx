@@ -225,23 +225,23 @@ function HeroSection({ products, reduced }) {
     )
 }
 
-/* ─── Trust Marquee ────────────────────────────────────────── */
-const TRUST_ITEMS = [
-    '🏆 India\'s No.1 Retro Jersey Store',
-    '⚡ 10,000+ Fans Suited Up',
-    '🔒 100% Authentic Fabrics',
-    '🚀 Ships Pan India',
-    '💬 WhatsApp Support',
-    '✅ Zero Fake Prints',
-]
-
-function TrustMarquee() {
+/* ─── DripDrip-style Trust Icons Bar ──────────────────────── */
+function TrustBar() {
     return (
-        <div className="cvt-marquee-bar">
-            <div className="cvt-marquee-track">
-                {[...TRUST_ITEMS, ...TRUST_ITEMS].map((t, i) => (
-                    <span key={i} className="cvt-marquee-item">{t}</span>
-                ))}
+        <div className="cvt-trust-bar">
+            <div className="cvt-trust-item">
+                <svg className="cvt-trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
+                <span className="cvt-trust-label">PROTECT<br/>YOUR ORDER</span>
+            </div>
+            <div className="cvt-trust-divider" />
+            <div className="cvt-trust-item">
+                <svg className="cvt-trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                <span className="cvt-trust-label">EASY EXCHANGE<br/>&amp; RETURN</span>
+            </div>
+            <div className="cvt-trust-divider" />
+            <div className="cvt-trust-item">
+                <svg className="cvt-trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75"/></svg>
+                <span className="cvt-trust-label">10,000+<br/>FANS SUITED UP</span>
             </div>
         </div>
     )
@@ -531,7 +531,7 @@ export default function Home() {
     return (
         <main className="home">
             <HeroSlider fallback={<HeroSection products={products} reduced={reduced} />} />
-            <TrustMarquee />
+            <TrustBar />
             <CategoryCardsSection categories={categories} products={products} reduced={reduced} />
             <LimitedDropSection products={products} loading={loading} reduced={reduced} />
             <SocialProof products={products} />
