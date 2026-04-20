@@ -1,10 +1,9 @@
-import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiShoppingBag, FiMinus, FiPlus, FiTrash2, FiArrowRight, FiLock } from 'react-icons/fi'
+import { FiMinus, FiPlus, FiTrash2, FiArrowRight, FiLock } from 'react-icons/fi'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
-import AuthModal from '../components/AuthModal'
+import '../styles/cart.css'
 
 const fmt = n => `₹${Number(n).toLocaleString('en-IN')}`
 
@@ -12,12 +11,11 @@ export default function CartPage() {
     const { items, removeItem, updateQty, totalItems, totalPrice, clearCart } = useCart()
     const { isLoggedIn } = useAuth()
     const navigate = useNavigate()
-    const [showAuth, setShowAuth] = useState(false)
 
     const handleCheckout = () => {
         if (items.length === 0) return
         if (!isLoggedIn) {
-            setShowAuth(true)
+            navigate('/login?redirect=' + encodeURIComponent('/checkout?cart=true'))
             return
         }
         navigate('/checkout?cart=true')
@@ -26,148 +24,118 @@ export default function CartPage() {
     const isEmpty = items.length === 0
 
     return (
-        <div style={{ minHeight: '80vh', maxWidth: 700, margin: '0 auto', padding: '40px 20px' }}>
-            <h1 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 32, marginBottom: 8, color: 'var(--color-text, #0a0a0a)' }}>
-                Your Cart
-            </h1>
-            <p style={{ color: 'var(--color-text-muted, #888)', fontFamily: 'Inter, sans-serif', marginBottom: 32, fontSize: 14 }}>
-                {totalItems > 0 ? `${totalItems} item${totalItems !== 1 ? 's' : ''} in your cart` : 'Your cart is empty'}
-            </p>
+        <div className="cart-page">
+            <div className="cart-page-header">
+                <h1 className="cart-page-title">Your Cart</h1>
+                <p className="cart-page-subtitle">
+                    {totalItems > 0
+                        ? `${totalItems} item${totalItems !== 1 ? 's' : ''} ready for checkout`
+                        : 'Your cart is empty'}
+                </p>
+            </div>
 
-            {isEmpty ? (
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                    style={{ textAlign: 'center', padding: '60px 20px' }}
-                >
-                    <div style={{ fontSize: 64, marginBottom: 16 }}>🛒</div>
-                    <h2 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 22, marginBottom: 8 }}>Nothing here yet</h2>
-                    <p style={{ color: '#999', fontFamily: 'Inter, sans-serif', marginBottom: 24 }}>Browse our drops and add jerseys to your cart</p>
-                    <Link to="/shop" style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 8,
-                        background: 'hsl(38,65%,55%)', color: '#0a0a0a', padding: '12px 28px',
-                        borderRadius: 10, fontFamily: 'Inter, sans-serif', fontWeight: 700, textDecoration: 'none', fontSize: 14,
-                    }}>
-                        Shop the Drop <FiArrowRight />
-                    </Link>
-                </motion.div>
-            ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 24 }}>
-                    {/* Items */}
-                    <div>
-                        <AnimatePresence>
-                            {items.map(item => (
-                                <motion.div
-                                    key={item.key}
-                                    layout
-                                    initial={{ opacity: 0, y: 12 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    transition={{ duration: 0.2 }}
-                                    style={{
-                                        display: 'flex', gap: 16, padding: '16px 0',
-                                        borderBottom: '1px solid rgba(128,128,128,0.12)',
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    {/* Image */}
-                                    {item.image ? (
-                                        <img src={item.image} alt={item.name} style={{
-                                            width: 80, height: 80, objectFit: 'cover', borderRadius: 10, flexShrink: 0,
-                                        }} />
-                                    ) : (
-                                        <div style={{ width: 80, height: 80, background: 'rgba(200,150,43,0.1)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, flexShrink: 0 }}>👕</div>
-                                    )}
+            <div className="cart-page-grid">
+                {isEmpty ? (
+                    <div className="cart-empty-state">
+                        <div className="cart-empty-icon">🛒</div>
+                        <h2 className="cart-empty-title">Nothing here yet</h2>
+                        <p className="cart-empty-sub">Browse our drops and add jerseys to your cart</p>
+                        <Link to="/shop" className="cart-shop-link">
+                            Shop the Drop <FiArrowRight />
+                        </Link>
+                    </div>
+                ) : (
+                    <>
+                        {/* ── Items list ── */}
+                        <div>
+                            <AnimatePresence>
+                                {items.map(item => (
+                                    <motion.div
+                                        key={item.key}
+                                        layout
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, x: -20 }}
+                                        transition={{ duration: 0.18 }}
+                                        className="cart-item-row"
+                                    >
+                                        {/* Image */}
+                                        {item.image
+                                            ? <img src={item.image} alt={item.name} className="cart-item-img" />
+                                            : <div className="cart-item-img-placeholder">👕</div>
+                                        }
 
-                                    {/* Info */}
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                        <p style={{ fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 15, margin: '0 0 4px', color: 'var(--color-text, #0a0a0a)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                            {item.name}
-                                        </p>
-                                        <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#888', margin: '0 0 10px' }}>Size: {item.size}</p>
+                                        {/* Info */}
+                                        <div className="cart-item-info">
+                                            <p className="cart-item-name">{item.name}</p>
+                                            <p className="cart-item-meta">Size: {item.size}</p>
+                                            {/* Qty controls */}
+                                            <div className="cart-item-controls">
+                                                <button className="cart-qty-btn" onClick={() => updateQty(item.key, item.qty - 1)}>
+                                                    <FiMinus size={11} />
+                                                </button>
+                                                <span className="cart-qty-num">{item.qty}</span>
+                                                <button className="cart-qty-btn" onClick={() => updateQty(item.key, item.qty + 1)}>
+                                                    <FiPlus size={11} />
+                                                </button>
+                                            </div>
+                                        </div>
 
-                                        {/* Qty controls */}
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                            <button onClick={() => updateQty(item.key, item.qty - 1)} style={qtyBtnStyle}>
-                                                <FiMinus size={11} />
-                                            </button>
-                                            <span style={{ width: 28, textAlign: 'center', fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14 }}>{item.qty}</span>
-                                            <button onClick={() => updateQty(item.key, item.qty + 1)} style={qtyBtnStyle}>
-                                                <FiPlus size={11} />
+                                        {/* Price + remove */}
+                                        <div className="cart-item-right">
+                                            <p className="cart-item-price">{fmt(item.price * item.qty)}</p>
+                                            <button className="cart-remove-btn" onClick={() => removeItem(item.key)} aria-label="Remove item">
+                                                <FiTrash2 size={14} />
                                             </button>
                                         </div>
-                                    </div>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
 
-                                    {/* Price + remove */}
-                                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                                        <p style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 16, margin: '0 0 8px', color: 'hsl(38,65%,55%)' }}>
-                                            {fmt(item.price * item.qty)}
-                                        </p>
-                                        <button onClick={() => removeItem(item.key)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#999', padding: 4, display: 'flex' }}>
-                                            <FiTrash2 size={14} />
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </AnimatePresence>
-
-                        <button onClick={clearCart} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', color: '#999', fontFamily: 'Inter, sans-serif', fontSize: 12, padding: 0 }}>
-                            Clear cart
-                        </button>
-                    </div>
-
-                    {/* Summary */}
-                    <div style={{
-                        background: 'rgba(200,150,43,0.06)', border: '1px solid rgba(200,150,43,0.15)',
-                        borderRadius: 16, padding: '24px',
-                    }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#888' }}>
-                            <span>Subtotal ({totalItems} items)</span>
-                            <span>{fmt(totalPrice)}</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16, fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#4ade80' }}>
-                            <span>Delivery</span>
-                            <span>FREE 🎉</span>
-                        </div>
-                        <div style={{ borderTop: '1px solid rgba(200,150,43,0.2)', paddingTop: 16, display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
-                            <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 18 }}>Total</span>
-                            <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 22, color: 'hsl(38,65%,55%)' }}>{fmt(totalPrice)}</span>
+                            <button className="cart-clear-btn" onClick={clearCart}>
+                                Clear cart
+                            </button>
                         </div>
 
-                        <motion.button
-                            whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                            onClick={handleCheckout}
-                            style={{
-                                width: '100%', padding: '15px', borderRadius: 12, border: 'none',
-                                background: 'hsl(38,65%,55%)', color: '#0a0a0a',
-                                fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: 16,
-                                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                            }}
-                        >
-                            <FiLock size={16} />
-                            {isLoggedIn ? 'Proceed to Checkout' : 'Sign In & Checkout'}
-                        </motion.button>
+                        {/* ── Order summary ── */}
+                        <div className="cart-summary-card">
+                            <p className="cart-summary-title">Order Summary</p>
 
-                        {!isLoggedIn && (
-                            <p style={{ textAlign: 'center', marginTop: 10, color: '#888', fontFamily: 'Inter, sans-serif', fontSize: 12 }}>
-                                You'll be asked to login before checkout
-                            </p>
-                        )}
-                    </div>
-                </div>
-            )}
+                            <div className="cart-summary-row">
+                                <span>Subtotal ({totalItems} item{totalItems !== 1 ? 's' : ''})</span>
+                                <span>{fmt(totalPrice)}</span>
+                            </div>
+                            <div className="cart-summary-row">
+                                <span>Delivery</span>
+                                <span className="cart-summary-free">FREE 🎉</span>
+                            </div>
 
-            {showAuth && (
-                <AuthModal
-                    onClose={() => setShowAuth(false)}
-                    onSuccess={() => { setShowAuth(false); navigate('/checkout?cart=true') }}
-                />
-            )}
+                            <hr className="cart-summary-divider" />
+
+                            <div className="cart-summary-total">
+                                <span className="cart-summary-total-label">Total</span>
+                                <span className="cart-summary-total-price">{fmt(totalPrice)}</span>
+                            </div>
+
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.97 }}
+                                onClick={handleCheckout}
+                                className="cart-checkout-btn-main"
+                            >
+                                <FiLock size={15} />
+                                {isLoggedIn ? 'Proceed to Checkout' : 'Sign In & Checkout'}
+                            </motion.button>
+
+                            {!isLoggedIn && (
+                                <p className="cart-login-note">
+                                    You'll be asked to sign in before checkout
+                                </p>
+                            )}
+                        </div>
+                    </>
+                )}
+            </div>
         </div>
     )
-}
-
-const qtyBtnStyle = {
-    width: 28, height: 28, borderRadius: 6, border: '1px solid rgba(128,128,128,0.2)',
-    background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-    color: 'inherit',
 }
