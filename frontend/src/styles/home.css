@@ -331,7 +331,7 @@
 .cvt-moments-track.cvt-auto-slider {
     display: inline-flex;
     padding: 8px 0 20px;
-    animation: cvt-marquee-slow 50s linear infinite;
+    animation: cvt-marquee-slow 80s linear infinite;
     will-change: transform;
 }
 
