@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xml:lang="en" xmlns="http://www.w3.org/2005/Atom" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:s="http://jadedpixel.com/-/spec/shopify">
+  <id>https://dripdrip.in/collections/all.atom</id>
+  <link rel="alternate" type="text/html" href="https://dripdrip.in/collections/all"/>
+  <link rel="self" type="application/atom+xml" href="https://dripdrip.in/collections/polo.atom"/>
+  <title>DRIP STUDIOS</title>
+  <updated>2026-02-15T20:08:00+05:30</updated>
+  <author>
+    <name>DRIP STUDIOS</name>
+  </author>
+  <entry>
+    <id>https://dripdrip.in/products/8791085580442</id>
+    <published>2026-02-15T20:08:00+05:30</published>
+    <updated>2026-02-15T20:08:00+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://dripdrip.in/products/navy-polo-copy"/>
+    <title>NAVY POLO</title>
+    <s:type>T-Shirt</s:type>
+    <s:vendor>DRIPDRIP</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0717/2584/2586/files/DSC00172copy_11zon.jpg?v=1771440257"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>DRIPDRIP<br>
+        <strong>Type: </strong>T-Shirt<br>
+        <strong>Price: </strong>
+            1499.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p>220 GSM. Super Premium Matte Lycra Fabric. Refined Polo Construction. Combed &amp; Bio-washed. Gender-Neutral. Tailored Regular Fit.</p>
+<p>This super-premium 220 GSM polo T-shirt from Drip Studios is designed for those who appreciate quiet luxury in everyday essentials. Crafted from a refined matte lycra blend, the fabric offers a smooth, elevated finish with natural stretch for comfort and structure. The tailored regular fit delivers a sharp, composed silhouette, while the classic polo collar adds a touch of timeless sophistication.</p>
+<p>Combed and bio-washed for exceptional softness and durability, this polo balances breathability, polish, and long-lasting performance. Built to transition seamlessly from relaxed settings to elevated occasions, it stands as a modern wardrobe staple defined by restraint, precision, and premium craftsmanship.</p>
+<h4>Care Guide</h4>
+<p>Wash inside out with similar colors using cold water to preserve the fabric’s finish and depth. Avoid harsh detergents. Tumble dry on low heat or air dry to maintain shape and elasticity. Store folded in a cool, dry space to retain its premium quality.</p>
+<h4>Core Features</h4>
+<p>220 GSM super-premium matte lycra fabric for a smooth, luxurious finish. Refined polo collar for timeless versatility. Tailored regular fit for a composed, elevated silhouette. Combed cotton blend ensures breathability and all-day comfort. Bio-washed treatment enhances softness, durability, and fabric longevity.</p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:tag>Unisex</s:tag>
+    <s:variant>
+      <id>https://dripdrip.in/products/8791085580442</id>
+      <title>S</title>
+      <s:price currency="INR">1499.00</s:price>
+      <s:sku>blind-drip</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8791085580442</id>
+      <title>M</title>
+      <s:price currency="INR">1499.00</s:price>
+      <s:sku>blind-drip</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8791085580442</id>
+      <title>L</title>
+      <s:price currency="INR">1499.00</s:price>
+      <s:sku>blind-drip</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8791085580442</id>
+      <title>XL</title>
+      <s:price currency="INR">1499.00</s:price>
+      <s:sku>blind-drip</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://dripdrip.in/products/8763241070746</id>
+    <published>2026-02-01T11:29:44+05:30</published>
+    <updated>2026-02-01T11:29:44+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://dripdrip.in/products/black-polo"/>
+    <title>BLACK POLO</title>
+    <s:type>T-Shirt</s:type>
+    <s:vendor>DRIPDRIP</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0717/2584/2586/files/DSC00068copy_11zon.jpg?v=1771440229"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>DRIPDRIP<br>
+        <strong>Type: </strong>T-Shirt<br>
+        <strong>Price: </strong>
+            1499.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p>220 GSM. Super Premium Matte Lycra Fabric. Refined Polo Construction. Combed &amp; Bio-washed. Gender-Neutral. Tailored Regular Fit.</p>
+<p>This super-premium 220 GSM polo T-shirt from Drip Studios is designed for those who appreciate quiet luxury in everyday essentials. Crafted from a refined matte lycra blend, the fabric offers a smooth, elevated finish with natural stretch for comfort and structure. The tailored regular fit delivers a sharp, composed silhouette, while the classic polo collar adds a touch of timeless sophistication.</p>
+<p>Combed and bio-washed for exceptional softness and durability, this polo balances breathability, polish, and long-lasting performance. Built to transition seamlessly from relaxed settings to elevated occasions, it stands as a modern wardrobe staple defined by restraint, precision, and premium craftsmanship.</p>
+<h4>Care Guide</h4>
+<p>Wash inside out with similar colors using cold water to preserve the fabric’s finish and depth. Avoid harsh detergents. Tumble dry on low heat or air dry to maintain shape and elasticity. Store folded in a cool, dry space to retain its premium quality.</p>
+<h4>Core Features</h4>
+<p>220 GSM super-premium matte lycra fabric for a smooth, luxurious finish. Refined polo collar for timeless versatility. Tailored regular fit for a composed, elevated silhouette. Combed cotton blend ensures breathability and all-day comfort. Bio-washed treatment enhances softness, durability, and fabric longevity.</p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:tag>Unisex</s:tag>
+    <s:variant>
+      <id>https://dripdrip.in/products/8763241070746</id>
+      <title>S</title>
+      <s:price currency="INR">1499.00</s:price>
+      <s:sku>blind-drip</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8763241070746</id>
+      <title>M</title>
+      <s:price currency="INR">1499.00</s:price>
+      <s:sku>blind-drip</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8763241070746</id>
+      <title>L</title>
+      <s:price currency="INR">1499.00</s:price>
+      <s:sku>blind-drip</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8763241070746</id>
+      <title>XL</title>
+      <s:price currency="INR">1499.00</s:price>
+      <s:sku>blind-drip</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+  </entry>
+</feed>

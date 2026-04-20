@@ -1,0 +1,1082 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xml:lang="en" xmlns="http://www.w3.org/2005/Atom" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:s="http://jadedpixel.com/-/spec/shopify">
+  <id>https://dripdrip.in/collections/all.atom</id>
+  <link rel="alternate" type="text/html" href="https://dripdrip.in/collections/all"/>
+  <link rel="self" type="application/atom+xml" href="https://dripdrip.in/collections/dripcult-certified-heat.atom"/>
+  <title>DRIP STUDIOS</title>
+  <updated>2026-03-28T14:01:28+05:30</updated>
+  <author>
+    <name>DRIP STUDIOS</name>
+  </author>
+  <entry>
+    <id>https://dripdrip.in/products/8873828876442</id>
+    <published>2026-03-28T14:01:28+05:30</published>
+    <updated>2026-03-28T14:01:28+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://dripdrip.in/products/young-rich-mighty-ii"/>
+    <title>YOUNG RICH MIGHTY II</title>
+    <s:type>oversized-tees</s:type>
+    <s:vendor>DRIP STUDIOS</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0717/2584/2586/files/DSC00325_copy.webp?v=1774686690"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>DRIP STUDIOS<br>
+        <strong>Type: </strong>oversized-tees<br>
+        <strong>Price: </strong>
+            2199.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p>260 GSM. Premium Heavyweight Fabric. High-Detail Puff Print Front &amp; Back. Gender-Neutral. Relaxed Fit. Combed &amp; Bio-washed. Exclusive YRM Limited Edition.</p>
+<p>This 260 GSM premium T-shirt from the exclusive YRM limited-edition collection is designed to make a bold, unmistakable statement. Crafted from heavyweight fabric, it offers a structured yet breathable feel that delivers all-day comfort with a strong streetwear presence. The front and back feature intricately detailed <strong>“YOUNG RICH MIGHTY”</strong> artwork executed in high-definition puff print, creating a striking raised texture that adds depth, dimension, and a premium visual impact. Designed for those who stand out effortlessly, this piece blends luxury aesthetics with everyday wearability. Combed and bio-washed for superior softness and long-lasting durability, it maintains its shape and finish over time while elevating your wardrobe with a powerful identity.</p>
+<h4>Care Guide</h4>
+<p>Machine wash inside out with similar colors using cold water. Avoid bleach. Tumble dry on low heat or air dry to preserve fabric quality and puff print detailing. Do not iron directly on the prints. Store in a cool, dry place.</p>
+<h4>Core Features</h4>
+<p>260 GSM premium heavyweight fabric for a structured, high-end feel. Relaxed, gender-neutral fit designed for statement streetwear. High-detail “YOUNG RICH MIGHTY” puff print on both front and back for elevated texture and depth. Exclusive YRM limited-edition release for a distinctive look. Combed and bio-washed fabric for enhanced softness, durability, and long-term shape retention.</p>
+</td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:tag>all-products</s:tag>
+    <s:tag>catalog_1</s:tag>
+    <s:tag>dripcult</s:tag>
+    <s:tag>fear-no-one</s:tag>
+    <s:tag>featured</s:tag>
+    <s:tag>frequently_bought_together</s:tag>
+    <s:tag>on-sale</s:tag>
+    <s:tag>oversized-tees</s:tag>
+    <s:tag>shirt</s:tag>
+    <s:tag>steal-the-drip</s:tag>
+    <s:tag>tshirt</s:tag>
+    <s:tag>vest</s:tag>
+    <s:variant>
+      <id>https://dripdrip.in/products/8873828876442</id>
+      <title>S</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8873828876442</id>
+      <title>M</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8873828876442</id>
+      <title>L</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8873828876442</id>
+      <title>XL</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8873828876442</id>
+      <title>XXL</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8873828876442</id>
+      <title>XS</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://dripdrip.in/products/8817199120538</id>
+    <published>2026-02-28T20:30:40+05:30</published>
+    <updated>2026-02-28T20:30:40+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://dripdrip.in/products/young-rich-mighty"/>
+    <title>YOUNG RICH MIGHTY</title>
+    <s:type>oversized-tees</s:type>
+    <s:vendor>DRIP STUDIOS</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0717/2584/2586/files/DSC00346copy_1__11zon.jpg?v=1772289837"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>DRIP STUDIOS<br>
+        <strong>Type: </strong>oversized-tees<br>
+        <strong>Price: </strong>
+            2199.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p>260 GSM. 100% French Terry Cotton. Gender-Neutral. Relaxed Fit. Combed &amp; Bio-washed. Premium Puff &amp; Screen Print. Exclusive Limited Edition.</p>
+<p>This 260 GSM French terry cotton T-shirt is crafted to combine premium comfort with bold, statement-driven design. Built from heavyweight French terry cotton, the fabric delivers a smooth, structured feel while remaining breathable and durable for all-day wear. Designed as an exclusive limited-edition release, the front features the striking <strong>“YOUNG RICH MIGHTY”</strong> artwork executed in a combination of premium puff and screen printing for layered texture and depth. The back carries the signature <strong>09</strong> brand number in the same high-quality print finish, creating a cohesive, standout identity from every angle. Combed and bio-washed for long-lasting softness and shape retention, this tee is made for those who move with confidence and presence.</p>
+<h4>Care Guide</h4>
+<p>Machine wash the T-shirt inside out with similar colors using cold water. Avoid bleach. Tumble dry on low heat or air dry to maintain print texture and fabric quality. Do not iron directly on the prints. Store in a cool, dry place.</p>
+<h4>Core Features</h4>
+<p>260 GSM French terry cotton for a premium heavyweight structure. Relaxed, gender-neutral fit designed for everyday statement wear. Front “YOUNG RICH MIGHTY” artwork in premium puff and screen print combination. Back brand number 09 executed in matching high-quality print finish. Exclusive limited-edition design for elevated street presence. Combed and bio-washed fabric for enhanced softness, durability, and long-term shape retention.</p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:tag>all-products</s:tag>
+    <s:tag>catalog_1</s:tag>
+    <s:tag>dripcult</s:tag>
+    <s:tag>fear-no-one</s:tag>
+    <s:tag>featured</s:tag>
+    <s:tag>frequently_bought_together</s:tag>
+    <s:tag>on-sale</s:tag>
+    <s:tag>oversized-tees</s:tag>
+    <s:tag>shirt</s:tag>
+    <s:tag>steal-the-drip</s:tag>
+    <s:tag>tshirt</s:tag>
+    <s:tag>vest</s:tag>
+    <s:variant>
+      <id>https://dripdrip.in/products/8817199120538</id>
+      <title>S</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8817199120538</id>
+      <title>M</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8817199120538</id>
+      <title>L</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8817199120538</id>
+      <title>XL</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8817199120538</id>
+      <title>XXL</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8817199120538</id>
+      <title>XS</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://dripdrip.in/products/8769503559834</id>
+    <published>2026-02-05T17:32:32+05:30</published>
+    <updated>2026-02-05T17:32:32+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://dripdrip.in/products/tempting"/>
+    <title>TEMPTING</title>
+    <s:type>oversized-tees</s:type>
+    <s:vendor>DRIP STUDIOS</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0717/2584/2586/files/DSC00604copy_11zon.jpg?v=1771440622"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>DRIP STUDIOS<br>
+        <strong>Type: </strong>oversized-tees<br>
+        <strong>Price: </strong>
+            1749.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p>260 GSM. 100% French Terry Cotton. Dual-Tone Colors. Gender-Neutral. Relaxed Fit. Combed &amp; Bio-washed. Puff Print. Made for Club &amp; House Parties.</p>
+<p>This 260 GSM French terry cotton T-shirt is designed to blend soft aesthetics with bold, nightlife-ready detailing. Available in two refined shades—Baby Pink and Off-White—it delivers a clean yet statement-driven look. Crafted from premium French terry cotton, the fabric offers a smooth, substantial feel with breathable comfort and durability. Made specially for club and house parties, the front features a minimal printed logo for a refined finish, while the back stands out with a bold puff print reading <strong>“AGAIN TEMPTED”</strong> alongside the signature <strong>9</strong>, adding depth, texture, and standout appeal under lights. Combed and bio-washed for lasting softness, this tee is built for elevated after-dark wear.</p>
+<h4>Care Guide</h4>
+<p>Machine wash the T-shirt inside out with similar colors using cold water. Avoid bleach. Tumble dry on low heat or air dry to preserve the puff print texture. Do not iron directly on the print. Store in a cool, dry place.</p>
+<h4>Core Features</h4>
+<p>260 GSM French terry cotton for a premium, heavyweight feel. Baby Pink and Off-White colorways crafted for night-out styling. Relaxed, gender-neutral fit ideal for club and house parties. Front logo print with bold “AGAIN TEMPTED” and 9 puff print on the back. High-quality puff printing for a textured, high-impact finish. Combed and bio-washed fabric for superior softness, durability, and shape retention.</p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:tag>all-products</s:tag>
+    <s:tag>catalog_1</s:tag>
+    <s:tag>dripcult</s:tag>
+    <s:tag>fear-no-one</s:tag>
+    <s:tag>featured</s:tag>
+    <s:tag>frequently_bought_together</s:tag>
+    <s:tag>on-sale</s:tag>
+    <s:tag>oversized-tees</s:tag>
+    <s:tag>shirt</s:tag>
+    <s:tag>steal-the-drip</s:tag>
+    <s:tag>tshirt</s:tag>
+    <s:tag>vest</s:tag>
+    <s:variant>
+      <id>https://dripdrip.in/products/8769503559834</id>
+      <title>S</title>
+      <s:price currency="INR">1749.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8769503559834</id>
+      <title>M</title>
+      <s:price currency="INR">1749.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8769503559834</id>
+      <title>L</title>
+      <s:price currency="INR">1749.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8769503559834</id>
+      <title>XS</title>
+      <s:price currency="INR">1749.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8769503559834</id>
+      <title>XL</title>
+      <s:price currency="INR">1749.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8769503559834</id>
+      <title>XXL</title>
+      <s:price currency="INR">1749.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://dripdrip.in/products/8769498775706</id>
+    <published>2026-02-05T16:41:23+05:30</published>
+    <updated>2026-02-05T16:41:23+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://dripdrip.in/products/resilient"/>
+    <title>RESILIENCE</title>
+    <s:type>dripcult</s:type>
+    <s:vendor>DRIP STUDIOS</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0717/2584/2586/files/DSC00511copy_11zon.jpg?v=1771440397"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>DRIP STUDIOS<br>
+        <strong>Type: </strong>dripcult<br>
+        <strong>Price: </strong>
+            1699.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p>260 GSM. 100% French Terry Cotton. Gender-Neutral. Boxy-Fit. Combed &amp; Bio-washed. Piping Work &amp; Embroidery.</p>
+<p>This 260 GSM boxy-fit T-shirt is designed for a strong, confident everyday statement with premium comfort at its core. Crafted from 100% French terry cotton, it offers a soft yet substantial feel with excellent breathability and durability. The design is elevated with refined piping work across the shoulders and front, adding depth and structure to the silhouette. Premium embroidery detailing on both the front and back enhances the overall craftsmanship, delivering a clean yet bold aesthetic. Finished with combed and bio-washed fabric, this tee ensures lasting softness, shape retention, and all-day wearability.</p>
+<p><span>Products in lighter shades (such as white or off-white) are </span><strong data-start="60" data-end="99">not eligible for return or exchange</strong><span> due to the high risk of stains, discoloration, or signs of use during handling or trial. Customers are advised to review product details carefully before placing an order for these colors.</span></p>
+<h4>Care Guide</h4>
+<p>Machine wash the T-shirt inside out with similar colors. Use cold water to preserve fabric quality and embroidery detailing. Tumble dry on low heat or air dry to avoid shrinkage. Do not iron directly on embroidery. Store in a cool, dry place.</p>
+<h4>Core Features</h4>
+<p>260 GSM French terry cotton for a premium, heavyweight feel. Boxy fit for a relaxed and modern silhouette. Piping work across shoulders and front for elevated detailing. Front and back embroidery for a refined, high-quality finish. Gender-neutral design suitable for diverse body types. Combed and bio-washed fabric for superior softness, durability, and long-lasting comfort.</p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:tag>all-products</s:tag>
+    <s:tag>blind-drop</s:tag>
+    <s:tag>catalog_1</s:tag>
+    <s:tag>dripcult</s:tag>
+    <s:tag>fast-delivery</s:tag>
+    <s:tag>featured</s:tag>
+    <s:tag>frequently_bought_together</s:tag>
+    <s:tag>on-sale</s:tag>
+    <s:tag>oversized-tees</s:tag>
+    <s:tag>shirt</s:tag>
+    <s:tag>special-category</s:tag>
+    <s:tag>steal-the-drip</s:tag>
+    <s:tag>tshirt</s:tag>
+    <s:tag>vest</s:tag>
+    <s:variant>
+      <id>https://dripdrip.in/products/8769498775706</id>
+      <title>M</title>
+      <s:price currency="INR">1699.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8769498775706</id>
+      <title>L</title>
+      <s:price currency="INR">1699.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8769498775706</id>
+      <title>XL</title>
+      <s:price currency="INR">1699.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8769498775706</id>
+      <title>XXL</title>
+      <s:price currency="INR">1699.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8769498775706</id>
+      <title>XS</title>
+      <s:price currency="INR">1699.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8769498775706</id>
+      <title>S</title>
+      <s:price currency="INR">1699.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://dripdrip.in/products/8703367938202</id>
+    <published>2025-12-14T20:53:13+05:30</published>
+    <updated>2025-12-14T20:53:13+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://dripdrip.in/products/ocean-phase"/>
+    <title>OCEAN PHASE</title>
+    <s:type>bottoms</s:type>
+    <s:vendor>DRIP STUDIOS</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0717/2584/2586/files/4181CC80-5506-4012-9AF8-9C03EC705494.png?v=1771567730"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>DRIP STUDIOS<br>
+        <strong>Type: </strong>bottoms<br>
+        <strong>Price: </strong>
+            2199.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p> MODEL HEIGHT 5'10 AND WAIST SIZE 32 WEARING M BOTTOMS.<br><br> 420 GSM COTTON FLEECE<br> COMBED &amp; BIO-WASHED FINISH<br> NAVY BLUE WITH HIGH-DENSITY PRINT ON FRONT &amp; EMBROIDERY NEAR ANKLE ZIP<br> BAGGY FIT<br> BELT LOOP FOR KEYS OR LIGHTER<br> UNISEX ARTICLE [REFER TO SIZE CHART FOR ACCURATE MEASUREMENTS]. </p> <ul> <li>Crafted from 420 GSM premium cotton fleece for a perfect balance of softness, structure, and durability.</li> <li>Bold DRIP STUDIOS high-density graphic print on the front adds statement-driven style.</li> <li>Embroidery detail near the ankle zipper enhances premium craftsmanship.</li> <li>Small ankle zipper allows adjustable styling and effortless fit over sneakers.</li> <li>Functional belt loop provides utility for holding keys, a lighter, or small essentials.</li> <li>Straight baggy silhouette designed for relaxed comfort and versatile streetwear styling.</li> <li>Heavyweight fabric ensures warmth, durability, and elevated street-lux appeal.</li> </ul> <h4>Care Guide</h4> <ul> <li>Machine wash the sweatpants inside out with like colors.</li> <li>Use cold water to preserve fabric quality and print integrity.</li> <li>Tumble dry on low heat or air dry to prevent shrinkage.</li> <li>Store in a cool, dry place to maintain shape and finish.</li> </ul> <h4>Core Features</h4> <ul> <li>Sweatpants constructed with 420 GSM fabric for a durable and substantial feel.</li> <li>Straight baggy fit for comfortable, versatile wear.</li> <li>Unisex article suitable for a wide range of body types and style preferences.</li> <li>Back pocket for convenient storage.</li> <li>Elasticated waist for a custom fit and added style.</li> <li>Soft, breathable jersey backing ensures all-day comfort and airflow.</li> </ul></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:tag>bottoms</s:tag>
+    <s:tag>fast-delivery</s:tag>
+    <s:tag>pants</s:tag>
+    <s:tag>special-category</s:tag>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703367938202</id>
+      <title>S</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>Reign4(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703367938202</id>
+      <title>M</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>Reign4(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703367938202</id>
+      <title>L</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>Reign4(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703367938202</id>
+      <title>XS</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>Reign4(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703367938202</id>
+      <title>XL</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>Reign4(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703367938202</id>
+      <title>XXL</title>
+      <s:price currency="INR">2199.00</s:price>
+      <s:sku>Reign4(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://dripdrip.in/products/8703367708826</id>
+    <published>2025-12-14T20:52:44+05:30</published>
+    <updated>2025-12-14T20:52:44+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://dripdrip.in/products/stand-alone-jersey"/>
+    <title>STAND ALONE JERSEY</title>
+    <s:type>oversized-tees</s:type>
+    <s:vendor>DRIP STUDIOS</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0717/2584/2586/files/DSC00177copy_11zon.jpg?v=1771440486"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>DRIP STUDIOS<br>
+        <strong>Type: </strong>oversized-tees<br>
+        <strong>Price: </strong>
+            1699.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+<p>260 GSM
+100% French Terry Cotton
+Boxy Fit
+V - Neck
+3-D High Density Print Front/Back
+White Fabric Piping on arms and V neck
+Gender- Neutral.
+Combed and Bio-washed.</p>
+<p>Oversized Boxy Fit V-Neck Jersey T-Shirt – "Fear No One / Against All Odds"
+
+Step into bold confidence with our oversized boxy fit V-neck jersey T-shirt, crafted from premium cotton for all-day comfort and effortless streetwear appeal. This relaxed silhouette features a front high-density print that reads "FEAR NO ONE", delivering a strong statement with a clean, elevated texture. On the back, the power continues with a matching high-density "AGAINST ALL ODDS" graphic—because your style should speak just as loud as your mindset.
+
+100% 260 GSM cotton for breathable comfort
+
+Oversized, boxy fit with dropped shoulders for a modern streetwear look
+
+V-neckline for a relaxed yet refined edge
+
+High-density front and back prints for a bold, textured finish
+
+Statement graphics: "FEAR NO ONE" (front) / "AGAINST ALL ODDS" (back)
+
+Wear it with confidence. Stand for something.</p>
+<h4>Care Guide</h4><p>Machine wash the t-shirt inside out with like colors.
+Use cold water to preserve the fabric’s quality.
+Tumble dry on low heat or air dry to prevent shrinkage and maintain the fabric’s integrity.
+Store the t-shirt in a cool, dry place to prevent moisture or mold buildup.
+</p>
+<h4>Core Features</h4><p>T-shirts with 260 GSM (Grams per Square Meter) for a durable and substantial feel.
+Oversized fit for comfortable and versatile wear by both men and women.
+Unisex article suitable for a wide range of body types and style preferences.
+Soft, breathable jersey fabric ensures comfort and airflow.</p>
+</td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:tag>all-products</s:tag>
+    <s:tag>catalog_1</s:tag>
+    <s:tag>dripcult</s:tag>
+    <s:tag>fast-delivery</s:tag>
+    <s:tag>fear-no-one</s:tag>
+    <s:tag>featured</s:tag>
+    <s:tag>new-arrival</s:tag>
+    <s:tag>on-sale</s:tag>
+    <s:tag>oversized-tees</s:tag>
+    <s:tag>shirt</s:tag>
+    <s:tag>special-category</s:tag>
+    <s:tag>steal-the-drip</s:tag>
+    <s:tag>tshirt</s:tag>
+    <s:tag>vest</s:tag>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703367708826</id>
+      <title>L</title>
+      <s:price currency="INR">1699.00</s:price>
+      <s:sku>oversizedtees-1(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703367708826</id>
+      <title>XL</title>
+      <s:price currency="INR">1699.00</s:price>
+      <s:sku>oversizedtees-1(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703367708826</id>
+      <title>XXL</title>
+      <s:price currency="INR">1699.00</s:price>
+      <s:sku>oversizedtees-1(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703367708826</id>
+      <title>S</title>
+      <s:price currency="INR">1699.00</s:price>
+      <s:sku>oversizedtees-1(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703367708826</id>
+      <title>XS</title>
+      <s:price currency="INR">1699.00</s:price>
+      <s:sku>oversizedtees-1(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703367708826</id>
+      <title>M</title>
+      <s:price currency="INR">1699.00</s:price>
+      <s:sku>oversizedtees-1(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://dripdrip.in/products/8703290441882</id>
+    <published>2025-12-14T19:51:47+05:30</published>
+    <updated>2025-12-14T19:51:47+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://dripdrip.in/products/ash-mode"/>
+    <title>ASH MODE</title>
+    <s:type>bottoms</s:type>
+    <s:vendor>DRIP STUDIOS</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0717/2584/2586/files/CD5A6A12-A2F8-4604-97DA-D739E0F4F500.png?v=1771567697"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>DRIP STUDIOS<br>
+        <strong>Type: </strong>bottoms<br>
+        <strong>Price: </strong>
+            2099.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p> MODEL HEIGHT 5'10 AND WAIST SIZE 32 WEARING M BOTTOMS.<br><br> 420 GSM COTTON FLEECE<br> COMBED &amp; BIO-WASHED FINISH<br> MELANGE GREY WITH EMBROIDERY DETAIL<br> BAGGY FIT<br> BELT LOOP FOR KEYS OR LIGHTER<br> UNISEX ARTICLE [REFER TO SIZE CHART FOR ACCURATE MEASUREMENTS]. </p> <ul> <li>Constructed from 420 GSM premium cotton fleece for superior structure, warmth, and durability.</li> <li>Melange grey color with signature Drip Studios embroidery detailing for subtle luxury.</li> <li>Sleek ankle zip allows adjustable styling and adds a refined touch.</li> <li>Discreet belt loop enhances practicality — ideal for holding keys, a lighter, or small essentials.</li> <li>Straight baggy silhouette designed for relaxed comfort and versatile streetwear styling.</li> <li>Heavyweight fabric ensures premium feel without compromising flexibility or movement.</li> <li>Perfect blend of elevated minimalism and streetwear utility for everyday wear.</li> </ul> <h4>Care Guide</h4> <ul> <li>Machine wash the sweatpants inside out with like colors.</li> <li>Use cold water to preserve fabric quality and embroidery integrity.</li> <li>Tumble dry on low heat or air dry to prevent shrinkage.</li> <li>Store in a cool, dry place to maintain shape and finish.</li> </ul> <h4>Core Features</h4> <ul> <li>Sweatpants constructed with 420 GSM fabric for a substantial, durable feel.</li> <li>Straight baggy fit for comfortable, versatile wear.</li> <li>Unisex article suitable for a wide range of body types and style preferences.</li> <li>Back pocket for convenient storage.</li> <li>Elasticated waist for a custom fit and added style.</li> <li>Soft, breathable jersey backing ensures all-day comfort and airflow.</li> </ul></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:tag>bottoms</s:tag>
+    <s:tag>fast-delivery</s:tag>
+    <s:tag>pants</s:tag>
+    <s:tag>special-category</s:tag>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703290441882</id>
+      <title>S</title>
+      <s:price currency="INR">2099.00</s:price>
+      <s:sku>Reign4(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703290441882</id>
+      <title>M</title>
+      <s:price currency="INR">2099.00</s:price>
+      <s:sku>Reign4(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703290441882</id>
+      <title>L</title>
+      <s:price currency="INR">2099.00</s:price>
+      <s:sku>Reign4(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703290441882</id>
+      <title>XS</title>
+      <s:price currency="INR">2099.00</s:price>
+      <s:sku>Reign4(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703290441882</id>
+      <title>XL</title>
+      <s:price currency="INR">2099.00</s:price>
+      <s:sku>Reign4(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703290441882</id>
+      <title>XXL</title>
+      <s:price currency="INR">2099.00</s:price>
+      <s:sku>Reign4(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://dripdrip.in/products/8703290212506</id>
+    <published>2025-12-14T19:51:17+05:30</published>
+    <updated>2025-12-14T19:51:17+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://dripdrip.in/products/holy-flex"/>
+    <title>HOLY FLEX</title>
+    <s:type>reign</s:type>
+    <s:vendor>DRIP STUDIOS</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0717/2584/2586/files/DSC00348copy_11zon_1.jpg?v=1771440511"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>DRIP STUDIOS<br>
+        <strong>Type: </strong>reign<br>
+        <strong>Price: </strong>
+            1869.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p>MALE MODEL HEIGHT 5'10 AND WAIST SIZE 32 WEARING M TEE.</p>
+<ul>
+<li>280 GSM premium French terry fabric for a substantial and durable feel.</li>
+<li>Oversized fit with full raglan sleeves for relaxed comfort and easy movement.</li>
+<li>Classic black and white color blocking with a crisp white body and deep black sleeves.</li>
+<li>Low-density front print featuring subtle script “Drip Studios” branding.</li>
+<li>Vertical “Drip Studios” screen print on sleeves for a bold yet minimal look.</li>
+<li>Impactful Christ face graphic on the back with low-density print for a softer, artistic texture.</li>
+<li>Piping work over the armhole area enhances structure and detailing.</li>
+<li>Combed and bio-washed finish for smooth texture and long-lasting quality.</li>
+</ul>
+<p>Care Guide</p>
+<ul>
+<li>Machine wash the tee inside out with like colors.</li>
+<li>Use cold water to preserve fabric quality and print finish.</li>
+<li>Tumble dry on low heat or air dry to avoid shrinkage.</li>
+<li>Store in a cool, dry place to prevent moisture or fabric damage.</li>
+</ul>
+<p>Core Features</p>
+<ul>
+<li>Tee with 280 GSM (Grams per Square Meter) for a premium, substantial feel.</li>
+<li>Oversized fit suitable for both men and women.</li>
+<li>Unisex article designed for versatile styling.</li>
+<li>Soft, breathable fabric ensures all-day comfort.</li>
+</ul></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:tag>fast-delivery</s:tag>
+    <s:tag>on-sale</s:tag>
+    <s:tag>oversized-tees</s:tag>
+    <s:tag>reign</s:tag>
+    <s:tag>shirt</s:tag>
+    <s:tag>special-category</s:tag>
+    <s:tag>tshirt</s:tag>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703290212506</id>
+      <title>S</title>
+      <s:price currency="INR">1869.00</s:price>
+      <s:sku>Reign1</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703290212506</id>
+      <title>M</title>
+      <s:price currency="INR">1869.00</s:price>
+      <s:sku>Reign1</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703290212506</id>
+      <title>L</title>
+      <s:price currency="INR">1869.00</s:price>
+      <s:sku>Reign1</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703290212506</id>
+      <title>XS</title>
+      <s:price currency="INR">1869.00</s:price>
+      <s:sku>Reign1</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703290212506</id>
+      <title>XL</title>
+      <s:price currency="INR">1869.00</s:price>
+      <s:sku>Reign1</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8703290212506</id>
+      <title>XXL</title>
+      <s:price currency="INR">1869.00</s:price>
+      <s:sku>Reign1</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://dripdrip.in/products/8702143266970</id>
+    <published>2025-12-13T13:39:42+05:30</published>
+    <updated>2025-12-13T13:39:42+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://dripdrip.in/products/code-9-flagged"/>
+    <title>CODE-9 FLAGGED</title>
+    <s:type>oversized-tees</s:type>
+    <s:vendor>DRIP STUDIOS</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0717/2584/2586/files/DSC00076copy_11zon.jpg?v=1771440450"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>DRIP STUDIOS<br>
+        <strong>Type: </strong>oversized-tees<br>
+        <strong>Price: </strong>
+            1649.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p>260 GSM. Premium Fabric with Raglan Sleeves. Front &amp; Back Print. 100% French Terry Cotton. Gender-Neutral. Boxy Fit. Combed &amp; Bio-washed.</p>
+<p>This premium 260 GSM T-shirt from Drip Studios is designed for those who like their style bold and unapologetic. Featuring classic raglan sleeves, it delivers enhanced comfort, mobility, and a distinct athletic-inspired silhouette. The front showcases the Drip Studios brand print with a clean, confident presence, while the back makes a powerful statement with the phrase “Are You Flagged and Certified Lover.” Crafted from high-quality French terry cotton, this tee offers durability, breathability, and all-day comfort. CODE 9 is made for individuals who wear their mindset as confidently as their style.</p>
+<h4>Care Guide</h4>
+<p>Machine wash the t-shirt inside out with similar colors. Use cold water to maintain fabric quality and print longevity. Tumble dry on low heat or air dry to avoid shrinkage. Store in a cool, dry place to preserve the fabric and prints.</p>
+<h4>Core Features</h4>
+<p>260 GSM fabric for a structured, premium feel. Raglan sleeves for improved comfort and a relaxed yet refined fit. Boxy, oversized silhouette suitable for both men and women. Unisex design crafted to complement diverse body types. Soft, breathable French terry cotton ensures lasting comfort and durability.</p></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:tag>all-products</s:tag>
+    <s:tag>catalog_1</s:tag>
+    <s:tag>dripcult</s:tag>
+    <s:tag>fear-no-one</s:tag>
+    <s:tag>featured</s:tag>
+    <s:tag>frequently_bought_together</s:tag>
+    <s:tag>on-sale</s:tag>
+    <s:tag>oversized-tees</s:tag>
+    <s:tag>shirt</s:tag>
+    <s:tag>steal-the-drip</s:tag>
+    <s:tag>tshirt</s:tag>
+    <s:tag>vest</s:tag>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143266970</id>
+      <title>S</title>
+      <s:price currency="INR">1649.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143266970</id>
+      <title>M</title>
+      <s:price currency="INR">1649.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143266970</id>
+      <title>L</title>
+      <s:price currency="INR">1649.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143266970</id>
+      <title>XL</title>
+      <s:price currency="INR">1649.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143266970</id>
+      <title>XXL</title>
+      <s:price currency="INR">1649.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://dripdrip.in/products/8702143234202</id>
+    <published>2025-12-13T13:39:40+05:30</published>
+    <updated>2025-12-13T13:39:40+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://dripdrip.in/products/certified-lover-ltd-ed"/>
+    <title>CERTIFIED LOVER</title>
+    <s:type>dripcult</s:type>
+    <s:vendor>DRIP STUDIOS</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0717/2584/2586/files/DSC00022copy_11zon.jpg?v=1771440426"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>DRIP STUDIOS<br>
+        <strong>Type: </strong>dripcult<br>
+        <strong>Price: </strong>
+            1649.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+<p>260 GSM.
+100% French Terry Cotton.
+Gender- Neutral.
+Boxy-Fit.
+Combed &amp; Bio-washed.
+Embroidery work front/back.</p>
+<p>This 260 GSM black oversized T-shirt is crafted to offer a bold, streetwear-inspired aesthetic with premium details. Designed with a white cloth lining running from top to bottom, as well as from the front neck to the shoulder area, it brings a fresh touch to your look. The front features an embroidered logo, adding a touch of sophistication and an elevated vibe to the piece. On the back, the embroidered “Certified Lover” (that too in embroidery) print adds an extra layer of exclusivity. Perfect for those who appreciate luxury and street style, this T-shirt combines comfort, durability, and high-end craftsmanship.
+</p>
+<h4>Care Guide</h4><p>Machine wash the t-shirt inside out with like colors.
+Use cold water to preserve the fabric’s quality.
+Tumble dry on low heat or air dry to prevent shrinkage and maintain the fabric’s integrity.
+Store the t-shirt in a cool, dry place to prevent moisture or mold buildup.
+</p>
+<h4>Core Features</h4><p>T-shirts with 260 GSM (Grams per Square Meter) for a durable and substantial feel.
+Oversized fit for comfortable and versatile wear by both men and women.
+Unisex article suitable for a wide range of body types and style preferences.
+Soft, breathable jersey fabric ensures comfort and airflow.</p>
+</td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:tag>all-products</s:tag>
+    <s:tag>blind-drop</s:tag>
+    <s:tag>catalog_1</s:tag>
+    <s:tag>dripcult</s:tag>
+    <s:tag>fast-delivery</s:tag>
+    <s:tag>featured</s:tag>
+    <s:tag>frequently_bought_together</s:tag>
+    <s:tag>on-sale</s:tag>
+    <s:tag>oversized-tees</s:tag>
+    <s:tag>shirt</s:tag>
+    <s:tag>special-category</s:tag>
+    <s:tag>steal-the-drip</s:tag>
+    <s:tag>tshirt</s:tag>
+    <s:tag>vest</s:tag>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143234202</id>
+      <title>M</title>
+      <s:price currency="INR">1649.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143234202</id>
+      <title>L</title>
+      <s:price currency="INR">1649.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143234202</id>
+      <title>XL</title>
+      <s:price currency="INR">1649.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143234202</id>
+      <title>XXL</title>
+      <s:price currency="INR">1649.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143234202</id>
+      <title>XS</title>
+      <s:price currency="INR">1649.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143234202</id>
+      <title>S</title>
+      <s:price currency="INR">1649.00</s:price>
+      <s:sku>oversizedtees-1</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://dripdrip.in/products/8702143135898</id>
+    <published>2025-12-13T13:39:24+05:30</published>
+    <updated>2025-12-13T13:39:24+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://dripdrip.in/products/midnight-drip"/>
+    <title>MIDNIGHT DRIP</title>
+    <s:type>T-Shirt</s:type>
+    <s:vendor>DRIPDRIP</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0717/2584/2586/files/AEFD019A-E6CF-4B7A-9207-4B466ABCC608.png?v=1769957835"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>DRIPDRIP<br>
+        <strong>Type: </strong>T-Shirt<br>
+        <strong>Price: </strong>
+            2399.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2"><p> 420 GSM<br> PREMIUM 100% COTTON FLEECE<br> HIGH-DENSITY “DRIP STUDIOS PROPERTY” FRONT PRINT<br> TWO-WAY YKK ZIPPER CLOSURE<br> BROAD STRUCTURED HOOD WITH KANGAROO POCKETS<br> UNISEX ARTICLE [REFER TO SIZE CHART FOR ACCURATE MEASUREMENTS]. </p> <ul> <li>Ultra-heavy 420 GSM cotton fleece delivers exceptional weight, warmth, and durability.</li> <li>Two-way YKK zipper offers enhanced versatility, functionality, and long-lasting performance.</li> <li>High-density “DRIP STUDIOS PROPERTY” print adds a bold yet refined visual statement.</li> <li>Broad, structured hood creates an elevated and confident silhouette.</li> <li>Functional kangaroo pockets provide everyday utility and warmth.</li> <li>Premium construction focused on comfort, structure, and longevity.</li> <li>Soft hand feel with breathable jersey backing for all-day wear.</li> <li>Designed as a statement essential that blends craftsmanship with attitude.</li> </ul> <h4>Care Guide</h4> <ul> <li>Machine wash the hoodie inside out with like colors.</li> <li>Use cold water to preserve fabric quality and print integrity.</li> <li>Tumble dry on low heat or air dry to prevent shrinkage.</li> <li>Store in a cool, dry place to maintain shape and finish.</li> </ul> <h4>Core Features</h4> <ul> <li>Hoodie constructed with 420 GSM fabric for a durable and substantial feel.</li> <li>Baggy fit for relaxed, comfortable, and versatile wear.</li> <li>Unisex article suitable for a wide range of body types and style preferences.</li> <li>Front pouch pocket for added warmth and convenience.</li> <li>Soft, breathable jersey fabric ensures comfort and airflow.</li> <li>Long sleeves with ribbed cuffs and hem for a secure, structured fit.</li> </ul></td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:tag>Unisex</s:tag>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143135898</id>
+      <title>S</title>
+      <s:price currency="INR">2399.00</s:price>
+      <s:sku>HOODIES</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143135898</id>
+      <title>M</title>
+      <s:price currency="INR">2399.00</s:price>
+      <s:sku>HOODIES</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143135898</id>
+      <title>L</title>
+      <s:price currency="INR">2399.00</s:price>
+      <s:sku>HOODIES</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143135898</id>
+      <title>XL</title>
+      <s:price currency="INR">2399.00</s:price>
+      <s:sku>HOODIES</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143135898</id>
+      <title>XXL</title>
+      <s:price currency="INR">2399.00</s:price>
+      <s:sku>HOODIES</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8702143135898</id>
+      <title>XS</title>
+      <s:price currency="INR">2399.00</s:price>
+      <s:sku>HOODIES</s:sku>
+      <s:grams>500</s:grams>
+    </s:variant>
+  </entry>
+  <entry>
+    <id>https://dripdrip.in/products/8698092748954</id>
+    <published>2025-12-05T21:41:39+05:30</published>
+    <updated>2025-12-05T21:41:39+05:30</updated>
+    <link rel="alternate" type="text/html" href="https://dripdrip.in/products/unholy-saint"/>
+    <title>UNHOLY SAINT ♡</title>
+    <s:type>hoodies</s:type>
+    <s:vendor>DRIP STUDIOS</s:vendor>
+    <summary type="html">
+      <![CDATA[<table border="0">
+  <tr>
+    <td width="200"><img width="200" src="https://cdn.shopify.com/s/files/1/0717/2584/2586/files/B6CFEE9B-C671-41C1-9335-0E6FB2AFEC1D.png?v=1769958160"></td>
+    <td valign="bottom">
+      <p>
+
+        <strong>Vendor: </strong>DRIP STUDIOS<br>
+        <strong>Type: </strong>hoodies<br>
+        <strong>Price: </strong>
+            2409.00
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+<p>MALE MODEL HEIGHT 5'10 AND WAIST SIZE 32  WEARING M HOODIE.
+
+420 GSM
+PIPING WORK OVER SHOULDER, ARMS AND WAIST AREA
+PREMIUM 100% COTTON MATERIAL
+EMBROIDERY PRINT FRONT AND BACK (78,000+ embroidery stitches)
+BAGGY FIT [REFER TO SIZE CHART FOR ACCURATE MEASUREMENTS].
+COMBED AND BIOWASHED.
+</p>
+<p>Step into elevated streetwear with this 420 GSM super-premium sweatshirt, crafted for comfort, durability, and bold style. Made using combed and bio-washed fabric, it delivers a smooth, soft feel with long-lasting quality. The design features sleek piping work running across the shoulders, arms, and waist, adding a sharp, structured look. Front and back high-density embroidery make a strong statement, showcasing intricate detailing that stands out. With its relaxed fit, this sweatshirt blends effortless vibe with premium construction—perfect for everyday wear or standout street style.</p>
+<h4>Care Guide</h4><p>* Machine wash the sweatshirt inside out with like colors.
+* Use cold water to preserve the fabric’s quality.
+* Tumble dry on low heat or air dry to prevent shrinkage and maintain the fabric’s integrity.
+* Store the sweatshirt in a cool, dry place to prevent moisture or mold buildup.</p>
+<h4>Core Features</h4><p>* Sweatshirt with 420 GSM (Grams per Square Meter) for a durable and substantial feel.
+* Baggy fit for comfortable and versatile wear by both men and women.
+* Unisex article suitable for a wide range of body types and style preferences.
+* Front pouch pocket for convenient storage and added warmth.
+* Soft, breathable jersey fabric ensures comfort and airflow.
+* Long sleeves and ribbed cuffs and hem provide a snug and stylish fit.</p>
+</td>
+  </tr>
+</table>
+]]>
+    </summary>
+    <s:tag>all-products</s:tag>
+    <s:tag>fast-delivery</s:tag>
+    <s:tag>hoodies</s:tag>
+    <s:tag>special-category</s:tag>
+    <s:variant>
+      <id>https://dripdrip.in/products/8698092748954</id>
+      <title>S</title>
+      <s:price currency="INR">2409.00</s:price>
+      <s:sku>HOODIES(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8698092748954</id>
+      <title>M</title>
+      <s:price currency="INR">2409.00</s:price>
+      <s:sku>HOODIES(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8698092748954</id>
+      <title>L</title>
+      <s:price currency="INR">2409.00</s:price>
+      <s:sku>HOODIES(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8698092748954</id>
+      <title>XL</title>
+      <s:price currency="INR">2409.00</s:price>
+      <s:sku>HOODIES(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+    <s:variant>
+      <id>https://dripdrip.in/products/8698092748954</id>
+      <title>XXL</title>
+      <s:price currency="INR">2409.00</s:price>
+      <s:sku>HOODIES(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)(-Copy 1)</s:sku>
+      <s:grams>0</s:grams>
+    </s:variant>
+  </entry>
+</feed>

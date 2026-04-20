@@ -1,19 +1,18 @@
 /**
- * HARLON — CONVERSION-FIRST HOME PAGE
- * Strategy: Sell the MOMENT, not the jersey.
- * Psychology: Urgency + Scarcity + Emotional Identity
+ * HARLON — HOME PAGE
+ * Hero: DripDrip-style infinite horizontal photo marquee
+ * Portrait cards (5:9) auto-scroll on white background
  */
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'framer-motion'
 import { FaWhatsapp } from 'react-icons/fa'
-import { FiArrowRight, FiShoppingBag, FiHeart, FiZap, FiAlertTriangle, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import { FiArrowRight, FiShoppingBag, FiHeart, FiZap } from 'react-icons/fi'
 import { useProducts } from '../context/ProductContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useCart } from '../context/CartContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 import Skeleton from '../components/ui/Skeleton'
-import { sliderApi } from '../services/api'
 import '../styles/home.css'
 import '../styles/hero-slider.css'
 
@@ -28,7 +27,6 @@ const stagger = (delay = 0.08) => ({
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: delay, delayChildren: 0.05 } },
 })
-
 
 /* ─── Branded Error State ──────────────────────────────────── */
 function LegendaryError({ onRetry }) {
@@ -52,196 +50,97 @@ function LegendaryError({ onRetry }) {
     )
 }
 
-/* ─── Hero Slider (admin-managed slides) ───────────────────── */
-const SLIDE_INTERVAL = 5000
+/* ─── Hero Marquee — DripDrip Clone ───────────────────────── */
+/* Infinite horizontal scroll of portrait model photos         */
+/* Admin uploads via /admin/slider. Fallback: product images   */
+function HeroMarquee({ products }) {
+    const [adminSlides, setAdminSlides] = useState(null)
 
-function HeroSlider({ fallback }) {
-    const [slides, setSlides] = useState([])
-    const [current, setCurrent] = useState(0)
-    const [loaded, setLoaded] = useState(false)
-    const timerRef = useRef(null)
-    const reduced = useReducedMotion()
-
+    // Fetch admin-uploaded slides
     useEffect(() => {
-        sliderApi.getSlides().then(res => {
-            if (res.success && res.slides?.length > 0) setSlides(res.slides)
-            setLoaded(true)
-        }).catch(() => setLoaded(true))
+        const base = (import.meta.env.VITE_API_URL || '/api').replace(/\/api$/, '') + '/api'
+        fetch(`${base}/slider`)
+            .then(r => r.json())
+            .then(res => setAdminSlides(res.success ? (res.slides || []) : []))
+            .catch(() => setAdminSlides([]))
     }, [])
 
-    const startTimer = useCallback((len) => {
-        clearInterval(timerRef.current)
-        timerRef.current = setInterval(() => {
-            setCurrent(c => (c + 1) % len)
-        }, SLIDE_INTERVAL)
-    }, [])
+    // Build image list: admin slides → product images
+    const rawImages = (() => {
+        if (adminSlides && adminSlides.length > 0) {
+            return adminSlides.map(s => ({ id: s._id, url: s.url, link: s.link || '/shop' }))
+        }
+        return (products || [])
+            .filter(p => p.images?.[0])
+            .slice(0, 12)
+            .map(p => ({ id: p._id, url: p.images[0], link: `/product/${p._id}` }))
+    })()
 
-    useEffect(() => {
-        if (slides.length > 1 && !reduced) startTimer(slides.length)
-        return () => clearInterval(timerRef.current)
-    }, [slides.length, reduced, startTimer])
+    // Nothing to show yet
+    if (adminSlides === null || rawImages.length === 0) {
+        return (
+            <section className="dd-marquee-section" style={{ paddingBottom: 24, minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Link to="/shop" style={{
+                    fontFamily: 'Inter, sans-serif', fontWeight: 800, fontSize: 12,
+                    letterSpacing: '0.08em', textTransform: 'uppercase',
+                    background: '#0a0a0a', color: '#fff',
+                    padding: '13px 28px', borderRadius: 2, textDecoration: 'none'
+                }}>
+                    SHOP THE DROP →
+                </Link>
+            </section>
+        )
+    }
 
-    const goTo = (idx) => { setCurrent(idx); startTimer(slides.length) }
-    const prev = () => goTo((current - 1 + slides.length) % slides.length)
-    const next = () => goTo((current + 1) % slides.length)
-
-    if (!loaded) return <div className="hs-root" />
-    if (slides.length === 0) return <div className="hs-root hs-fallback">{fallback}</div>
+    // Duplicate cards for seamless infinite loop (exactly like DripDrip)
+    const track = [...rawImages, ...rawImages]
 
     return (
-        <div className="hs-root">
-            {slides.map((slide, i) => (
-                <div key={slide._id} className={`hs-slide${i === current ? ' active' : ''}`}>
-                    <img src={slide.url} alt={slide.title || 'Banner'} className="hs-slide-img" />
-                    <div className="hs-overlay" />
-                    {(slide.title || slide.subtitle) && (
-                        <div className="hs-content">
-                            <div className="hs-text">
-                                {slide.title && (
-                                    <motion.h1
-                                        key={`t-${i}-${current}`}
-                                        className="hs-title"
-                                        initial={reduced ? {} : { opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                                    >
-                                        {slide.title}
-                                    </motion.h1>
-                                )}
-                                {slide.subtitle && (
-                                    <motion.p
-                                        key={`s-${i}-${current}`}
-                                        className="hs-subtitle"
-                                        initial={reduced ? {} : { opacity: 0, y: 16 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.5, delay: 0.1 }}
-                                    >
-                                        {slide.subtitle}
-                                    </motion.p>
-                                )}
-                                <motion.div
-                                    key={`cta-${i}-${current}`}
-                                    initial={reduced ? {} : { opacity: 0, y: 12 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.45, delay: 0.18 }}
-                                >
-                                    <Link to={slide.link || '/shop'} className="hs-cta">
-                                        SHOP NOW <FiArrowRight />
-                                    </Link>
-                                </motion.div>
+        <section className="dd-marquee-section" aria-label="Featured drops">
+            <div className="dd-marquee-container">
+                <div className="dd-marquee-track">
+                    {track.map((img, i) => (
+                        <Link
+                            key={`${img.id}-${i}`}
+                            to={img.link}
+                            className="dd-card"
+                            tabIndex={i >= rawImages.length ? -1 : 0}
+                            aria-hidden={i >= rawImages.length}
+                        >
+                            <div className="dd-card-aspect">
+                                <img
+                                    src={img.url}
+                                    alt="Drop"
+                                    className="dd-card-img"
+                                    loading={i < 4 ? 'eager' : 'lazy'}
+                                    fetchPriority={i < 4 ? 'high' : 'auto'}
+                                />
                             </div>
-                        </div>
-                    )}
-                </div>
-            ))}
-
-            {slides.length > 1 && (
-                <>
-                    <button className="hs-arrow hs-arrow--prev" onClick={prev} aria-label="Previous"><FiChevronLeft /></button>
-                    <button className="hs-arrow hs-arrow--next" onClick={next} aria-label="Next"><FiChevronRight /></button>
-                    <div className="hs-dots">
-                        {slides.map((_, i) => (
-                            <button key={i} className={`hs-dot${i === current ? ' active' : ''}`} onClick={() => goTo(i)} aria-label={`Slide ${i + 1}`} />
-                        ))}
-                    </div>
-                    {!reduced && <div key={`${current}-p`} className="hs-progress" />}
-                </>
-            )}
-        </div>
-    )
-}
-
-/* ─── Hero Section (original fallback) ─────────────────────── */
-function HeroSection({ products, reduced }) {
-    const featuredImg = products.find(p => p.featured && p.images?.[0])?.images?.[0] || products[0]?.images?.[0]
-    const totalDropping = products.filter(p => p.stock > 0).length
-
-    return (
-        <section className="cvt-hero" aria-label="Hero">
-            {/* Cinematic background */}
-            {featuredImg && (
-                <div className="cvt-hero-bg">
-                    <img src={featuredImg} alt="" aria-hidden="true" className="cvt-hero-bg-img" />
-                    <div className="cvt-hero-bg-overlay" />
-                    <div className="cvt-hero-grain" />
-                </div>
-            )}
-            {!featuredImg && <div className="cvt-hero-fallback-bg" />}
-
-            <div className="cvt-hero-inner">
-                <motion.div
-                    initial="hidden"
-                    animate="visible"
-                    variants={reduced ? {} : stagger(0.12)}
-                    className="cvt-hero-content"
-                >
-                    {/* Live badge */}
-                    <motion.div variants={reduced ? {} : mk(12)} className="cvt-live-badge">
-                        <span className="cvt-live-dot" />
-                        DROP LIVE NOW
-                    </motion.div>
-
-                    {/* Headline */}
-                    <motion.h1 variants={reduced ? {} : mk(24, 0.6)} className="cvt-hero-headline">
-                        NOT FOR<br />
-                        <span className="cvt-hero-gold">CASUAL FANS.</span>
-                    </motion.h1>
-
-                    {/* Subtext */}
-                    <motion.p variants={reduced ? {} : mk(20, 0.55)} className="cvt-hero-sub">
-                        Only legends wear legends.
-                    </motion.p>
-
-                    {/* Scarcity line */}
-                    <motion.p variants={reduced ? {} : mk(16)} className="cvt-hero-scarcity">
-                        <FiAlertTriangle size={13} />
-                        Limited stock. No restocks. Once it's gone, it's gone.
-                    </motion.p>
-
-                    {/* CTA */}
-                    <motion.div variants={reduced ? {} : mk(16)} className="cvt-hero-ctas">
-                        <Link to="/shop" className="cvt-cta-primary">
-                            SHOP THE DROP
-                            <FiArrowRight />
                         </Link>
-                        {totalDropping > 0 && (
-                            <span className="cvt-cta-note">
-                                {totalDropping} jerseys · While they last
-                            </span>
-                        )}
-                    </motion.div>
-                </motion.div>
+                    ))}
+                </div>
             </div>
-
-            {/* Scroll arrow */}
-            <motion.div
-                className="cvt-hero-scroll"
-                animate={reduced ? {} : { y: [0, 8, 0] }}
-                transition={{ repeat: Infinity, duration: 1.8 }}
-            >
-                <span>↓</span>
-            </motion.div>
         </section>
     )
 }
 
-/* ─── DripDrip-style Trust Icons Bar ──────────────────────── */
-function TrustBar() {
+/* ─── Trust Bar (3 icons, DripDrip style) ──────────────────── */
+const TRUST_ITEMS = [
+    '🏆 India\'s No.1 Retro Jersey Store',
+    '⚡ 10,000+ Fans Suited Up',
+    '🔒 100% Authentic Fabrics',
+    '🚀 Ships Pan India',
+    '💬 WhatsApp Support',
+    '✅ Zero Fake Prints',
+]
+
+function TrustMarquee() {
     return (
-        <div className="cvt-trust-bar">
-            <div className="cvt-trust-item">
-                <svg className="cvt-trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>
-                <span className="cvt-trust-label">PROTECT<br/>YOUR ORDER</span>
-            </div>
-            <div className="cvt-trust-divider" />
-            <div className="cvt-trust-item">
-                <svg className="cvt-trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                <span className="cvt-trust-label">EASY EXCHANGE<br/>&amp; RETURN</span>
-            </div>
-            <div className="cvt-trust-divider" />
-            <div className="cvt-trust-item">
-                <svg className="cvt-trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75"/></svg>
-                <span className="cvt-trust-label">10,000+<br/>FANS SUITED UP</span>
+        <div className="cvt-marquee-bar">
+            <div className="cvt-marquee-track">
+                {[...TRUST_ITEMS, ...TRUST_ITEMS].map((t, i) => (
+                    <span key={i} className="cvt-marquee-item">{t}</span>
+                ))}
             </div>
         </div>
     )
@@ -251,9 +150,7 @@ function TrustBar() {
 function CategoryCardsSection({ categories, products, reduced }) {
     if (!categories || categories.length === 0) return null
 
-    // Build cards based on real DB categories
     const cards = categories.map(cat => {
-        // Use category image if available, else find a product image in that category
         const fallbackProduct = products?.find(p => p.category === cat.name && p.images?.length > 0)
         return {
             id: encodeURIComponent(cat.name.toLowerCase()),
@@ -262,7 +159,6 @@ function CategoryCardsSection({ categories, products, reduced }) {
         }
     })
 
-    // Ensure we have enough cards to fill the screen twice over for seamless looping
     const infiniteCards = [...cards, ...cards, ...cards, ...cards]
 
     return (
@@ -272,11 +168,9 @@ function CategoryCardsSection({ categories, products, reduced }) {
                 <h2 className="cvt-section-title">Shop by<br /><em>Category.</em></h2>
                 <p className="cvt-section-desc">Find the exact era, club, or legend you're looking for.</p>
             </div>
-            
+
             <div className="cvt-moments-scroll-wrap">
                 <div className="cvt-moments-track cvt-auto-slider">
-                    
-                    {/* First continuous group */}
                     <div className="cvt-moments-group">
                         {infiniteCards.map((card, i) => (
                             <Link to={`/shop?chip=${card.id}`} key={`g1-${i}`} className="cvt-moment-card">
@@ -292,16 +186,12 @@ function CategoryCardsSection({ categories, products, reduced }) {
                                         <span className="cvt-moment-tag">CATEGORY</span>
                                         <h3 className="cvt-moment-label">{card.name}</h3>
                                         <p className="cvt-moment-story">Authentic retro drops.</p>
-                                        <span className="cvt-moment-cta">
-                                            Explore <FiArrowRight size={12} />
-                                        </span>
+                                        <span className="cvt-moment-cta">Explore <FiArrowRight size={12} /></span>
                                     </div>
                                 </div>
                             </Link>
                         ))}
                     </div>
-
-                    {/* Identical cloned group for seamless CSS infinite translation */}
                     <div className="cvt-moments-group" aria-hidden="true">
                         {infiniteCards.map((card, i) => (
                             <Link to={`/shop?chip=${card.id}`} key={`g2-${i}`} className="cvt-moment-card" tabIndex="-1">
@@ -317,15 +207,12 @@ function CategoryCardsSection({ categories, products, reduced }) {
                                         <span className="cvt-moment-tag">CATEGORY</span>
                                         <h3 className="cvt-moment-label">{card.name}</h3>
                                         <p className="cvt-moment-story">Authentic retro drops.</p>
-                                        <span className="cvt-moment-cta">
-                                            Explore <FiArrowRight size={12} />
-                                        </span>
+                                        <span className="cvt-moment-cta">Explore <FiArrowRight size={12} /></span>
                                     </div>
                                 </div>
                             </Link>
                         ))}
                     </div>
-
                 </div>
             </div>
         </section>
@@ -364,19 +251,9 @@ function DropCard({ product, reduced }) {
             <Link to={`/product/${product._id}`} className="cvt-drop-card-link">
                 <div className="cvt-drop-img-wrap">
                     {img && <img src={img} alt={product.name} className="cvt-drop-img" loading="lazy" />}
-
-                    {/* Scarcity badges */}
-                    {sellingFast && (
-                        <span className="cvt-badge cvt-badge--fire">🔥 Selling Fast</span>
-                    )}
-                    {!inStock && (
-                        <span className="cvt-badge cvt-badge--sold">SOLD OUT</span>
-                    )}
-                    {disc > 0 && inStock && !sellingFast && (
-                        <span className="cvt-badge cvt-badge--sale">−{disc}%</span>
-                    )}
-
-                    {/* Quick actions overlay */}
+                    {sellingFast && <span className="cvt-badge cvt-badge--fire">🔥 Selling Fast</span>}
+                    {!inStock && <span className="cvt-badge cvt-badge--sold">SOLD OUT</span>}
+                    {disc > 0 && inStock && !sellingFast && <span className="cvt-badge cvt-badge--sale">−{disc}%</span>}
                     <div className="cvt-drop-overlay">
                         <button
                             className="cvt-drop-wl-btn"
@@ -387,19 +264,13 @@ function DropCard({ product, reduced }) {
                         </button>
                         {inStock && (
                             <button className="cvt-drop-add-btn" onClick={handleAddCart}>
-                                <FiShoppingBag size={14} />
-                                Add to Drop
+                                <FiShoppingBag size={14} /> Add to Drop
                             </button>
                         )}
                     </div>
                 </div>
-
                 <div className="cvt-drop-info">
-                    {lowStock && (
-                        <span className="cvt-stock-pill">
-                            ⚡ Only {stock} left
-                        </span>
-                    )}
+                    {lowStock && <span className="cvt-stock-pill">⚡ Only {stock} left</span>}
                     <p className="cvt-drop-category">{product.category}</p>
                     <h3 className="cvt-drop-name">{product.name}</h3>
                     <div className="cvt-drop-price-row">
@@ -415,7 +286,6 @@ function DropCard({ product, reduced }) {
 /* ─── Limited Drop Section ─────────────────────────────────── */
 function LimitedDropSection({ products, loading, reduced }) {
     const drops = products.slice(0, 8)
-
     return (
         <section className="cvt-drops" aria-label="Limited Drop">
             <div className="cvt-drops-header">
@@ -433,25 +303,15 @@ function LimitedDropSection({ products, loading, reduced }) {
                     </Link>
                 </div>
             </div>
-
             <div className="cvt-drops-grid">
                 {loading
-                    ? Array(8).fill(0).map((_, i) => (
-                        <div key={i} className="cvt-drop-card">
-                            <Skeleton.Card />
-                        </div>
-                    ))
-                    : drops.map(p => (
-                        <DropCard key={p._id} product={p} reduced={reduced} />
-                    ))
+                    ? Array(8).fill(0).map((_, i) => <div key={i} className="cvt-drop-card"><Skeleton.Card /></div>)
+                    : drops.map(p => <DropCard key={p._id} product={p} reduced={reduced} />)
                 }
             </div>
-
             {!loading && drops.length > 0 && (
                 <div className="cvt-drops-footer">
-                    <p className="cvt-drops-footer-txt">
-                        Miss this — it's gone forever.
-                    </p>
+                    <p className="cvt-drops-footer-txt">Miss this — it's gone forever.</p>
                     <Link to="/shop" className="cvt-cta-primary cvt-cta-primary--outline">
                         View All Drops <FiArrowRight />
                     </Link>
@@ -462,7 +322,7 @@ function LimitedDropSection({ products, loading, reduced }) {
 }
 
 /* ─── Social Strip ─────────────────────────────────────────── */
-function SocialProof({ products }) {
+function SocialProof() {
     return (
         <section className="cvt-social-strip">
             <div className="cvt-social-inner">
@@ -497,17 +357,14 @@ function FooterCTA() {
                     Not a fan.<br />
                     <span className="cvt-hero-gold">A Legend.</span>
                 </h2>
-                <p className="cvt-footer-sub">
-                    Every jersey tells a story. What's yours?
-                </p>
+                <p className="cvt-footer-sub">Every jersey tells a story. What's yours?</p>
                 <div className="cvt-footer-ctas">
                     <Link to="/shop" className="cvt-cta-primary">
                         CLAIM YOUR JERSEY <FiArrowRight />
                     </Link>
                     <a
                         href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hi HARLON! I want to find my jersey.')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        target="_blank" rel="noopener noreferrer"
                         className="cvt-cta-wa"
                     >
                         <FaWhatsapp size={20} /> Need help choosing?
@@ -518,23 +375,21 @@ function FooterCTA() {
     )
 }
 
-
 /* ─── HOME PAGE ────────────────────────────────────────────── */
 export default function Home() {
     const { products, categories, loading, error, refreshData } = useProducts()
     const reduced = useReducedMotion()
 
-    if (error) {
-        return <LegendaryError onRetry={refreshData} />
-    }
+    if (error) return <LegendaryError onRetry={refreshData} />
 
     return (
         <main className="home">
-            <HeroSlider fallback={<HeroSection products={products} reduced={reduced} />} />
-            <TrustBar />
+            {/* DripDrip-style hero: infinite scrolling portrait photo marquee */}
+            <HeroMarquee products={products} />
+            <TrustMarquee />
             <CategoryCardsSection categories={categories} products={products} reduced={reduced} />
             <LimitedDropSection products={products} loading={loading} reduced={reduced} />
-            <SocialProof products={products} />
+            <SocialProof />
             <FooterCTA />
         </main>
     )
