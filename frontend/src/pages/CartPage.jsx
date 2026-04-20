@@ -34,42 +34,43 @@ export default function CartPage() {
                 </p>
             </div>
 
-            <div className="cart-page-grid">
-                {isEmpty ? (
-                    <div className="cart-empty-state">
-                        <div className="cart-empty-icon">🛒</div>
-                        <h2 className="cart-empty-title">Nothing here yet</h2>
-                        <p className="cart-empty-sub">Browse our drops and add jerseys to your cart</p>
-                        <Link to="/shop" className="cart-shop-link">
-                            Shop the Drop <FiArrowRight />
-                        </Link>
-                    </div>
-                ) : (
-                    <>
-                        {/* ── Items list ── */}
-                        <div>
-                            <AnimatePresence>
-                                {items.map(item => (
-                                    <motion.div
-                                        key={item.key}
-                                        layout
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, x: -20 }}
-                                        transition={{ duration: 0.18 }}
-                                        className="cart-item-row"
-                                    >
-                                        {/* Image */}
-                                        {item.image
-                                            ? <img src={item.image} alt={item.name} className="cart-item-img" />
-                                            : <div className="cart-item-img-placeholder">👕</div>
-                                        }
+            {isEmpty ? (
+                <div className="cart-empty-state">
+                    <div className="cart-empty-icon">🛒</div>
+                    <h2 className="cart-empty-title">Nothing here yet</h2>
+                    <p className="cart-empty-sub">Browse our drops and add jerseys to your cart</p>
+                    <Link to="/shop" className="cart-shop-link">
+                        Shop the Drop <FiArrowRight />
+                    </Link>
+                </div>
+            ) : (
+                <div className="cart-page-grid">
+                    {/* ── Items list ── */}
+                    <div>
+                        <AnimatePresence>
+                            {items.map(item => (
+                                <motion.div
+                                    key={item.key}
+                                    layout
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, x: -16 }}
+                                    transition={{ duration: 0.18 }}
+                                    className="cart-item-row"
+                                >
+                                    {/* Image */}
+                                    {item.image
+                                        ? <img src={item.image} alt={item.name} className="cart-item-img" />
+                                        : <div className="cart-item-img-placeholder">👕</div>
+                                    }
 
-                                        {/* Info */}
-                                        <div className="cart-item-info">
-                                            <p className="cart-item-name">{item.name}</p>
-                                            <p className="cart-item-meta">Size: {item.size}</p>
-                                            {/* Qty controls */}
+                                    {/* Info — takes all remaining width */}
+                                    <div className="cart-item-info">
+                                        <p className="cart-item-name">{item.name}</p>
+                                        <p className="cart-item-meta">Size: {item.size}</p>
+
+                                        {/* Bottom row: [- qty +] on left, [price 🗑️] on right */}
+                                        <div className="cart-item-bottom">
                                             <div className="cart-item-controls">
                                                 <button className="cart-qty-btn" onClick={() => updateQty(item.key, item.qty - 1)}>
                                                     <FiMinus size={11} />
@@ -79,63 +80,62 @@ export default function CartPage() {
                                                     <FiPlus size={11} />
                                                 </button>
                                             </div>
-                                        </div>
 
-                                        {/* Price + remove */}
-                                        <div className="cart-item-right">
-                                            <p className="cart-item-price">{fmt(item.price * item.qty)}</p>
-                                            <button className="cart-remove-btn" onClick={() => removeItem(item.key)} aria-label="Remove item">
-                                                <FiTrash2 size={14} />
-                                            </button>
+                                            <div className="cart-item-price-trash">
+                                                <span className="cart-item-price">{fmt(item.price * item.qty)}</span>
+                                                <button className="cart-remove-btn" onClick={() => removeItem(item.key)} aria-label="Remove">
+                                                    <FiTrash2 size={14} />
+                                                </button>
+                                            </div>
                                         </div>
-                                    </motion.div>
-                                ))}
-                            </AnimatePresence>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
 
-                            <button className="cart-clear-btn" onClick={clearCart}>
-                                Clear cart
-                            </button>
+                        <button className="cart-clear-btn" onClick={clearCart}>
+                            Clear cart
+                        </button>
+                    </div>
+
+                    {/* ── Order summary ── */}
+                    <div className="cart-summary-card">
+                        <p className="cart-summary-title">Order Summary</p>
+
+                        <div className="cart-summary-row">
+                            <span>Subtotal ({totalItems} item{totalItems !== 1 ? 's' : ''})</span>
+                            <span>{fmt(totalPrice)}</span>
+                        </div>
+                        <div className="cart-summary-row">
+                            <span>Delivery</span>
+                            <span className="cart-summary-free">FREE 🎉</span>
                         </div>
 
-                        {/* ── Order summary ── */}
-                        <div className="cart-summary-card">
-                            <p className="cart-summary-title">Order Summary</p>
+                        <hr className="cart-summary-divider" />
 
-                            <div className="cart-summary-row">
-                                <span>Subtotal ({totalItems} item{totalItems !== 1 ? 's' : ''})</span>
-                                <span>{fmt(totalPrice)}</span>
-                            </div>
-                            <div className="cart-summary-row">
-                                <span>Delivery</span>
-                                <span className="cart-summary-free">FREE 🎉</span>
-                            </div>
-
-                            <hr className="cart-summary-divider" />
-
-                            <div className="cart-summary-total">
-                                <span className="cart-summary-total-label">Total</span>
-                                <span className="cart-summary-total-price">{fmt(totalPrice)}</span>
-                            </div>
-
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.97 }}
-                                onClick={handleCheckout}
-                                className="cart-checkout-btn-main"
-                            >
-                                <FiLock size={15} />
-                                {isLoggedIn ? 'Proceed to Checkout' : 'Sign In & Checkout'}
-                            </motion.button>
-
-                            {!isLoggedIn && (
-                                <p className="cart-login-note">
-                                    You'll be asked to sign in before checkout
-                                </p>
-                            )}
+                        <div className="cart-summary-total">
+                            <span className="cart-summary-total-label">Total</span>
+                            <span className="cart-summary-total-price">{fmt(totalPrice)}</span>
                         </div>
-                    </>
-                )}
-            </div>
+
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={handleCheckout}
+                            className="cart-checkout-btn-main"
+                        >
+                            <FiLock size={15} />
+                            {isLoggedIn ? 'Proceed to Checkout' : 'Sign In & Checkout'}
+                        </motion.button>
+
+                        {!isLoggedIn && (
+                            <p className="cart-login-note">
+                                You'll be asked to sign in before checkout
+                            </p>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
