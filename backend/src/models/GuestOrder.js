@@ -24,12 +24,24 @@ const guestOrderSchema = new mongoose.Schema({
     },
 
     product: {
-        productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
-        name: { type: String, required: true },
+        productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' }, // optional in cart mode
+        name: { type: String, default: '' },
         image: { type: String, default: '' },
-        size: { type: String, required: true },
-        price: { type: Number, required: true }
+        size: { type: String, default: '' },
+        price: { type: Number, default: 0 }
     },
+
+    // Cart mode: multiple items
+    items: [{
+        productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+        name: { type: String },
+        image: { type: String, default: '' },
+        size: { type: String },
+        qty: { type: Number, default: 1 },
+        price: { type: Number }
+    }],
+
+    isCartOrder: { type: Boolean, default: false },
 
     customer: {
         firstName: { type: String, required: true, trim: true },
