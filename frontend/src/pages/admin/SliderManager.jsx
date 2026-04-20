@@ -113,8 +113,8 @@ export default function SliderManager() {
                     padding: '14px 18px', marginBottom: 24,
                     fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#9a3412', lineHeight: 1.6
                 }}>
-                    📸 <strong>Upload banner images</strong> (recommended: 1920×1080px or 16:9 ratio). They will appear as a full-screen slider on the homepage.
-                    If no slides are added, the default hero design will show.
+                    📸 <strong>Upload model drop images</strong> (recommended: background removed, portrait ratio ~5:9). These will scroll horizontally in the hero section on a white background.
+                    If no slides are added, standard product images will show.
                 </div>
 
                 {loading ? (
@@ -147,8 +147,8 @@ export default function SliderManager() {
                                 opacity: slide.active ? 1 : 0.6,
                             }}>
                                 {/* Preview */}
-                                <div style={{ width: 200, flexShrink: 0, position: 'relative' }}>
-                                    <img src={slide.url} alt="Slide" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', minHeight: 120 }} />
+                                <div style={{ width: 140, flexShrink: 0, position: 'relative', background: '#f8f8f8' }}>
+                                    <img src={slide.url} alt="Slide" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', minHeight: 180 }} />
                                     <span style={{
                                         position: 'absolute', top: 8, left: 8,
                                         background: 'rgba(0,0,0,0.6)', color: '#fff',

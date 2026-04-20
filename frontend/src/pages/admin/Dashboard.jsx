@@ -245,6 +245,10 @@ function Dashboard() {
                             <span className="icon">📦</span>
                             <span>Stock</span>
                         </Link>
+                        <Link to="/admin/slider" className="action-tile">
+                            <span className="icon">📸</span>
+                            <span>Hero Slider</span>
+                        </Link>
                         <Link to="/admin/guest-orders" className="action-tile">
                             <span className="icon"><FiShoppingBag /></span>
                             <span>Guest Orders</span>
