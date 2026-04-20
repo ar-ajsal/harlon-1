@@ -2,12 +2,14 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { FiArrowLeft, FiUpload, FiTrash2, FiEye, FiEyeOff, FiImage, FiCheck } from 'react-icons/fi'
 import { sliderApi, uploadApi } from '../../services/api'
+import ImageCropper from '../../components/ImageCropper'
 
 export default function SliderManager() {
     const [slides, setSlides] = useState([])
     const [loading, setLoading] = useState(true)
     const [uploading, setUploading] = useState(false)
     const [toast, setToast] = useState(null)
+    const [cropImageSrc, setCropImageSrc] = useState(null)
     const fileRef = useRef()
 
     const showToast = (msg, type = 'success') => {
@@ -24,13 +26,24 @@ export default function SliderManager() {
 
     useEffect(() => { load() }, [])
 
-    // Upload image → add slide
-    const handleUpload = async (e) => {
+    // Upload image → select for crop
+    const handleUpload = (e) => {
         const file = e.target.files?.[0]
         if (!file) return
+
+        const reader = new FileReader()
+        reader.onload = () => {
+            setCropImageSrc(reader.result)
+        }
+        reader.readAsDataURL(file)
+        e.target.value = ''
+    }
+
+    const handleCropComplete = async (croppedFile) => {
+        setCropImageSrc(null)
         setUploading(true)
         try {
-            const upRes = await uploadApi.uploadSingle(file)
+            const upRes = await uploadApi.uploadSingle(croppedFile)
             if (!upRes.url) { showToast('Upload failed', 'error'); return }
 
             const addRes = await sliderApi.addSlide({ url: upRes.url, publicId: upRes.public_id || '' })
@@ -44,8 +57,11 @@ export default function SliderManager() {
             showToast('Error uploading image', 'error')
         } finally {
             setUploading(false)
-            e.target.value = ''
         }
+    }
+
+    const handleCropCancel = () => {
+        setCropImageSrc(null)
     }
 
     const toggleActive = async (slide) => {
@@ -220,6 +236,16 @@ export default function SliderManager() {
                     </div>
                 )}
             </div>
+
+            {/* Image Cropper Modal */}
+            {cropImageSrc && (
+                <ImageCropper
+                    imageSrc={cropImageSrc}
+                    onCropComplete={handleCropComplete}
+                    onCancel={handleCropCancel}
+                    aspectRatio={5 / 9}
+                />
+            )}
         </div>
     )
 }
