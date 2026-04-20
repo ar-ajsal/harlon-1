@@ -176,3 +176,38 @@ export const authApi = {
         return res.json();
     }
 };
+
+// Slider API
+export const sliderApi = {
+    getSlides: async () => {
+        const res = await fetch(`${API_URL}/slider`);
+        return res.json();
+    },
+    getAllSlides: async () => {
+        const res = await fetch(`${API_URL}/slider/all`, { headers: getAuthHeaders() });
+        return res.json();
+    },
+    addSlide: async (data) => {
+        const res = await fetch(`${API_URL}/slider`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+            body: JSON.stringify(data)
+        });
+        return res.json();
+    },
+    updateSlide: async (id, data) => {
+        const res = await fetch(`${API_URL}/slider/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+            body: JSON.stringify(data)
+        });
+        return res.json();
+    },
+    deleteSlide: async (id) => {
+        const res = await fetch(`${API_URL}/slider/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
+        return res.json();
+    }
+};

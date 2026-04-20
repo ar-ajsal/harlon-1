@@ -3,17 +3,19 @@
  * Strategy: Sell the MOMENT, not the jersey.
  * Psychology: Urgency + Scarcity + Emotional Identity
  */
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'framer-motion'
 import { FaWhatsapp } from 'react-icons/fa'
-import { FiArrowRight, FiShoppingBag, FiHeart, FiZap, FiAlertTriangle } from 'react-icons/fi'
+import { FiArrowRight, FiShoppingBag, FiHeart, FiZap, FiAlertTriangle, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import { useProducts } from '../context/ProductContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useCart } from '../context/CartContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 import Skeleton from '../components/ui/Skeleton'
+import { sliderApi } from '../services/api'
 import '../styles/home.css'
+import '../styles/hero-slider.css'
 
 const fmt = (n) => `₹${Number(n).toLocaleString('en-IN')}`
 const discount = (p, o) => o && p < o ? Math.round((1 - p / o) * 100) : 0
@@ -50,7 +52,106 @@ function LegendaryError({ onRetry }) {
     )
 }
 
-/* ─── Hero Section ─────────────────────────────────────────── */
+/* ─── Hero Slider (admin-managed slides) ───────────────────── */
+const SLIDE_INTERVAL = 5000
+
+function HeroSlider({ fallback }) {
+    const [slides, setSlides] = useState([])
+    const [current, setCurrent] = useState(0)
+    const [loaded, setLoaded] = useState(false)
+    const timerRef = useRef(null)
+    const reduced = useReducedMotion()
+
+    useEffect(() => {
+        sliderApi.getSlides().then(res => {
+            if (res.success && res.slides?.length > 0) setSlides(res.slides)
+            setLoaded(true)
+        }).catch(() => setLoaded(true))
+    }, [])
+
+    const startTimer = useCallback((len) => {
+        clearInterval(timerRef.current)
+        timerRef.current = setInterval(() => {
+            setCurrent(c => (c + 1) % len)
+        }, SLIDE_INTERVAL)
+    }, [])
+
+    useEffect(() => {
+        if (slides.length > 1 && !reduced) startTimer(slides.length)
+        return () => clearInterval(timerRef.current)
+    }, [slides.length, reduced, startTimer])
+
+    const goTo = (idx) => { setCurrent(idx); startTimer(slides.length) }
+    const prev = () => goTo((current - 1 + slides.length) % slides.length)
+    const next = () => goTo((current + 1) % slides.length)
+
+    if (!loaded) return <div className="hs-root" />
+    if (slides.length === 0) return <div className="hs-root hs-fallback">{fallback}</div>
+
+    return (
+        <div className="hs-root">
+            {slides.map((slide, i) => (
+                <div key={slide._id} className={`hs-slide${i === current ? ' active' : ''}`}>
+                    <img src={slide.url} alt={slide.title || 'Banner'} className="hs-slide-img" />
+                    <div className="hs-overlay" />
+                    {(slide.title || slide.subtitle) && (
+                        <div className="hs-content">
+                            <div className="hs-text">
+                                {slide.title && (
+                                    <motion.h1
+                                        key={`t-${i}-${current}`}
+                                        className="hs-title"
+                                        initial={reduced ? {} : { opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                                    >
+                                        {slide.title}
+                                    </motion.h1>
+                                )}
+                                {slide.subtitle && (
+                                    <motion.p
+                                        key={`s-${i}-${current}`}
+                                        className="hs-subtitle"
+                                        initial={reduced ? {} : { opacity: 0, y: 16 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.5, delay: 0.1 }}
+                                    >
+                                        {slide.subtitle}
+                                    </motion.p>
+                                )}
+                                <motion.div
+                                    key={`cta-${i}-${current}`}
+                                    initial={reduced ? {} : { opacity: 0, y: 12 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.45, delay: 0.18 }}
+                                >
+                                    <Link to={slide.link || '/shop'} className="hs-cta">
+                                        SHOP NOW <FiArrowRight />
+                                    </Link>
+                                </motion.div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            ))}
+
+            {slides.length > 1 && (
+                <>
+                    <button className="hs-arrow hs-arrow--prev" onClick={prev} aria-label="Previous"><FiChevronLeft /></button>
+                    <button className="hs-arrow hs-arrow--next" onClick={next} aria-label="Next"><FiChevronRight /></button>
+                    <div className="hs-dots">
+                        {slides.map((_, i) => (
+                            <button key={i} className={`hs-dot${i === current ? ' active' : ''}`} onClick={() => goTo(i)} aria-label={`Slide ${i + 1}`} />
+                        ))}
+                    </div>
+                    {!reduced && <div key={`${current}-p`} className="hs-progress" />}
+                </>
+            )}
+        </div>
+    )
+}
+
+/* ─── Hero Section (original fallback) ─────────────────────── */
 function HeroSection({ products, reduced }) {
     const featuredImg = products.find(p => p.featured && p.images?.[0])?.images?.[0] || products[0]?.images?.[0]
     const totalDropping = products.filter(p => p.stock > 0).length
@@ -429,7 +530,7 @@ export default function Home() {
 
     return (
         <main className="home">
-            <HeroSection products={products} reduced={reduced} />
+            <HeroSlider fallback={<HeroSection products={products} reduced={reduced} />} />
             <TrustMarquee />
             <CategoryCardsSection categories={categories} products={products} reduced={reduced} />
             <LimitedDropSection products={products} loading={loading} reduced={reduced} />

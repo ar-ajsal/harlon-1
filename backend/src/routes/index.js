@@ -20,6 +20,7 @@ import fanCollectionRoutes from './fanCollection.routes.js';
 import offerRoutes from './offer.routes.js';
 import settingsRoutes from './settings.routes.js';
 import userRoutes from './user.routes.js';
+import sliderRoutes from './slider.routes.js';
 
 
 const router = Router();
@@ -48,6 +49,8 @@ router.use('/offers', offerRoutes);
 router.use('/settings', settingsRoutes);
 // ── Customer User Auth + Cart ──────────────────────────────────────────────────
 router.use('/user', userRoutes);
+// ── Homepage Slider ────────────────────────────────────────────────────────────
+router.use('/slider', sliderRoutes);
 
 
 export default router;
