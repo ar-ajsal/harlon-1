@@ -98,3 +98,16 @@
 .dd-card+.dd-card {
     margin-left: 0px;
 }
+
+/* ===== Dark Mode Support ===== */
+[data-theme="dark"] .dd-marquee-section {
+    background: var(--white);
+}
+
+[data-theme="dark"] .dd-card {
+    background: var(--noir-10);
+}
+
+[data-theme="dark"] .dd-card-aspect {
+    background: var(--white); /* White in light mode, deep dark in dark mode */
+}
