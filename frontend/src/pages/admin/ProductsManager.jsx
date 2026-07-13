@@ -167,6 +167,7 @@ function ProductsManager() {
     const [showModal, setShowModal] = useState(false)
     const [editingProduct, setEditingProduct] = useState(null)
     const [searchTerm, setSearchTerm] = useState('')
+    const [categoryFilter, setCategoryFilter] = useState('all')
     const [formData, setFormData] = useState({
         name: '',
         price: '',
@@ -350,10 +351,15 @@ function ProductsManager() {
 
     const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
 
-    const filteredProducts = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    const filteredProducts = products.filter(product => {
+        const matchesSearch =
+            product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            product.category?.toLowerCase().includes(searchTerm.toLowerCase())
+        const matchesCategory = categoryFilter === 'all' ||
+            product.category === categoryFilter ||
+            (Array.isArray(product.categories) && product.categories.includes(categoryFilter))
+        return matchesSearch && matchesCategory
+    })
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -407,6 +413,20 @@ function ProductsManager() {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
+                    </div>
+                    {/* Category Filter Dropdown */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <select
+                            className="form-select"
+                            value={categoryFilter}
+                            onChange={e => setCategoryFilter(e.target.value)}
+                            style={{ fontSize: '13px', padding: '7px 12px', minWidth: 140, height: 38 }}
+                        >
+                            <option value="all">All Categories</option>
+                            {categories.map(cat => (
+                                <option key={cat._id} value={cat.name}>{cat.name}</option>
+                            ))}
+                        </select>
                     </div>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                         {products.every(p => p.isVisible === false) ? (
