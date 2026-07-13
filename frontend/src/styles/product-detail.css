@@ -265,6 +265,28 @@
     display: block;
 }
 
+/* Multi-category pill row on product detail */
+.pd-category-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.pd-category-pill {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: hsl(38, 75%, 50%);
+    background: rgba(212, 155, 70, 0.1);
+    border: 1px solid rgba(212, 155, 70, 0.3);
+    padding: 3px 10px;
+    border-radius: 20px;
+    line-height: 1.5;
+}
+
 /* Price row */
 .pd-price-row {
     display: flex;

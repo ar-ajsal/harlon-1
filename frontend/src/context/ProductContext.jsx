@@ -30,8 +30,9 @@ export function ProductProvider({ children }) {
             setError(null)
 
             const [productsResponse, categoriesData] = await Promise.all([
-                productsApi.getAll({ page: 1, limit: 1000, ...options }), // Load visible products only (isVisible: true filter applies)
-                categoriesApi.getAll({ limit: 1000 })
+                productsApi.getAll({ page: 1, limit: 1000, ...options }),
+                // User-facing: only visible categories. Admin (_admin flag) gets all
+                categoriesApi.getAll({ limit: 100, ...(options._admin ? {} : { visibleOnly: true }) })
             ])
 
             // Handle pagination response structure
@@ -132,7 +133,10 @@ export function ProductProvider({ children }) {
 
     const getProductsByCategory = (category) => {
         if (!category || category === 'all') return products
-        return products.filter(p => p.category.toLowerCase() === category.toLowerCase())
+        return products.filter(p =>
+            p.category?.toLowerCase() === category.toLowerCase() ||
+            (Array.isArray(p.categories) && p.categories.some(c => c.toLowerCase() === category.toLowerCase()))
+        )
     }
 
     const addCategory = async (category) => {

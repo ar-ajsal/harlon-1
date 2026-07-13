@@ -60,7 +60,12 @@ class ProductService {
         const query = {};
 
         if (filters.category && filters.category !== 'all') {
-            query.category = new RegExp(filters.category, 'i');
+            const catRegex = new RegExp(filters.category, 'i');
+            // Match against new multi-category array OR legacy single category string
+            query.$or = [
+                { categories: { $elemMatch: { $regex: filters.category, $options: 'i' } } },
+                { category: catRegex }
+            ];
         }
         if (filters.featured === 'true') {
             query.featured = true;

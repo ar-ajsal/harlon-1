@@ -30,6 +30,10 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Category is required']
     },
+    // Multi-category support — array of category names
+    categories: [{
+        type: String
+    }],
     sizes: [{
         type: String,
         enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
@@ -141,8 +145,9 @@ productSchema.index({ name: 'text', description: 'text' });
 // Shop listing — most common query: visible products sorted by priority
 productSchema.index({ isVisible: 1, priority: -1 });
 
-// Category filter in shop
+// Category filter in shop (legacy single + new multi)
 productSchema.index({ isVisible: 1, category: 1, priority: -1 });
+productSchema.index({ isVisible: 1, categories: 1, priority: -1 });
 
 // Homepage featured / best-seller rails
 productSchema.index({ featured: 1, isVisible: 1 });

@@ -48,7 +48,13 @@ function SortableRow({ product, onEdit, onDelete, onVisibilityToggle }) {
                     </div>
                 </div>
             </td>
-            <td>{product.category}</td>
+            <td>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                    {(product.categories?.length ? product.categories : [product.category]).map(c => (
+                        <span key={c} style={{ fontSize: '11px', background: 'var(--surface-light)', padding: '2px 7px', borderRadius: 10, whiteSpace: 'nowrap' }}>{c}</span>
+                    ))}
+                </div>
+            </td>
             <td>₹{product.price}</td>
             <td>
                 <label onClick={e => e.stopPropagation()} className="toggle-switch">
@@ -131,7 +137,11 @@ function SortableMobileCard({ product, onEdit, onVisibilityToggle }) {
                         {product.name}
                         {product.soldOut && <span style={{ fontSize: '10px', color: '#dc2626', marginLeft: '6px', border: '1px solid #dc2626', padding: '1px 4px', borderRadius: '4px', background: '#fff1f1' }}>Sold Out</span>}
                     </div>
-                    <div className="mobile-card-subtitle">{product.category}</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, marginTop: 2 }}>
+                        {(product.categories?.length ? product.categories : [product.category]).map(c => (
+                            <span key={c} style={{ fontSize: '10px', background: 'var(--surface-light)', padding: '1px 6px', borderRadius: 8 }}>{c}</span>
+                        ))}
+                    </div>
                     <div className="mobile-card-price">₹{product.price}</div>
                     <label onClick={e => e.stopPropagation()} className="toggle-switch">
                         <input
@@ -164,6 +174,7 @@ function ProductsManager() {
         originalPrice: '',
         description: '',
         category: '',
+        categories: [],
         sizes: [],
         images: [],
         featured: false,
@@ -186,6 +197,7 @@ function ProductsManager() {
             originalPrice: '',
             description: '',
             category: categories[0]?.name || '',
+            categories: [],
             sizes: ['S', 'M', 'L', 'XL'],
             images: [],
             featured: false,
@@ -210,11 +222,12 @@ function ProductsManager() {
             originalPrice: product.originalPrice?.toString() || '',
             description: product.description,
             category: product.category,
+            categories: product.categories || [],
             sizes: product.sizes || [],
             images: product.images || [],
             featured: product.featured,
             bestSeller: product.bestSeller || false,
-            isVisible: product.isVisible !== false, // Default to true if undefined
+            isVisible: product.isVisible !== false,
             soldOut: product.soldOut || false,
             tryOnEnabled: product.tryOnEnabled || false,
             overlayImage: product.overlayImage || '',
@@ -287,6 +300,15 @@ function ProductsManager() {
             setFormData({ ...formData, sizes: formData.sizes.filter(s => s !== size) })
         } else {
             setFormData({ ...formData, sizes: [...formData.sizes, size] })
+        }
+    }
+
+    const toggleCategory = (catName) => {
+        const current = formData.categories || []
+        if (current.includes(catName)) {
+            setFormData({ ...formData, categories: current.filter(c => c !== catName) })
+        } else {
+            setFormData({ ...formData, categories: [...current, catName] })
         }
     }
 
@@ -535,7 +557,7 @@ function ProductsManager() {
                                     </div>
 
                                     <div className="form-group">
-                                        <label className="form-label">Category *</label>
+                                        <label className="form-label">Primary Category *</label>
                                         <select
                                             className="form-select"
                                             value={formData.category}
@@ -547,6 +569,25 @@ function ProductsManager() {
                                                 <option key={cat._id} value={cat.name}>{cat.name}</option>
                                             ))}
                                         </select>
+                                        <small style={{ color: 'var(--noir-60)', fontSize: '11px' }}>Used for filtering &amp; legacy support</small>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Additional Categories</label>
+                                        <div className="size-selector" style={{ flexWrap: 'wrap' }}>
+                                            {categories.map(cat => (
+                                                <button
+                                                    key={cat._id}
+                                                    type="button"
+                                                    className={`size-chip ${(formData.categories || []).includes(cat.name) ? 'active' : ''}`}
+                                                    onClick={() => toggleCategory(cat.name)}
+                                                    style={{ fontSize: '12px' }}
+                                                >
+                                                    {cat.name}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <small style={{ color: 'var(--noir-60)', fontSize: '11px' }}>Click to assign multiple categories — shown as pills on the store</small>
                                     </div>
 
                                     <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>

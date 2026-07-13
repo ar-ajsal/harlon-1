@@ -546,6 +546,28 @@
     margin: 0 0 3px;
 }
 
+/* Multi-category pill container on shop cards */
+.dsc-cat-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 0 0 5px;
+}
+
+.dsc-cat-pill {
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: hsl(38, 80%, 55%);
+    background: rgba(212, 155, 70, 0.1);
+    border: 1px solid rgba(212, 155, 70, 0.25);
+    padding: 2px 6px;
+    border-radius: 20px;
+    line-height: 1.4;
+}
+
 .dsc-name {
     font-family: 'Syne', sans-serif;
     font-weight: 700;

@@ -16,6 +16,10 @@ const categorySchema = new mongoose.Schema({
     image: {
         type: String,
         default: ''
+    },
+    isVisible: {
+        type: Boolean,
+        default: true
     }
 }, {
     timestamps: true

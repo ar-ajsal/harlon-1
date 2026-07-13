@@ -5,9 +5,14 @@ class CategoryService {
     async getAll(filters = {}) {
         const query = {};
 
+        // User-facing pages pass visibleOnly=true — hide hidden categories
+        if (filters.visibleOnly === 'true' || filters.visibleOnly === true) {
+            query.isVisible = true;
+        }
+
         // Pagination
         const page = parseInt(filters.page) || 1;
-        const limit = parseInt(filters.limit) || 20;
+        const limit = parseInt(filters.limit) || 100;
         const skip = (page - 1) * limit;
 
         const [categories, total] = await Promise.all([

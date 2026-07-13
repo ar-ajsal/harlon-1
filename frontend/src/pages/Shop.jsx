@@ -82,7 +82,7 @@ function DropHero({ total, loading }) {
 }
 
 /* ── Smart Filter Chips ─────────────────────────────────────── */
-function filterProducts(products, chipId, search, categories) {
+function filterProducts(products, chipId, search) {
     let result = [...products]
 
     // Text search
@@ -91,16 +91,20 @@ function filterProducts(products, chipId, search, categories) {
         result = result.filter(p =>
             p.name?.toLowerCase().includes(q) ||
             p.category?.toLowerCase().includes(q) ||
+            (Array.isArray(p.categories) && p.categories.some(c => c.toLowerCase().includes(q))) ||
             p.description?.toLowerCase().includes(q)
         )
     }
 
-    // Smart chip filters
+    // Smart chip filters — match against categories array OR legacy category string
     if (chipId !== 'all') {
-        result = result.filter(p =>
-            p.category?.toLowerCase() === chipId.toLowerCase() ||
-            p.category?.toLowerCase().includes(chipId.toLowerCase())
-        )
+        result = result.filter(p => {
+            const legacyMatch = p.category?.toLowerCase() === chipId.toLowerCase() ||
+                p.category?.toLowerCase().includes(chipId.toLowerCase())
+            const multiMatch = Array.isArray(p.categories) &&
+                p.categories.some(c => c.toLowerCase() === chipId.toLowerCase() || c.toLowerCase().includes(chipId.toLowerCase()))
+            return legacyMatch || multiMatch
+        })
     }
 
     return result
@@ -249,7 +253,11 @@ function DropShopCard({ product, index, reduced }) {
                 </div>
 
                 <div className="dsc-info">
-                    <p className="dsc-cat">{product.category}</p>
+                    <div className="dsc-cat-pills">
+                        {(product.categories?.length ? product.categories : [product.category]).filter(Boolean).map(cat => (
+                            <span key={cat} className="dsc-cat-pill">{cat}</span>
+                        ))}
+                    </div>
                     <h3 className="dsc-name">{product.name}</h3>
                     {subtext && <p className="dsc-subtext">"{subtext}"</p>}
                     <div className="dsc-price-row">
