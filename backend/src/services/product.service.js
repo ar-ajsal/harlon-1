@@ -121,7 +121,7 @@ class ProductService {
         // Field projection — public gets card-only fields (~50% smaller payload)
         const projection = isAdminRequest
             ? null
-            : 'name price originalPrice images category sizes sleeveLength collarType zip soldOut inStock featured bestSeller priority isVisible tryOnEnabled overlayImage';
+            : 'name price originalPrice images category categories sizes sleeveLength collarType zip soldOut inStock featured bestSeller priority isVisible tryOnEnabled overlayImage';
 
         const dbQuery = Product
             .find(query)
