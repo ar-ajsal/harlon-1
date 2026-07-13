@@ -85,15 +85,24 @@ function DropHero({ total, loading }) {
 function filterProducts(products, chipId, search) {
     let result = [...products]
 
-    // Text search
+    // Flexible Text search (multi-keyword)
     if (search) {
-        const q = search.toLowerCase()
-        result = result.filter(p =>
-            p.name?.toLowerCase().includes(q) ||
-            p.category?.toLowerCase().includes(q) ||
-            (Array.isArray(p.categories) && p.categories.some(c => c.toLowerCase().includes(q))) ||
-            p.description?.toLowerCase().includes(q)
-        )
+        const terms = search.toLowerCase().split(/\s+/).filter(Boolean)
+        
+        result = result.filter(p => {
+            // Combine all relevant product text into one searchable blob
+            const searchableText = [
+                p.name,
+                p.category,
+                ...(p.categories || []),
+                p.description,
+                p.sleeveLength,
+                p.collarType
+            ].filter(Boolean).join(' ').toLowerCase()
+
+            // Product must contain EVERY keyword the user typed (in any order)
+            return terms.every(term => searchableText.includes(term))
+        })
     }
 
     // Smart chip filters — match against categories array OR legacy category string
