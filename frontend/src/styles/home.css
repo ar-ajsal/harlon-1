@@ -328,6 +328,28 @@
     width: 100%;
 }
 
+/* Mobile: 2-column grid — hidden on desktop */
+.cvt-moments-grid-mobile {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 0 16px;
+}
+
+/* Desktop slider — hidden on mobile */
+.cvt-moments-desktop-only {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .cvt-moments-grid-mobile {
+        display: none;
+    }
+    .cvt-moments-desktop-only {
+        display: block;
+    }
+}
+
 .cvt-moments-track.cvt-auto-slider {
     display: inline-flex;
     padding: 8px 0 20px;

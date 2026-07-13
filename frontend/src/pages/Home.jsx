@@ -169,7 +169,31 @@ function CategoryCardsSection({ categories, products, reduced }) {
                 <p className="cvt-section-desc">Find the exact era, club, or legend you're looking for.</p>
             </div>
 
-            <div className="cvt-moments-scroll-wrap">
+            {/* Mobile: 2-column grid */}
+            <div className="cvt-moments-grid-mobile">
+                {cards.map((card) => (
+                    <Link to={`/shop?chip=${card.id}`} key={card.id} className="cvt-moment-card">
+                        <div className="cvt-moment-img-wrap">
+                            {card.img ? (
+                                <img src={card.img} alt={card.name} className="cvt-moment-img" />
+                            ) : (
+                                <div className="cvt-moment-placeholder" style={{ background: '#222' }}>
+                                    <span style={{ color: '#555', fontSize: 32 }}>⚽</span>
+                                </div>
+                            )}
+                            <div className="cvt-moment-overlay">
+                                <span className="cvt-moment-tag">CATEGORY</span>
+                                <h3 className="cvt-moment-label">{card.name}</h3>
+                                <p className="cvt-moment-story">Authentic retro drops.</p>
+                                <span className="cvt-moment-cta">Explore <FiArrowRight size={12} /></span>
+                            </div>
+                        </div>
+                    </Link>
+                ))}
+            </div>
+
+            {/* Desktop: auto-scrolling slider */}
+            <div className="cvt-moments-scroll-wrap cvt-moments-desktop-only">
                 <div className="cvt-moments-track cvt-auto-slider">
                     <div className="cvt-moments-group">
                         {infiniteCards.map((card, i) => (
