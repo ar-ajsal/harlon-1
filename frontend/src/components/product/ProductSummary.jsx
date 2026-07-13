@@ -58,8 +58,8 @@ function ProductSummary({
         <div className="pd-sidebar-inner">
             {/* Category pills */}
             <div className="pd-category-pills">
-                {(product.categories?.length ? product.categories : [product.category]).filter(Boolean).map(cat => (
-                    <span key={cat} className="pd-category-pill">{cat}</span>
+                {[...new Set([product.category, ...(product.categories || [])])].filter(Boolean).map((cat, idx) => (
+                    <span key={idx} className="category-pill">{cat}</span>
                 ))}
             </div>
 

@@ -254,7 +254,7 @@ function DropShopCard({ product, index, reduced }) {
 
                 <div className="dsc-info">
                     <div className="dsc-cat-pills">
-                        {(product.categories?.length ? product.categories : [product.category]).filter(Boolean).map(cat => (
+                        {[...new Set([product.category, ...(product.categories || [])])].filter(Boolean).map(cat => (
                             <span key={cat} className="dsc-cat-pill">{cat}</span>
                         ))}
                     </div>

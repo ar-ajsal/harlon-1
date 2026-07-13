@@ -50,7 +50,7 @@ function SortableRow({ product, onEdit, onDelete, onVisibilityToggle }) {
             </td>
             <td>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                    {(product.categories?.length ? product.categories : [product.category]).map(c => (
+                    {[...new Set([product.category, ...(product.categories || [])])].filter(Boolean).map(c => (
                         <span key={c} style={{ fontSize: '11px', background: 'var(--surface-light)', padding: '2px 7px', borderRadius: 10, whiteSpace: 'nowrap' }}>{c}</span>
                     ))}
                 </div>
@@ -138,7 +138,7 @@ function SortableMobileCard({ product, onEdit, onVisibilityToggle }) {
                         {product.soldOut && <span style={{ fontSize: '10px', color: '#dc2626', marginLeft: '6px', border: '1px solid #dc2626', padding: '1px 4px', borderRadius: '4px', background: '#fff1f1' }}>Sold Out</span>}
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, marginTop: 2 }}>
-                        {(product.categories?.length ? product.categories : [product.category]).map(c => (
+                        {[...new Set([product.category, ...(product.categories || [])])].filter(Boolean).map(c => (
                             <span key={c} style={{ fontSize: '10px', background: 'var(--surface-light)', padding: '1px 6px', borderRadius: 8 }}>{c}</span>
                         ))}
                     </div>
