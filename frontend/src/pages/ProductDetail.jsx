@@ -321,7 +321,7 @@ function ProductDetail() {
                         transition={{ duration: 0.45, delay: 0.1, ease: [0.2, 0.9, 0.2, 1] }}
                     >
                         {/* Countdown pill (above CTAs) */}
-                        {!product.soldOut && (
+                        {product.stock > 0 && (
                             <div className="pd-countdown-pill">
                                 <span>⚡ Order within</span>
                                 <span className="pd-countdown-timer">{h}:{m}:{s}</span>
@@ -338,7 +338,7 @@ function ProductDetail() {
                                 onBuy={handleBuy}
                                 onAddToCart={handleAddToCart}
                                 onWhatsApp={handleWhatsAppOrder}
-                                soldOut={product.soldOut}
+                                soldOut={product.stock <= 0}
                                 deliveryEstimate={`Estimated by ${dates.rangeLabel}`}
                                 onSizeGuideClick={() => setActiveTab('sizeChart')}
                                 orderSettings={orderSettings}
@@ -704,7 +704,7 @@ function ProductDetail() {
                             <span className="pd-sticky-price">₹{fmt(currentPrice)}</span>
                         </div>
                         <div style={{ display: 'flex', gap: 8 }}>
-                            {!product.soldOut && (
+                            {product.stock > 0 && (
                                 <button
                                     type="button"
                                     onClick={handleAddToCart}
@@ -725,10 +725,10 @@ function ProductDetail() {
                                     type="button"
                                     className="pd-sticky-buy"
                                     onClick={handleBuy}
-                                    disabled={product.soldOut}
+                                    disabled={product.stock <= 0}
                                     style={{ flex: 1 }}
                                 >
-                                    {product.soldOut ? 'Sold Out' : 'Buy Now'}
+                                    {product.stock <= 0 ? 'Sold Out' : 'Buy Now'}
                                 </button>
                             )}
                         </div>

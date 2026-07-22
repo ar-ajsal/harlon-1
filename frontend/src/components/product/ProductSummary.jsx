@@ -17,7 +17,6 @@ function ProductSummary({
     onBuy,
     onAddToCart,
     onWhatsApp,
-    soldOut = false,
     deliveryEstimate = '',
     onSizeGuideClick,
     orderSettings = { whatsappOrderEnabled: true, onlinePaymentEnabled: true },
@@ -78,9 +77,9 @@ function ProductSummary({
             </div>
 
             {/* Sold-out badge */}
-            {soldOut && (
-                <div className="pd-sold-badge">
-                    <span>❌</span> Sold Out — Check back soon
+            {product?.stock <= 0 && (
+                <div className="ps-sold-banner">
+                    This item is currently out of stock.
                 </div>
             )}
 
@@ -109,9 +108,9 @@ function ProductSummary({
                                 key={size}
                                 type="button"
                                 className={`pd-size-btn${selectedSize === size ? ' active' : ''}`}
-                                onClick={() => !soldOut && onSizeSelect?.(size)}
-                                disabled={soldOut}
-                                whileTap={soldOut ? {} : tap}
+                                onClick={() => product?.stock > 0 && onSizeSelect?.(size)}
+                                disabled={product?.stock <= 0}
+                                whileTap={product?.stock <= 0 ? {} : tap}
                                 aria-pressed={selectedSize === size}
                                 aria-label={`Size ${size}`}
                             >
@@ -135,18 +134,18 @@ function ProductSummary({
                                 type="button"
                                 className="pd-btn-buy"
                                 onClick={handleBuyClick}
-                                disabled={soldOut}
-                                whileHover={soldOut ? {} : hover}
-                                whileTap={soldOut ? {} : tap}
+                                disabled={product?.stock <= 0}
+                                whileHover={product?.stock <= 0 ? {} : hover}
+                                whileTap={product?.stock <= 0 ? {} : tap}
                                 aria-label="Buy now"
                             >
                                 <FiShoppingBag style={{ fontSize: 18 }} />
-                                {soldOut ? 'Sold Out' : `Buy Now — ₹${fmt(currentPrice)}`}
+                                {product?.stock <= 0 ? 'Sold Out' : `Buy Now — ₹${fmt(currentPrice)}`}
                             </motion.button>
                         )}
 
                         {/* ── Add to Cart ── */}
-                        {!soldOut && onAddToCart && (
+                        {product?.stock > 0 && onAddToCart && (
                             <motion.button
                                 type="button"
                                 onClick={onAddToCart}
@@ -173,19 +172,19 @@ function ProductSummary({
                                 type="button"
                                 className="pd-btn-wa"
                                 onClick={onWhatsApp}
-                                disabled={soldOut}
-                                whileHover={soldOut ? {} : hover}
-                                whileTap={soldOut ? {} : tap}
+                                disabled={product?.stock <= 0}
+                                whileHover={product?.stock <= 0 ? {} : hover}
+                                whileTap={product?.stock <= 0 ? {} : tap}
                                 aria-label="Order on WhatsApp"
                             >
                                 <FaWhatsapp style={{ fontSize: 20 }} />
-                                {soldOut ? 'Sold Out' : 'Order via WhatsApp'}
+                                {product?.stock <= 0 ? 'Sold Out' : 'Order via WhatsApp'}
                             </motion.button>
                         )}
                     </>
                 )}
 
-                {soldOut && (
+                {product?.stock <= 0 && (
                     <button type="button" className="pd-btn-waitlist">
                         <FiZap style={{ fontSize: 14 }} />
                         Notify me when back

@@ -38,9 +38,9 @@ export default function JerseyOfTheDay({ products }) {
 
         // Fallback: auto-pick best seller, then featured, then first visible
         if (!pick) {
-            pick = products.find(p => p.bestSeller && !p.soldOut)
-                || products.find(p => p.featured && !p.soldOut)
-                || products.find(p => p.isVisible !== false && !p.soldOut)
+            pick = products.find(p => p.bestSeller && (p.stock > 0))
+                || products.find(p => p.featured && (p.stock > 0))
+                || products.find(p => p.isVisible !== false && (p.stock > 0))
         }
 
         if (pick) setJotd(pick)

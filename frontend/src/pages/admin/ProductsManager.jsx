@@ -41,7 +41,7 @@ function SortableRow({ product, onEdit, onDelete, onVisibilityToggle }) {
                         <span className="product-cell-name">
                             {product.name}
                             {product.isVisible === false && <span style={{ fontSize: '10px', color: 'var(--error)', marginLeft: '6px', border: '1px solid var(--error)', padding: '1px 4px', borderRadius: '4px' }}>Hidden</span>}
-                            {product.soldOut && <span style={{ fontSize: '10px', color: '#dc2626', marginLeft: '6px', border: '1px solid #dc2626', padding: '1px 4px', borderRadius: '4px', background: '#fff1f1' }}>Sold Out</span>}
+                            {product.stock <= 0 && <span style={{ fontSize: '10px', color: '#dc2626', marginLeft: '6px', border: '1px solid #dc2626', padding: '1px 4px', borderRadius: '4px', background: '#fff1f1' }}>Sold Out</span>}
                         </span>
                         {product.featured && <span className="badge badge-accent">Featured</span>}
                         {product.bestSeller && <span className="badge badge-primary">Best Seller</span>}
@@ -135,7 +135,7 @@ function SortableMobileCard({ product, onEdit, onVisibilityToggle }) {
                 <div className="mobile-card-content">
                     <div className="mobile-card-title">
                         {product.name}
-                        {product.soldOut && <span style={{ fontSize: '10px', color: '#dc2626', marginLeft: '6px', border: '1px solid #dc2626', padding: '1px 4px', borderRadius: '4px', background: '#fff1f1' }}>Sold Out</span>}
+                        {product.stock <= 0 && <span style={{ fontSize: '10px', color: '#dc2626', marginLeft: '6px', border: '1px solid #dc2626', padding: '1px 4px', borderRadius: '4px', background: '#fff1f1' }}>Sold Out</span>}
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, marginTop: 2 }}>
                         {[...new Set([product.category, ...(product.categories || [])])].filter(Boolean).map(c => (
@@ -181,7 +181,7 @@ function ProductsManager() {
         featured: false,
         bestSeller: false,
         isVisible: true,
-        soldOut: false,
+        priority: 0,
         tryOnEnabled: false,
         overlayImage: '',
         sleeveLength: '',
@@ -204,7 +204,7 @@ function ProductsManager() {
             featured: false,
             bestSeller: false,
             isVisible: true,
-            soldOut: false,
+            priority: 0,
             tryOnEnabled: false,
             overlayImage: '',
             sleeveLength: '',
@@ -228,8 +228,8 @@ function ProductsManager() {
             images: product.images || [],
             featured: product.featured,
             bestSeller: product.bestSeller || false,
-            isVisible: product.isVisible !== false,
-            soldOut: product.soldOut || false,
+            isVisible: product.isVisible ?? true,
+            priority: product.priority || 0,
             tryOnEnabled: product.tryOnEnabled || false,
             overlayImage: product.overlayImage || '',
             sleeveLength: product.sleeveLength || '',
@@ -806,19 +806,6 @@ function ProductsManager() {
                                                 <span className="switch-desc">Show this product in store</span>
                                             </span>
                                         </div>
-
-                                        <label className="switch-label">
-                                            <input
-                                                type="checkbox"
-                                                checked={formData.soldOut}
-                                                onChange={e => setFormData({ ...formData, soldOut: e.target.checked })}
-                                                style={{ marginTop: '4px', width: '18px', height: '18px', cursor: 'pointer', accentColor: '#dc2626' }}
-                                            />
-                                            <span className="switch-text">
-                                                <span className="switch-title" style={{ color: formData.soldOut ? 'var(--error)' : 'var(--noir-100)' }}>Sold Out</span>
-                                                <span className="switch-desc">Block purchases — shows "Sold Out" badge to customers</span>
-                                            </span>
-                                        </label>
                                     </div>
 
                                     <div className="switch-divider"></div>

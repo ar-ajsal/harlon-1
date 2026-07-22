@@ -35,11 +35,8 @@ const escapeXML = (unsafe) => {
  * A product is in stock ONLY when ALL three conditions pass.
  */
 const getAvailability = (product) => {
-    // Hidden products shouldn't get ad spend, but keeping them in catalog 
-    // prevents "Product ID not found" errors when users visit direct links.
-    if (!product.isVisible)  return 'out of stock';
-    if (product.soldOut)     return 'out of stock';
-    if (!product.inStock)    return 'out of stock';
+    // Generate Meta availability solely from stock. 
+    // Hidden products (isVisible: false) must still exist in catalog to prevent Pixel ID mismatch.
     if (product.stock <= 0)  return 'out of stock';
     return 'in stock';
 };
@@ -85,8 +82,6 @@ export const getCatalogFeed = async (req, res) => {
                 price: 1,
                 originalPrice: 1,
                 images: 1,
-                inStock: 1,
-                soldOut: 1,
                 stock: 1,
                 category: 1,
             }

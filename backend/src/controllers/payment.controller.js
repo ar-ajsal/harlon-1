@@ -91,14 +91,13 @@ export const razorpayWebhook = async (req, res) => {
                     order.product.productId,
                     [{
                         $set: {
-                            stock: { $max: [0, { $subtract: ['$stock', 1] }] },
-                            inStock: { $gt: [{ $max: [0, { $subtract: ['$stock', 1] }] }, 0] }
+                            stock: { $max: [0, { $subtract: ['$stock', 1] }] }
                         }
                     }],
                     { new: true }
                 );
                 if (updated) {
-                    console.log(`[stock] ${updated.name} → stock: ${updated.stock}, inStock: ${updated.inStock}`);
+                    console.log(`[stock] ${updated.name} → stock: ${updated.stock}`);
                 }
             } catch (stockErr) {
                 console.error('[stock] Failed to decrement stock:', stockErr.message);

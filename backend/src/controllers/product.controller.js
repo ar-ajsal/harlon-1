@@ -56,8 +56,7 @@ export const updateStock = asyncHandler(async (req, res) => {
     }
     const newStock = Math.floor(Number(stock));
     const product = await productService.update(req.params.id, {
-        stock: newStock,
-        inStock: newStock > 0
+        stock: newStock
     });
     res.json(ApiResponse.success(product, `Stock updated to ${newStock}`));
 });

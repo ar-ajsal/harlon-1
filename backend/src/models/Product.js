@@ -60,10 +60,6 @@ const productSchema = new mongoose.Schema({
         default: 0,
         min: [0, 'Stock cannot be negative']
     },
-    inStock: {
-        type: Boolean,
-        default: true
-    },
     featured: {
         type: Boolean,
         default: false
@@ -75,10 +71,6 @@ const productSchema = new mongoose.Schema({
     isVisible: {
         type: Boolean,
         default: true
-    },
-    soldOut: {
-        type: Boolean,
-        default: false
     },
     priority: {
         type: Number,

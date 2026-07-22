@@ -31,15 +31,15 @@ function ProductCard({ product, priority = false }) {
 
     // Scarcity
     const stock = product.stock ?? 99
-    const inStock = product.inStock !== false && !product.soldOut
-    const lowStock = inStock && stock < 10 && stock > 0
-    const sellingFast = inStock && stock <= 5 && stock > 0
+    const isAvailable = stock > 0
+    const lowStock = isAvailable && stock < 10
+    const sellingFast = isAvailable && stock <= 5
 
     return (
         <Link
             to={`/product/${product._id}`}
-            className={`product-card${product.soldOut ? ' sold-out' : ''}${isDropLive ? ' drop-active' : ''}`}
-            aria-label={`${product.name}${product.soldOut ? ' — Sold Out' : ''}`}
+            className={`product-card${!isAvailable ? ' sold-out' : ''}${isDropLive ? ' drop-active' : ''}`}
+            aria-label={`${product.name}${!isAvailable ? ' — Sold Out' : ''}`}
         >
             {/* Image */}
             <div className="product-image-wrapper">
@@ -54,17 +54,17 @@ function ProductCard({ product, priority = false }) {
                     loading={priority ? 'eager' : 'lazy'}
                     decoding={priority ? 'sync' : 'async'}
                     fetchpriority={priority ? 'high' : undefined}
-                    style={product.soldOut ? { opacity: 0.5, filter: 'grayscale(50%)' } : undefined}
+                    style={!isAvailable ? { opacity: 0.5, filter: 'grayscale(50%)' } : undefined}
                 />
 
                 {/* Sold-out diagonal ribbon */}
-                {product.soldOut && <SoldOutRibbon />}
+                {!isAvailable && <SoldOutRibbon />}
 
                 {/* Drop badge */}
-                {isDropLive && !product.soldOut && (
+                {isDropLive && isAvailable && (
                     <span className="product-badge drop-badge">⚡ DROP LIVE</span>
                 )}
-                {isDropUpcoming && !product.soldOut && (
+                {isDropUpcoming && isAvailable && (
                     <span className="product-badge drop-badge upcoming">⏳ DROP SOON</span>
                 )}
 

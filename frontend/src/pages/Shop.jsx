@@ -121,7 +121,7 @@ function filterProducts(products, chipId, search) {
 }
 
 /* ── Auto-Cycling Image Carousel ───────────────────────────── */
-function ImageCarousel({ images, productName, soldOut }) {
+function ImageCarousel({ images, productName, stock }) {
     const [activeIdx, setActiveIdx] = useState(0)
     const [hovered, setHovered] = useState(false)
     const intervalRef = useRef(null)
@@ -191,14 +191,14 @@ function DropShopCard({ product, index, reduced }) {
     const mrp = product.price
     const d = calcDisc(price, mrp)
     const stock = product.stock ?? 99
-    const inStock = product.inStock !== false && !product.soldOut && stock > 0
-    const lowStock = inStock && stock < 10
-    const sellingFast = inStock && stock <= 5
+    const isAvailable = stock > 0;
+    const lowStock = isAvailable && stock < 10
+    const sellingFast = isAvailable && stock <= 5
     const sizes = product.sizes?.filter(s => s.stock > 0) || []
     const firstSize = sizes[0]?.size || 'M'
 
     // Dynamic badge
-    const badge = product.soldOut ? { label: 'SOLD OUT', cls: 'badge--sold' }
+    const badge = !isAvailable ? { label: 'SOLD OUT', cls: 'badge--sold' }
         : sellingFast ? { label: '🔥 HOT', cls: 'badge--hot' }
         : lowStock ? { label: 'LIMITED', cls: 'badge--limited' }
         : product.bestSeller ? { label: 'BEST', cls: 'badge--best' }
@@ -212,7 +212,7 @@ function DropShopCard({ product, index, reduced }) {
 
     return (
         <motion.div
-            className={`dsc${product.soldOut ? ' dsc--sold' : ''}`}
+            className={`dsc${!isAvailable ? ' dsc--sold' : ''}`}
             initial={reduced ? {} : { opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-40px' }}
@@ -223,7 +223,7 @@ function DropShopCard({ product, index, reduced }) {
                     <ImageCarousel
                         images={images}
                         productName={product.name}
-                        soldOut={product.soldOut}
+                        stock={stock}
                     />
 
                     {/* Stock warning TOP LEFT */}
@@ -232,7 +232,7 @@ function DropShopCard({ product, index, reduced }) {
                             ⚡ ONLY {stock} LEFT
                         </span>
                     )}
-                    {product.soldOut && (
+                    {!isAvailable && (
                         <span className="dsc-stock-badge dsc-stock-badge--sold">SOLD OUT</span>
                     )}
 

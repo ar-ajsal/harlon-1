@@ -411,7 +411,7 @@ function Dashboard() {
                                 style={{ width: '100%', padding: '9px 12px', border: '1.5px solid #e5e7eb', borderRadius: 8, fontSize: 13, boxSizing: 'border-box', background: '#fff' }}
                             >
                                 <option value="">-- Auto-pick best seller --</option>
-                                {products.filter(p => !p.soldOut).map(p => (
+                                {products.filter(p => (p.stock > 0)).map(p => (
                                     <option key={p._id} value={p._id}>{p.name}</option>
                                 ))}
                             </select>

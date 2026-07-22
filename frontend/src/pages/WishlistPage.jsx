@@ -94,10 +94,10 @@ export default function WishlistPage() {
                                                     alt={product.name}
                                                     loading="lazy"
                                                 />
-                                                {product.soldOut && (
+                                                {product.stock <= 0 && (
                                                     <div className="wl-sold-overlay">Sold Out</div>
                                                 )}
-                                                {disc >= 8 && !product.soldOut && (
+                                                {disc >= 8 && product.stock > 0 && (
                                                     <span className="wl-disc-badge">{disc}% OFF</span>
                                                 )}
                                             </Link>
