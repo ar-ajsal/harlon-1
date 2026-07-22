@@ -35,6 +35,9 @@ const escapeXML = (unsafe) => {
  * A product is in stock ONLY when ALL three conditions pass.
  */
 const getAvailability = (product) => {
+    // Hidden products shouldn't get ad spend, but keeping them in catalog 
+    // prevents "Product ID not found" errors when users visit direct links.
+    if (!product.isVisible)  return 'out of stock';
     if (product.soldOut)     return 'out of stock';
     if (!product.inStock)    return 'out of stock';
     if (product.stock <= 0)  return 'out of stock';
@@ -72,7 +75,6 @@ export const getCatalogFeed = async (req, res) => {
          */
         const products = await Product.find(
             {
-                isVisible: true,
                 productType: { $ne: 'mystery-box' }, // mystery boxes are not real SKUs
             },
             // Projection — only load the fields we actually use (lean query)
