@@ -468,79 +468,135 @@ function GuestOrders() {
                     <p>Guest orders will appear here once customers place them.</p>
                 </div>
             ) : (
-                <div className="orders-table-container table-responsive">
-                    <table className="orders-table">
-                        <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Product</th>
-                                <th>Size</th>
-                                <th>Customer</th>
-                                <th>Payment</th>
-                                <th>Delivery</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {orders.map(order => (
-                                <tr key={order._id}>
-                                    <td>
-                                        <code style={{ fontSize: '12px', background: '#f3f4f6', padding: '2px 6px', borderRadius: '4px' }}>
-                                            {order.orderId}
-                                        </code>
-                                    </td>
-                                    <td>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            {order.product?.image && (
-                                                <img src={order.product.image} alt="" style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '4px' }} />
-                                            )}
-                                            <span style={{ fontSize: '13px' }}>{order.product?.name}</span>
+                <>
+                    {/* Mobile Card List */}
+                    <div className="mobile-card-list">
+                        {orders.map(order => (
+                            <div key={order._id} className="mobile-card" onClick={() => setDetailOrder(order)}>
+                                <div className="mobile-card-content" style={{ width: '100%' }}>
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                                        {order.product?.image && (
+                                            <img
+                                                src={order.product.image}
+                                                alt={order.product?.name}
+                                                className="mobile-card-image"
+                                                style={{ width: 60, height: 60, flexShrink: 0 }}
+                                            />
+                                        )}
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div className="mobile-card-title">{order.product?.name}</div>
+                                            <div className="mobile-card-subtitle">
+                                                Size: <strong>{order.product?.size}</strong>
+                                            </div>
+                                            <div className="mobile-card-subtitle">{customerName(order.customer)}</div>
+                                            <div className="mobile-card-subtitle" style={{ color: '#9ca3af', fontSize: 11 }}>
+                                                {order.customer?.phone}
+                                            </div>
                                         </div>
-                                    </td>
-                                    <td><strong>{order.product?.size}</strong></td>
-                                    <td>
-                                        <div style={{ fontSize: '13px' }}>
-                                            <div><strong>{customerName(order.customer)}</strong></div>
-                                            <div style={{ color: '#6b7280' }}>{order.customer?.email}</div>
-                                            <div style={{ color: '#6b7280' }}>{order.customer?.phone}</div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                            <Badge value={order.payment?.payment_status} colors={PAYMENT_COLORS} />
-                                            <span style={{ fontSize: '11px', color: '#9ca3af' }}>{order.payment?.method}</span>
-                                        </div>
-                                    </td>
-                                    <td><Badge value={order.deliveryStatus} colors={DELIVERY_COLORS} /></td>
-                                    <td style={{ fontSize: '12px', color: '#6b7280' }}>
-                                        {new Date(order.createdAt).toLocaleDateString('en-IN')}
-                                    </td>
-                                    <td>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                            <motion.button
-                                                className="btn btn-secondary"
-                                                style={{ fontSize: '12px', padding: '4px 10px', display: 'flex', alignItems: 'center', gap: '4px' }}
-                                                onClick={() => setDetailOrder(order)}
-                                                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                                            >
-                                                <FiEye size={13} /> Manage
-                                            </motion.button>
-                                            <motion.button
-                                                className="btn btn-secondary"
-                                                style={{ fontSize: '12px', padding: '4px 10px', background: '#f0fdf4', color: '#166534', borderColor: '#bbf7d0' }}
-                                                onClick={() => handleWhatsAppNotify(order.orderId)}
-                                                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                                            >
-                                                💬 WA
-                                            </motion.button>
-                                        </div>
-                                    </td>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
+                                        <Badge value={order.deliveryStatus} colors={DELIVERY_COLORS} />
+                                        <Badge value={order.payment?.payment_status} colors={PAYMENT_COLORS} />
+                                        <span style={{ fontSize: '11px', color: '#9ca3af', marginLeft: 'auto' }}>
+                                            {new Date(order.createdAt).toLocaleDateString('en-IN')}
+                                        </span>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                                        <button
+                                            className="btn btn-secondary btn-sm"
+                                            style={{ flex: 1 }}
+                                            onClick={(e) => { e.stopPropagation(); setDetailOrder(order) }}
+                                        >
+                                            <FiEye size={13} /> Manage
+                                        </button>
+                                        <button
+                                            className="btn btn-sm"
+                                            style={{ flex: 1, background: '#f0fdf4', color: '#166534', border: '1px solid #bbf7d0' }}
+                                            onClick={(e) => { e.stopPropagation(); handleWhatsAppNotify(order.orderId) }}
+                                        >
+                                            💬 WhatsApp
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Desktop Table */}
+                    <div className="orders-table-container table-responsive">
+                        <table className="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Product</th>
+                                    <th>Size</th>
+                                    <th>Customer</th>
+                                    <th>Payment</th>
+                                    <th>Delivery</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                {orders.map(order => (
+                                    <tr key={order._id}>
+                                        <td>
+                                            <code style={{ fontSize: '12px', background: '#f3f4f6', padding: '2px 6px', borderRadius: '4px' }}>
+                                                {order.orderId}
+                                            </code>
+                                        </td>
+                                        <td>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                {order.product?.image && (
+                                                    <img src={order.product.image} alt="" style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '4px' }} />
+                                                )}
+                                                <span style={{ fontSize: '13px' }}>{order.product?.name}</span>
+                                            </div>
+                                        </td>
+                                        <td><strong>{order.product?.size}</strong></td>
+                                        <td>
+                                            <div style={{ fontSize: '13px' }}>
+                                                <div><strong>{customerName(order.customer)}</strong></div>
+                                                <div style={{ color: '#6b7280' }}>{order.customer?.email}</div>
+                                                <div style={{ color: '#6b7280' }}>{order.customer?.phone}</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                                <Badge value={order.payment?.payment_status} colors={PAYMENT_COLORS} />
+                                                <span style={{ fontSize: '11px', color: '#9ca3af' }}>{order.payment?.method}</span>
+                                            </div>
+                                        </td>
+                                        <td><Badge value={order.deliveryStatus} colors={DELIVERY_COLORS} /></td>
+                                        <td style={{ fontSize: '12px', color: '#6b7280' }}>
+                                            {new Date(order.createdAt).toLocaleDateString('en-IN')}
+                                        </td>
+                                        <td>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                                <motion.button
+                                                    className="btn btn-secondary"
+                                                    style={{ fontSize: '12px', padding: '4px 10px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                                    onClick={() => setDetailOrder(order)}
+                                                    whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                                                >
+                                                    <FiEye size={13} /> Manage
+                                                </motion.button>
+                                                <motion.button
+                                                    className="btn btn-secondary"
+                                                    style={{ fontSize: '12px', padding: '4px 10px', background: '#f0fdf4', color: '#166534', borderColor: '#bbf7d0' }}
+                                                    onClick={() => handleWhatsAppNotify(order.orderId)}
+                                                    whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                                                >
+                                                    💬 WA
+                                                </motion.button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </>
             )}
 
             {/* Pagination */}

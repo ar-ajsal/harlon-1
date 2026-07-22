@@ -118,7 +118,97 @@ function StockManager() {
                 </div>
             </div>
 
-            {/* Table */}
+            {/* Mobile Card List */}
+            <div className="mobile-card-list" style={{ paddingBottom: 20 }}>
+                {filtered.length === 0 ? (
+                    <div className="empty-state">
+                        <span className="empty-icon">📦</span>
+                        <h3>No products found</h3>
+                        <p>Try adjusting your search or filter.</p>
+                    </div>
+                ) : filtered.map(p => {
+                    const isEditing = p._id in editing
+                    const isSaving = saving[p._id]
+                    const stock = p.stock ?? 0
+                    const isOut = !p.inStock || stock === 0
+                    const isLow = p.inStock && stock >= 1 && stock <= 3
+
+                    return (
+                        <div key={p._id} className="mobile-card" style={{ opacity: isOut ? 0.7 : 1, background: isOut ? '#fff5f5' : undefined }}>
+                            {p.images?.[0] && (
+                                <img
+                                    src={p.images[0]}
+                                    alt={p.name}
+                                    className="mobile-card-image"
+                                />
+                            )}
+                            <div className="mobile-card-content">
+                                <div className="mobile-card-title">{p.name}</div>
+                                <div className="mobile-card-subtitle">{p.category} · ₹{p.price}</div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                                    <span style={{
+                                        display: 'inline-block', padding: '2px 8px', borderRadius: 999,
+                                        fontSize: 11, fontWeight: 600,
+                                        background: p.inStock ? '#10b98122' : '#ef444422',
+                                        color: p.inStock ? '#10b981' : '#ef4444',
+                                        border: `1px solid ${p.inStock ? '#10b98144' : '#ef444444'}`
+                                    }}>
+                                        {p.inStock ? '✅ In Stock' : '❌ Out'}
+                                    </span>
+                                    {!isEditing && (
+                                        <span style={{
+                                            fontWeight: isLow ? 700 : 600,
+                                            color: isLow ? '#e67e22' : (isOut ? '#ef4444' : '#374151'),
+                                            fontSize: 14
+                                        }}>
+                                            Stock: {stock}{isLow && ' ⚠️'}
+                                        </span>
+                                    )}
+                                </div>
+                                {isEditing ? (
+                                    <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+                                        <input
+                                            type="number" min="0"
+                                            className="form-input"
+                                            style={{ flex: 1, padding: '6px 10px', fontSize: 14 }}
+                                            value={editing[p._id]}
+                                            onChange={e => setEditing(ed => ({ ...ed, [p._id]: e.target.value }))}
+                                            onKeyDown={e => {
+                                                if (e.key === 'Enter') saveStock(p._id)
+                                                if (e.key === 'Escape') cancelEdit(p._id)
+                                            }}
+                                            autoFocus
+                                        />
+                                        <button
+                                            className="btn btn-primary btn-sm"
+                                            onClick={() => saveStock(p._id)}
+                                            disabled={isSaving}
+                                        >
+                                            {isSaving ? '...' : 'Save'}
+                                        </button>
+                                        <button
+                                            className="btn btn-secondary btn-sm"
+                                            onClick={() => cancelEdit(p._id)}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        style={{ marginTop: 8, alignSelf: 'flex-start' }}
+                                        onClick={() => startEdit(p)}
+                                    >
+                                        ✏️ Edit Stock
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    )
+                })}
+            </div>
+
+            {/* Desktop Table */}
             <div className="orders-table-container">
                 <table className="orders-table">
                     <thead>

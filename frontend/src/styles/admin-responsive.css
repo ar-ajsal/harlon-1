@@ -1332,7 +1332,8 @@ label {
     .admin-table,
     .orders-table,
     .products-table,
-    .table-responsive {
+    .table-responsive,
+    .orders-table-container {
         display: none !important;
     }
 
@@ -1340,6 +1341,30 @@ label {
     .mobile-search-container,
     .fab-btn {
         display: flex;
+    }
+
+    /* For pages that render mobile cards outside a flex container */
+    .mobile-cards-block {
+        display: block;
+    }
+
+    /* Stock summary — 2 cols on mobile */
+    .stock-summary-grid {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    /* Orders/Inquiries filter bar — stack vertically */
+    .orders-filters > div {
+        flex-direction: column !important;
+    }
+    .orders-filters .form-input,
+    .orders-filters input {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+    .orders-filters form {
+        min-width: 0 !important;
+        width: 100% !important;
     }
 
     .stats-grid {

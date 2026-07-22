@@ -173,49 +173,84 @@ function Dashboard() {
                     📊 Top Products by Profit Margin
                 </h3>
                 {topProducts.length > 0 ? (
-                    <div style={{ overflowX: 'auto' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                            <thead>
-                                <tr style={{ borderBottom: '2px solid #f3f4f6' }}>
-                                    {['#', 'Product', 'Price', 'Cost', 'Profit', 'Margin'].map(h => (
-                                        <th key={h} style={{ padding: '8px 12px', textAlign: h === 'Product' || h === '#' ? 'left' : 'right', fontWeight: 700, color: '#6b7280', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {topProducts.map((p, i) => (
-                                    <tr key={p._id} style={{ borderBottom: '1px solid #f9fafb', transition: 'background 0.15s' }}
-                                        onMouseEnter={e => e.currentTarget.style.background = '#fafaf8'}
-                                        onMouseLeave={e => e.currentTarget.style.background = ''}
-                                    >
-                                        <td style={{ padding: '10px 12px', color: '#9ca3af', fontWeight: 700 }}>{i + 1}</td>
-                                        <td style={{ padding: '10px 12px' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                                <img src={p.images?.[0] || '/images/placeholder.jpg'} alt={p.name}
-                                                    style={{ width: 36, height: 36, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />
-                                                <div>
-                                                    <div style={{ fontWeight: 600, color: '#0f0f11', fontSize: 13 }}>{p.name}</div>
-                                                    <div style={{ fontSize: 11, color: '#9ca3af' }}>{p.category}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td style={{ padding: '10px 12px', textAlign: 'right', color: '#374151', fontWeight: 600 }}>₹{p.price.toLocaleString('en-IN')}</td>
-                                        <td style={{ padding: '10px 12px', textAlign: 'right', color: '#9ca3af' }}>₹{(p.costPrice || 0).toLocaleString('en-IN')}</td>
-                                        <td style={{ padding: '10px 12px', textAlign: 'right', color: '#16a34a', fontWeight: 700 }}>₹{p.profit.toLocaleString('en-IN')}</td>
-                                        <td style={{ padding: '10px 12px', textAlign: 'right' }}>
-                                            <span style={{
-                                                display: 'inline-block', padding: '3px 8px', borderRadius: 6, fontSize: 12, fontWeight: 700,
-                                                background: p.margin >= 40 ? '#dcfce7' : p.margin >= 20 ? '#fef9c3' : '#fee2e2',
-                                                color: p.margin >= 40 ? '#15803d' : p.margin >= 20 ? '#a16207' : '#dc2626',
-                                            }}>
-                                                {p.margin}%
-                                            </span>
-                                        </td>
+                    <>
+                        {/* Mobile Card List */}
+                        <div className="mobile-card-list">
+                            {topProducts.map((p, i) => (
+                                <div key={p._id} className="mobile-card">
+                                    <img
+                                        src={p.images?.[0] || '/images/placeholder.jpg'}
+                                        alt={p.name}
+                                        className="mobile-card-image"
+                                    />
+                                    <div className="mobile-card-content">
+                                        <div className="mobile-card-title">
+                                            <span style={{ color: '#9ca3af', marginRight: 6 }}>#{i + 1}</span>
+                                            {p.name}
+                                        </div>
+                                        <div className="mobile-card-subtitle">{p.category}</div>
+                                        <div style={{ display: 'flex', gap: 8, marginTop: 4, alignItems: 'center' }}>
+                                            <span style={{ fontSize: 12, color: '#374151', fontWeight: 600 }}>₹{p.price}</span>
+                                            <span style={{ fontSize: 11, color: '#9ca3af' }}>cost ₹{p.costPrice || 0}</span>
+                                            <span style={{ fontSize: 12, fontWeight: 700, color: '#16a34a' }}>+₹{p.profit}</span>
+                                        </div>
+                                        <span style={{
+                                            display: 'inline-block', padding: '2px 8px', borderRadius: 6, fontSize: 12, fontWeight: 700, marginTop: 4,
+                                            background: p.margin >= 40 ? '#dcfce7' : p.margin >= 20 ? '#fef9c3' : '#fee2e2',
+                                            color: p.margin >= 40 ? '#15803d' : p.margin >= 20 ? '#a16207' : '#dc2626',
+                                        }}>
+                                            {p.margin}% margin
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Desktop Table */}
+                        <div className="table-responsive" style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                                <thead>
+                                    <tr style={{ borderBottom: '2px solid #f3f4f6' }}>
+                                        {['#', 'Product', 'Price', 'Cost', 'Profit', 'Margin'].map(h => (
+                                            <th key={h} style={{ padding: '8px 12px', textAlign: h === 'Product' || h === '#' ? 'left' : 'right', fontWeight: 700, color: '#6b7280', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</th>
+                                        ))}
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    {topProducts.map((p, i) => (
+                                        <tr key={p._id} style={{ borderBottom: '1px solid #f9fafb', transition: 'background 0.15s' }}
+                                            onMouseEnter={e => e.currentTarget.style.background = '#fafaf8'}
+                                            onMouseLeave={e => e.currentTarget.style.background = ''}
+                                        >
+                                            <td style={{ padding: '10px 12px', color: '#9ca3af', fontWeight: 700 }}>{i + 1}</td>
+                                            <td style={{ padding: '10px 12px' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                                    <img src={p.images?.[0] || '/images/placeholder.jpg'} alt={p.name}
+                                                        style={{ width: 36, height: 36, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />
+                                                    <div>
+                                                        <div style={{ fontWeight: 600, color: '#0f0f11', fontSize: 13 }}>{p.name}</div>
+                                                        <div style={{ fontSize: 11, color: '#9ca3af' }}>{p.category}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td style={{ padding: '10px 12px', textAlign: 'right', color: '#374151', fontWeight: 600 }}>₹{p.price.toLocaleString('en-IN')}</td>
+                                            <td style={{ padding: '10px 12px', textAlign: 'right', color: '#9ca3af' }}>₹{(p.costPrice || 0).toLocaleString('en-IN')}</td>
+                                            <td style={{ padding: '10px 12px', textAlign: 'right', color: '#16a34a', fontWeight: 700 }}>₹{p.profit.toLocaleString('en-IN')}</td>
+                                            <td style={{ padding: '10px 12px', textAlign: 'right' }}>
+                                                <span style={{
+                                                    display: 'inline-block', padding: '3px 8px', borderRadius: 6, fontSize: 12, fontWeight: 700,
+                                                    background: p.margin >= 40 ? '#dcfce7' : p.margin >= 20 ? '#fef9c3' : '#fee2e2',
+                                                    color: p.margin >= 40 ? '#15803d' : p.margin >= 20 ? '#a16207' : '#dc2626',
+                                                }}>
+                                                    {p.margin}%
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </>
                 ) : (
                     <div style={{ textAlign: 'center', padding: '24px', color: '#9ca3af', fontSize: 14 }}>
                         Add cost prices to products to see profit analytics

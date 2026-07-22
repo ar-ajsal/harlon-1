@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react'
 import { userApi } from '../api/user.api'
+import { addToCart as trackAddToCart } from '../utils/metaPixel'
 
 const CartContext = createContext()
 
@@ -95,8 +96,23 @@ export function CartProvider({ children }) {
             }
             return next
         })
+
+        // ── Meta Pixel — AddToCart ────────────────────────────────────────────
+        // Fire only when a NEW item is added (not when quantity is incremented).
+        // The exists check inside setItems is synchronous so we snapshot it here.
+        // content_ids must be product._id string to match the catalog g:id field.
+        const alreadyInCart = !!items.find(i => i.key === `${product._id}-${size}`)
+        if (!alreadyInCart) {
+            trackAddToCart({
+                content_ids:  [product._id],
+                content_name: product.name,
+                value:        product.discountedPrice || product.price,
+                currency:     'INR',
+            })
+        }
+
         setIsOpen(true)
-    }, [])
+    }, [items])
 
     const removeItem = useCallback((key) => {
         setItems(prev => {

@@ -21,6 +21,7 @@ import fanCollectionRoutes from './fanCollection.routes.js';
 import offerRoutes from './offer.routes.js';
 import settingsRoutes from './settings.routes.js';
 import userRoutes from './user.routes.js';
+import metaRoutes from './meta.routes.js';
 
 
 const router = Router();
@@ -50,6 +51,8 @@ router.use('/offers', offerRoutes);
 router.use('/settings', settingsRoutes);
 // ── Customer User Auth + Cart ──────────────────────────────────────────────────
 router.use('/user', userRoutes);
+// ── Integrations ───────────────────────────────────────────────────────────────
+router.use('/meta', metaRoutes);
 
 
 export default router;

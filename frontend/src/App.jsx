@@ -14,6 +14,7 @@ import FlashSaleBanner from './components/FlashSaleBanner'
 import CartDrawer from './components/CartDrawer'
 import { CartProvider } from './context/CartContext'
 import { AuthProvider } from './context/AuthContext'
+import MetaPixelTracker from './components/MetaPixelTracker'
 
 // ── Customer pages — lazy (route-split) ─────────────────────────────────────
 const Home = lazy(() => import('./pages/Home'))
@@ -102,6 +103,7 @@ function App() {
         <CartProvider>
         <div className="app">
             {showLoader && <HarlonLoader onDone={handleLoaderDone} />}
+            <MetaPixelTracker />
             <CartDrawer />
             <Routes>
                 {/* ── Admin Routes ─────────────────────────────────────── */}

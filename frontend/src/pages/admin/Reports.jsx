@@ -135,7 +135,31 @@ function Reports() {
                         </div>
                     </div>
 
-                    {/* Daily Sales Table */}
+                    {/* Daily Sales — Mobile Card List */}
+                    <div className="mobile-card-list" style={{ marginTop: '2rem' }}>
+                        <div style={{ fontSize: 15, fontWeight: 700, color: '#0f0f11', marginBottom: 4, width: '100%' }}>
+                            Daily Sales Breakdown
+                        </div>
+                        {daily && daily.length > 0 ? daily.map((day) => (
+                            <div key={day._id} className="mobile-card" style={{ justifyContent: 'space-between' }}>
+                                <div className="mobile-card-content">
+                                    <div className="mobile-card-title">
+                                        {new Date(day._id).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}
+                                    </div>
+                                    <div className="mobile-card-subtitle">{day.orders} order{day.orders !== 1 ? 's' : ''}</div>
+                                </div>
+                                <div className="mobile-card-price">{formatCurrency(day.sales)}</div>
+                            </div>
+                        )) : (
+                            <div className="empty-state" style={{ padding: '40px 24px' }}>
+                                <span className="empty-icon">📊</span>
+                                <h3>No sales data</h3>
+                                <p>No orders were placed this month.</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Daily Sales Table — Desktop */}
                     <div className="orders-table-container" style={{ marginTop: '2rem', overflowX: 'auto' }}>
                         <div className="table-header" style={{ padding: '1.5rem', borderBottom: '1px solid var(--noir-10)' }}>
                             <h3 style={{ margin: 0, fontSize: '1.1rem' }}>Daily Sales Breakdown</h3>

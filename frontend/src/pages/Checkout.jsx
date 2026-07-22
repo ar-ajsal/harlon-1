@@ -12,6 +12,7 @@ import { WHATSAPP_NUMBER } from '../config/constants'
 import OrderSuccess from '../components/order/OrderSuccess'
 import { offersApi } from '../api/offers.api'
 import { settingsApi } from '../api/settings.api'
+import { initiateCheckout, purchase as trackPurchase } from '../utils/metaPixel'
 import '../styles/checkout.css'
 
 const RAZORPAY_SCRIPT = 'https://checkout.razorpay.com/v1/checkout.js'
@@ -158,6 +159,35 @@ function Checkout() {
         }
     }, [products, productId, prefilledSize])
 
+    // ── Meta Pixel — InitiateCheckout ────────────────────────────────────────
+    // Fires once when checkout is ready with real product/cart data.
+    // ref guard prevents duplicate fires on re-renders or StrictMode double-mounts.
+    // Does NOT fire if settings are still loading (prevents premature events).
+    const initiateCheckoutFiredRef = useRef(false)
+    useEffect(() => {
+        if (loadingSettings) return
+        if (initiateCheckoutFiredRef.current) return
+
+        if (isCartMode) {
+            if (cartItems.length === 0) return
+            initiateCheckoutFiredRef.current = true
+            initiateCheckout({
+                content_ids: cartItems.map(i => i._id || i.productId || i.id),
+                num_items:   cartItems.reduce((s, i) => s + i.qty, 0),
+                value:       cartItems.reduce((s, i) => s + i.price * i.qty, 0),
+                currency:    'INR',
+            })
+        } else if (product) {
+            initiateCheckoutFiredRef.current = true
+            initiateCheckout({
+                content_ids: [product._id],
+                num_items:   1,
+                value:       product.price,
+                currency:    'INR',
+            })
+        }
+    }, [product, cartItems, isCartMode, loadingSettings])
+
     // ── Form handlers ────────────────────────────────────────────────────────
     const handleChange = useCallback((e) => {
         const { name, value } = e.target
@@ -275,6 +305,15 @@ function Checkout() {
             })
 
             if (paymentMethod === 'whatsapp') {
+                // ── Meta Pixel — Purchase (WhatsApp) ────────────────────────────────
+                // WhatsApp orders are treated as confirmed intent.
+                trackPurchase({
+                    content_ids: isCartMode
+                        ? cartItems.map(i => i._id || i.productId || i.id)
+                        : [product._id],
+                    value:    finalPrice,
+                    currency: 'INR',
+                })
                 setSuccess({ orderId: response.orderId, trackToken: response.trackToken, isWhatsapp: true })
                 if (isCartMode) clearCart()
                 return
@@ -308,7 +347,20 @@ function Checkout() {
                 order_id: data.razorpayOrderId,
                 prefill: { name: form.fullName, email: form.email, contact: form.phone },
                 theme: { color: '#C8962B' }, // gold
-                handler: () => { setSuccess({ orderId: data.orderId, trackToken: data.trackToken }); resolve() },
+                handler: () => {
+                    // ── Meta Pixel — Purchase (Razorpay confirmed) ──────────────────
+                    // Only fires inside the Razorpay success handler — guaranteed
+                    // to fire after real payment confirmation, never on dismiss/fail.
+                    trackPurchase({
+                        content_ids: isCartMode
+                            ? cartItems.map(i => i._id || i.productId || i.id)
+                            : [product._id],
+                        value:    data.amount / 100, // Razorpay sends paise; convert to INR
+                        currency: data.currency || 'INR',
+                    })
+                    setSuccess({ orderId: data.orderId, trackToken: data.trackToken })
+                    resolve()
+                },
                 modal: { ondismiss: () => { toast.info('Payment cancelled. Your order is saved.'); resolve() } },
             }
             const rzp = new window.Razorpay(options)

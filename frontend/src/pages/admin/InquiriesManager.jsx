@@ -98,86 +98,161 @@ function InquiriesManager() {
                     <p>Inquiries will appear here once customers submit them.</p>
                 </div>
             ) : (
-                <div className="orders-table-container table-responsive">
-                    <table className="orders-table">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Customer</th>
-                                <th>Phone</th>
-                                <th>Email</th>
-                                <th>Message</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {inquiries.map(inq => (
-                                <tr key={inq._id}>
-                                    <td style={{ fontWeight: 600, fontSize: '13px' }}>{inq.productName}</td>
-                                    <td>{inq.customer?.name}</td>
-                                    <td>
-                                        <a href={`tel:${inq.customer?.phone}`} style={{ color: '#6366f1' }}>
-                                            {inq.customer?.phone}
-                                        </a>
-                                    </td>
-                                    <td style={{ fontSize: '13px', color: '#6b7280' }}>{inq.customer?.email || '—'}</td>
-                                    <td style={{ maxWidth: '220px' }}>
-                                        <div
-                                            style={{
-                                                cursor: 'pointer', fontSize: '13px',
-                                                overflow: 'hidden',
-                                                maxHeight: expanded === inq._id ? 'none' : '44px',
-                                                WebkitLineClamp: expanded === inq._id ? 'none' : 2,
-                                                display: '-webkit-box',
-                                                WebkitBoxOrient: 'vertical',
-                                            }}
-                                            onClick={() => setExpanded(expanded === inq._id ? null : inq._id)}
-                                        >
-                                            {inq.message}
+                <>
+                    {/* Mobile Card List */}
+                    <div className="mobile-card-list">
+                        {inquiries.map(inq => (
+                            <div key={inq._id} className="mobile-card" style={{ flexDirection: 'column', gap: 10 }}>
+                                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div className="mobile-card-title">{inq.productName}</div>
+                                        <div className="mobile-card-subtitle" style={{ fontWeight: 600 }}>{inq.customer?.name}</div>
+                                        <div style={{ display: 'flex', gap: 8, marginTop: 4, flexWrap: 'wrap' }}>
+                                            <a href={`tel:${inq.customer?.phone}`} style={{ fontSize: 12, color: '#6366f1', fontWeight: 600 }}>
+                                                📞 {inq.customer?.phone}
+                                            </a>
+                                            {inq.customer?.email && (
+                                                <span style={{ fontSize: 12, color: '#9ca3af' }}>{inq.customer.email}</span>
+                                            )}
                                         </div>
-                                        {inq.message?.length > 80 && (
-                                            <button
-                                                style={{ fontSize: '11px', color: '#6366f1', border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
+                                    </div>
+                                    <span style={{
+                                        display: 'inline-block', padding: '3px 10px', borderRadius: '999px',
+                                        fontSize: '11px', fontWeight: 600, flexShrink: 0,
+                                        background: (STATUS_COLORS[inq.status] || '#6b7280') + '22',
+                                        color: STATUS_COLORS[inq.status] || '#6b7280',
+                                        border: `1px solid ${(STATUS_COLORS[inq.status] || '#6b7280')}44`
+                                    }}>
+                                        {inq.status}
+                                    </span>
+                                </div>
+
+                                {/* Message */}
+                                <div
+                                    style={{
+                                        fontSize: 13, color: '#374151', lineHeight: 1.5,
+                                        background: '#f9fafb', borderRadius: 8, padding: '10px 12px',
+                                        cursor: 'pointer',
+                                        overflow: 'hidden',
+                                        maxHeight: expanded === inq._id ? 'none' : '60px',
+                                        WebkitLineClamp: expanded === inq._id ? 'none' : 3,
+                                        display: '-webkit-box',
+                                        WebkitBoxOrient: 'vertical',
+                                    }}
+                                    onClick={() => setExpanded(expanded === inq._id ? null : inq._id)}
+                                >
+                                    {inq.message}
+                                </div>
+                                {inq.message?.length > 80 && (
+                                    <button
+                                        style={{ fontSize: '11px', color: '#6366f1', border: 'none', background: 'none', cursor: 'pointer', padding: 0, alignSelf: 'flex-start' }}
+                                        onClick={() => setExpanded(expanded === inq._id ? null : inq._id)}
+                                    >
+                                        {expanded === inq._id ? 'Show less ▲' : 'Show more ▼'}
+                                    </button>
+                                )}
+
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <span style={{ fontSize: '11px', color: '#9ca3af' }}>
+                                        {new Date(inq.createdAt).toLocaleDateString('en-IN')}
+                                    </span>
+                                    {STATUS_NEXT[inq.status] && (
+                                        <motion.button
+                                            className="btn btn-secondary btn-sm"
+                                            disabled={updating === inq._id}
+                                            onClick={() => handleStatusUpdate(inq._id, STATUS_NEXT[inq.status])}
+                                            whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                                        >
+                                            → Mark as {STATUS_NEXT[inq.status]}
+                                        </motion.button>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Desktop Table */}
+                    <div className="orders-table-container table-responsive">
+                        <table className="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Email</th>
+                                    <th>Message</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {inquiries.map(inq => (
+                                    <tr key={inq._id}>
+                                        <td style={{ fontWeight: 600, fontSize: '13px' }}>{inq.productName}</td>
+                                        <td>{inq.customer?.name}</td>
+                                        <td>
+                                            <a href={`tel:${inq.customer?.phone}`} style={{ color: '#6366f1' }}>
+                                                {inq.customer?.phone}
+                                            </a>
+                                        </td>
+                                        <td style={{ fontSize: '13px', color: '#6b7280' }}>{inq.customer?.email || '—'}</td>
+                                        <td style={{ maxWidth: '220px' }}>
+                                            <div
+                                                style={{
+                                                    cursor: 'pointer', fontSize: '13px',
+                                                    overflow: 'hidden',
+                                                    maxHeight: expanded === inq._id ? 'none' : '44px',
+                                                    WebkitLineClamp: expanded === inq._id ? 'none' : 2,
+                                                    display: '-webkit-box',
+                                                    WebkitBoxOrient: 'vertical',
+                                                }}
                                                 onClick={() => setExpanded(expanded === inq._id ? null : inq._id)}
                                             >
-                                                {expanded === inq._id ? 'Show less' : 'Show more'}
-                                            </button>
-                                        )}
-                                    </td>
-                                    <td>
-                                        <span style={{
-                                            display: 'inline-block', padding: '3px 10px', borderRadius: '999px',
-                                            fontSize: '12px', fontWeight: 600,
-                                            background: (STATUS_COLORS[inq.status] || '#6b7280') + '22',
-                                            color: STATUS_COLORS[inq.status] || '#6b7280',
-                                            border: `1px solid ${(STATUS_COLORS[inq.status] || '#6b7280')}44`
-                                        }}>
-                                            {inq.status}
-                                        </span>
-                                    </td>
-                                    <td style={{ fontSize: '12px', color: '#6b7280' }}>
-                                        {new Date(inq.createdAt).toLocaleDateString('en-IN')}
-                                    </td>
-                                    <td>
-                                        {STATUS_NEXT[inq.status] && (
-                                            <motion.button
-                                                className="btn btn-secondary"
-                                                style={{ fontSize: '12px', padding: '4px 10px' }}
-                                                disabled={updating === inq._id}
-                                                onClick={() => handleStatusUpdate(inq._id, STATUS_NEXT[inq.status])}
-                                                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
-                                            >
-                                                → {STATUS_NEXT[inq.status]}
-                                            </motion.button>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                                                {inq.message}
+                                            </div>
+                                            {inq.message?.length > 80 && (
+                                                <button
+                                                    style={{ fontSize: '11px', color: '#6366f1', border: 'none', background: 'none', cursor: 'pointer', padding: 0 }}
+                                                    onClick={() => setExpanded(expanded === inq._id ? null : inq._id)}
+                                                >
+                                                    {expanded === inq._id ? 'Show less' : 'Show more'}
+                                                </button>
+                                            )}
+                                        </td>
+                                        <td>
+                                            <span style={{
+                                                display: 'inline-block', padding: '3px 10px', borderRadius: '999px',
+                                                fontSize: '12px', fontWeight: 600,
+                                                background: (STATUS_COLORS[inq.status] || '#6b7280') + '22',
+                                                color: STATUS_COLORS[inq.status] || '#6b7280',
+                                                border: `1px solid ${(STATUS_COLORS[inq.status] || '#6b7280')}44`
+                                            }}>
+                                                {inq.status}
+                                            </span>
+                                        </td>
+                                        <td style={{ fontSize: '12px', color: '#6b7280' }}>
+                                            {new Date(inq.createdAt).toLocaleDateString('en-IN')}
+                                        </td>
+                                        <td>
+                                            {STATUS_NEXT[inq.status] && (
+                                                <motion.button
+                                                    className="btn btn-secondary"
+                                                    style={{ fontSize: '12px', padding: '4px 10px' }}
+                                                    disabled={updating === inq._id}
+                                                    onClick={() => handleStatusUpdate(inq._id, STATUS_NEXT[inq.status])}
+                                                    whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                                                >
+                                                    → {STATUS_NEXT[inq.status]}
+                                                </motion.button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </>
             )}
 
             {pagination.pages > 1 && (

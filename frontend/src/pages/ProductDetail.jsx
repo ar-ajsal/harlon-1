@@ -6,6 +6,7 @@ import { FiHeart, FiShoppingCart } from 'react-icons/fi'
 import { useProducts } from '../context/ProductContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useCart } from '../context/CartContext'
+import { viewContent } from '../utils/metaPixel'
 import { WHATSAPP_NUMBER } from '../config/constants'
 import { couponsApi, couponSalesApi } from '../api/coupons.api'
 import { settingsApi } from '../api/settings.api'
@@ -149,6 +150,20 @@ function ProductDetail() {
         setCouponOpen(false)
         window.scrollTo({ top: 0, behavior: prefersReduced ? 'instant' : 'smooth' })
     }, [id])
+
+    // ── Meta Pixel — ViewContent ─────────────────────────────────────────────
+    // Fires once per product, after the product is fully loaded.
+    // Guard: do NOT fire during loading state or if product is null.
+    // content_ids uses product._id string to exactly match g:id in the catalog XML.
+    useEffect(() => {
+        if (!product || loading) return
+        viewContent({
+            content_ids:  [product._id],
+            content_name: product.name,
+            value:        product.price,
+            currency:     'INR',
+        })
+    }, [product?._id]) // depend on _id only — fires once per unique product
 
     // Sticky bar observer on CTA block
     useEffect(() => {

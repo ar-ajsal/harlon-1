@@ -14,6 +14,7 @@ import { useWishlist } from '../context/WishlistContext'
 import { useCart } from '../context/CartContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 import Skeleton from '../components/ui/Skeleton'
+import { search as trackSearch } from '../utils/metaPixel'
 import '../styles/shop.css'
 
 const PRODUCTS_PER_PAGE = 12
@@ -384,6 +385,19 @@ export default function Shop() {
         val ? p.set('search', val) : p.delete('search')
         setSearchParams(p, { replace: true })
     }, [searchParams, setSearchParams])
+
+    // ── Meta Pixel — Search ────────────────────────────────────────────────────
+    // Debounced: fires 600ms after the user stops typing, not on every keystroke.
+    // Guard: only fires when search string is non-empty (no event on clear).
+    const searchDebounceRef = useRef(null)
+    useEffect(() => {
+        if (!search.trim()) return
+        clearTimeout(searchDebounceRef.current)
+        searchDebounceRef.current = setTimeout(() => {
+            trackSearch(search.trim())
+        }, 600)
+        return () => clearTimeout(searchDebounceRef.current)
+    }, [search])
 
     const handleChip = (id) => {
         setActiveChip(id)
