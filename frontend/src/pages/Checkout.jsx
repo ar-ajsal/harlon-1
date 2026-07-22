@@ -172,7 +172,7 @@ function Checkout() {
             if (cartItems.length === 0) return
             initiateCheckoutFiredRef.current = true
             initiateCheckout({
-                content_ids: cartItems.map(i => i._id || i.productId || i.id),
+                content_ids: cartItems.map(i => i.productId || i.id),
                 num_items:   cartItems.reduce((s, i) => s + i.qty, 0),
                 value:       cartItems.reduce((s, i) => s + i.price * i.qty, 0),
                 currency:    'INR',
@@ -307,11 +307,20 @@ function Checkout() {
             if (paymentMethod === 'whatsapp') {
                 // ── Meta Pixel — Purchase (WhatsApp) ────────────────────────────────
                 // WhatsApp orders are treated as confirmed intent.
+                // NOTE: finalPrice is defined in the render body after early-return
+                // guards, so it cannot be referenced here. Compute the value directly
+                // from state (cartItems, product, appliedOffer) which ARE in closure.
+                const _purchaseValue = Math.max(0,
+                    (isCartMode
+                        ? cartItems.reduce((s, i) => s + i.price * i.qty, 0)
+                        : (product?.price || 0)
+                    ) - (appliedOffer?.discountAmount ?? 0)
+                )
                 trackPurchase({
                     content_ids: isCartMode
-                        ? cartItems.map(i => i._id || i.productId || i.id)
+                        ? cartItems.map(i => i.productId || i.id)
                         : [product._id],
-                    value:    finalPrice,
+                    value:    _purchaseValue,
                     currency: 'INR',
                 })
                 setSuccess({ orderId: response.orderId, trackToken: response.trackToken, isWhatsapp: true })
@@ -353,7 +362,7 @@ function Checkout() {
                     // to fire after real payment confirmation, never on dismiss/fail.
                     trackPurchase({
                         content_ids: isCartMode
-                            ? cartItems.map(i => i._id || i.productId || i.id)
+                            ? cartItems.map(i => i.productId || i.id)
                             : [product._id],
                         value:    data.amount / 100, // Razorpay sends paise; convert to INR
                         currency: data.currency || 'INR',

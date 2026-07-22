@@ -81,7 +81,6 @@ export function CartProvider({ children }) {
             // Sync to server async
             const token = getToken()
             if (token) {
-                const newItem = next.find(i => i.key === key)
                 if (!exists) {
                     userApi.addToCart(token, {
                         productId: product._id,

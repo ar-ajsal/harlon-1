@@ -153,5 +153,8 @@ productSchema.index({ isVisible: 1, categories: 1, priority: -1 });
 productSchema.index({ featured: 1, isVisible: 1 });
 productSchema.index({ bestSeller: 1, isVisible: 1 });
 
+// Meta catalog feed: visible non-mystery-box products
+productSchema.index({ isVisible: 1, productType: 1 });
+
 
 export default mongoose.model('Product', productSchema);
