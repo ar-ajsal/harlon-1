@@ -39,7 +39,15 @@ export function ProductProvider({ children }) {
             const productsData = productsResponse.data?.data || productsResponse.data || productsResponse || []
             const paginationData = productsResponse.data?.pagination || productsResponse.pagination || { page: 1, pages: 1, total: productsData.length, limit: 12 }
 
-            setProducts(Array.isArray(productsData) ? productsData : [])
+            // Temporary patch for legacy products without inStock defined
+            const patchedProducts = (Array.isArray(productsData) ? productsData : []).map(p => {
+                if (p.inStock === undefined && p.stock === 0) {
+                    return { ...p, inStock: true, stock: 99 }
+                }
+                return p
+            });
+
+            setProducts(patchedProducts)
             setPagination(paginationData)
 
             // Handle nested response structure: success.data.data
@@ -61,7 +69,15 @@ export function ProductProvider({ children }) {
             const newProducts = response.data?.data || response.data || response || []
             const newPagination = response.data?.pagination || response.pagination || pagination
 
-            setProducts(prev => [...prev, ...(Array.isArray(newProducts) ? newProducts : [])])
+            // Temporary patch for legacy products
+            const patchedNewProducts = (Array.isArray(newProducts) ? newProducts : []).map(p => {
+                if (p.inStock === undefined && p.stock === 0) {
+                    return { ...p, inStock: true, stock: 99 }
+                }
+                return p
+            });
+
+            setProducts(prev => [...prev, ...patchedNewProducts])
             setPagination(newPagination)
 
             return { products: newProducts, pagination: newPagination }
