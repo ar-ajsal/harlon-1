@@ -5,7 +5,8 @@
  */
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, useReducedMotion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { FiSearch, FiX, FiShoppingBag, FiHeart, FiZap } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useProducts } from '../context/ProductContext'
@@ -15,6 +16,7 @@ import { useCart } from '../context/CartContext'
 import { WHATSAPP_NUMBER } from '../config/constants'
 import Skeleton from '../components/ui/Skeleton'
 import { search as trackSearch } from '../utils/metaPixel'
+import { gsap, ScrollTrigger, fadeUpBatch, prefersReducedMotion } from '../utils/gsapUtils'
 import '../styles/shop.css'
 
 const PRODUCTS_PER_PAGE = 12
@@ -60,20 +62,51 @@ function UrgencyBar() {
     )
 }
 
-/* ── Micro Hero ─────────────────────────────────────────────── */
+/* ── Micro Hero ──────────────────────────────────────────── */
 function DropHero({ total, loading }) {
+    const titleRef = useRef(null)
+    const subRef = useRef(null)
+    const countRef = useRef(null)
+
+    useEffect(() => {
+        if (prefersReducedMotion()) return
+        const tl = gsap.timeline()
+        if (titleRef.current) {
+            tl.fromTo(titleRef.current,
+                { opacity: 0, y: 36, skewY: 2 },
+                { opacity: 1, y: 0, skewY: 0, duration: 0.65, ease: 'power4.out' }
+            )
+        }
+        if (subRef.current) {
+            tl.fromTo(subRef.current,
+                { opacity: 0, y: 16 },
+                { opacity: 1, y: 0, duration: 0.45, ease: 'power3.out' },
+                '-=0.3'
+            )
+        }
+        return () => tl.kill()
+    }, [])
+
+    useEffect(() => {
+        if (!countRef.current || prefersReducedMotion() || loading) return
+        gsap.fromTo(countRef.current,
+            { opacity: 0, y: 10 },
+            { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', delay: 0.1 }
+        )
+    }, [loading, total])
+
     return (
         <div className="shop-hero">
             <div className="shop-hero-inner">
                 <span className="shop-hero-eyebrow">
                     <span className="shop-live-dot" /> LIVE NOW
                 </span>
-                <h1 className="shop-hero-title">THE DROP</h1>
-                <p className="shop-hero-sub">
+                <h1 className="shop-hero-title" ref={titleRef}>THE DROP</h1>
+                <p className="shop-hero-sub" ref={subRef}>
                     Only for real fans. Once sold out, gone forever.
                 </p>
                 {!loading && total > 0 && (
-                    <p className="shop-hero-count">
+                    <p className="shop-hero-count" ref={countRef}>
                         <FiZap size={13} /> {total} jerseys available — while they last
                     </p>
                 )}
@@ -180,8 +213,8 @@ function ImageCarousel({ images, productName, stock }) {
     )
 }
 
-/* ── Product Card ───────────────────────────────────────────── */
-function DropShopCard({ product, index, reduced }) {
+/* ── Product Card ──────────────────────────────────────────── */
+function DropShopCard({ product }) {
     const { addItem } = useCart()
     const { isWishlisted, toggleWishlist } = useWishlist()
     const wishlisted = isWishlisted(product._id)
@@ -191,13 +224,12 @@ function DropShopCard({ product, index, reduced }) {
     const mrp = product.price
     const d = calcDisc(price, mrp)
     const stock = product.stock ?? 99
-    const isAvailable = stock > 0;
+    const isAvailable = stock > 0
     const lowStock = isAvailable && stock < 10
     const sellingFast = isAvailable && stock <= 5
     const sizes = product.sizes?.filter(s => s.stock > 0) || []
     const firstSize = sizes[0]?.size || 'M'
 
-    // Dynamic badge
     const badge = !isAvailable ? { label: 'SOLD OUT', cls: 'badge--sold' }
         : sellingFast ? { label: '🔥 HOT', cls: 'badge--hot' }
         : lowStock ? { label: 'LIMITED', cls: 'badge--limited' }
@@ -205,19 +237,12 @@ function DropShopCard({ product, index, reduced }) {
         : d >= 30 ? { label: `−${d}%`, cls: 'badge--sale' }
         : null
 
-    // Parse emotional subtext from description or generate from name
     const subtext = product.story?.trim()?.split('\n')?.[0]
         || product.description?.trim()?.split('.')[0]
         || null
 
     return (
-        <motion.div
-            className={`dsc${!isAvailable ? ' dsc--sold' : ''}`}
-            initial={reduced ? {} : { opacity: 0, y: 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.4, delay: (index % 6) * 0.06 }}
-        >
+        <div className={`dsc${!isAvailable ? ' dsc--sold' : ''}`}>
             <Link to={`/product/${product._id}`} className="dsc-link">
                 <div className="dsc-img-wrap">
                     <ImageCarousel
@@ -226,7 +251,6 @@ function DropShopCard({ product, index, reduced }) {
                         stock={stock}
                     />
 
-                    {/* Stock warning TOP LEFT */}
                     {lowStock && (
                         <span className="dsc-stock-badge">
                             ⚡ ONLY {stock} LEFT
@@ -236,12 +260,10 @@ function DropShopCard({ product, index, reduced }) {
                         <span className="dsc-stock-badge dsc-stock-badge--sold">SOLD OUT</span>
                     )}
 
-                    {/* Type badge TOP RIGHT */}
                     {badge && (
                         <span className={`dsc-badge ${badge.cls}`}>{badge.label}</span>
                     )}
 
-                    {/* Overlay actions */}
                     <div className="dsc-overlay">
                         <button
                             className={`dsc-wl${wishlisted ? ' active' : ''}`}
@@ -269,6 +291,19 @@ function DropShopCard({ product, index, reduced }) {
                         ))}
                     </div>
                     <h3 className="dsc-name">{product.name}</h3>
+                    {subtext && <p className="dsc-subtext">"{subtext}"</p>}
+                    <div className="dsc-price-row">
+                        <span className="dsc-price">{fmt(price)}</span>
+                        {d > 0 && <span className="dsc-mrp">{fmt(mrp)}</span>}
+                        {sellingFast && (
+                            <span className="dsc-selling-fast">Selling fast</span>
+                        )}
+                    </div>
+                </div>
+            </Link>
+        </div>
+    )
+}<h3 className="dsc-name">{product.name}</h3>
                     {subtext && <p className="dsc-subtext">"{subtext}"</p>}
                     <div className="dsc-price-row">
                         <span className="dsc-price">{fmt(price)}</span>
@@ -370,12 +405,37 @@ export default function Shop() {
 
     const searchRef = useRef(null)
     const loaderRef = useRef(null)
+    const feedRef = useRef(null)
 
     // Filter products client-side (all loaded)
     const filtered = filterProducts(products, activeChip, search, categories)
     const displayed = filtered.slice(0, displayCount)
     const hasMore = displayed.length < filtered.length
     const feed = buildFeed(displayed)
+
+    // GSAP: batch-animate product cards when feed changes
+    useEffect(() => {
+        if (!feedRef.current || prefersReducedMotion()) return
+        const cards = feedRef.current.querySelectorAll('.shop-feed-card')
+        if (!cards.length) return
+        // Reset before re-animating (for filter changes)
+        gsap.set(cards, { opacity: 0, y: 28 })
+        ScrollTrigger.batch(cards, {
+            start: 'top 92%',
+            once: false,
+            onEnter: (batch) => {
+                gsap.to(batch, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.5,
+                    ease: 'power3.out',
+                    stagger: 0.06,
+                    overwrite: true,
+                })
+            },
+        })
+        return () => ScrollTrigger.getAll().forEach(t => t.kill())
+    }, [displayed.length, activeChip, search])
 
     // Sync search to URL
     const handleSearch = useCallback((val) => {
@@ -505,14 +565,13 @@ export default function Shop() {
                     <EmptyDrop onClear={clearAll} />
                 ) : (
                     <>
-                        <div className="shop-feed">
+                        <div className="shop-feed" ref={feedRef}>
                             {feed.map((item, i) =>
                                 item.type === 'product' ? (
                                     <div key={item.data._id} className="shop-feed-card">
                                         <DropShopCard
                                             product={item.data}
                                             index={item.index}
-                                            reduced={reduced}
                                         />
                                     </div>
                                 ) : (
