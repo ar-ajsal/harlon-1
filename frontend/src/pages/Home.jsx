@@ -5,8 +5,7 @@
  */
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { useReducedMotion } from 'framer-motion'
-import { gsap, ScrollTrigger, fadeUpBatch, fadeUpOnScroll, prefersReducedMotion } from '../utils/gsapUtils'
+import { motion, useReducedMotion } from 'framer-motion'
 import { FaWhatsapp } from 'react-icons/fa'
 import { FiArrowRight, FiShoppingBag, FiHeart, FiZap } from 'react-icons/fi'
 import { useProducts } from '../context/ProductContext'
@@ -149,22 +148,6 @@ function TrustMarquee() {
 
 /* ─── Category Cards Section ───────────────────────────────── */
 function CategoryCardsSection({ categories, products, reduced }) {
-    const headerRef = useRef(null)
-    const gridRef = useRef(null)
-
-    useEffect(() => {
-        if (prefersReducedMotion()) return
-        // Animate section header
-        if (headerRef.current) {
-            fadeUpOnScroll(headerRef.current, { y: 24, duration: 0.55 })
-        }
-        // Stagger mobile grid cards
-        if (gridRef.current) {
-            fadeUpBatch(gridRef.current.querySelectorAll('.cvt-moment-card'), { y: 28, stagger: 0.07 })
-        }
-        return () => ScrollTrigger.getAll().forEach(t => t.kill())
-    }, [categories.length])
-
     if (!categories || categories.length === 0) return null
 
     const cards = categories.map(cat => {
@@ -180,14 +163,14 @@ function CategoryCardsSection({ categories, products, reduced }) {
 
     return (
         <section className="cvt-moments" aria-label="Shop by Category">
-            <div className="cvt-section-header" ref={headerRef}>
+            <div className="cvt-section-header">
                 <span className="cvt-section-eyebrow">THE COLLECTION</span>
                 <h2 className="cvt-section-title">Shop by<br /><em>Category.</em></h2>
                 <p className="cvt-section-desc">Find the exact era, club, or legend you're looking for.</p>
             </div>
 
             {/* Mobile: 2-column grid */}
-            <div className="cvt-moments-grid-mobile" ref={gridRef}>
+            <div className="cvt-moments-grid-mobile">
                 {cards.map((card) => (
                     <Link to={`/shop?chip=${card.id}`} key={card.id} className="cvt-moment-card">
                         <div className="cvt-moment-img-wrap">
@@ -261,7 +244,7 @@ function CategoryCardsSection({ categories, products, reduced }) {
 }
 
 /* ─── Drop Product Card ─────────────────────────────────────── */
-function DropCard({ product }) {
+function DropCard({ product, reduced }) {
     const { addItem } = useCart()
     const { addToWishlist, isWishlisted } = useWishlist()
     const img = product.images?.[0] || ''
@@ -282,7 +265,13 @@ function DropCard({ product }) {
     }, [product, firstSize, addItem])
 
     return (
-        <div className="cvt-drop-card">
+        <motion.div
+            className="cvt-drop-card"
+            initial={reduced ? {} : { opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.45 }}
+        >
             <Link to={`/product/${product._id}`} className="cvt-drop-card-link">
                 <div className="cvt-drop-img-wrap">
                     {img && <img src={img} alt={product.name} className="cvt-drop-img" loading="lazy" />}
@@ -314,27 +303,16 @@ function DropCard({ product }) {
                     </div>
                 </div>
             </Link>
-        </div>
+        </motion.div>
     )
 }
 
 /* ─── Limited Drop Section ─────────────────────────────────── */
-function LimitedDropSection({ products, loading }) {
+function LimitedDropSection({ products, loading, reduced }) {
     const drops = products.slice(0, 8)
-    const headerRef = useRef(null)
-    const gridRef = useRef(null)
-
-    useEffect(() => {
-        if (loading || prefersReducedMotion()) return
-        if (headerRef.current) fadeUpOnScroll(headerRef.current, { y: 20 })
-        if (gridRef.current) {
-            fadeUpBatch(gridRef.current.querySelectorAll('.cvt-drop-card'), { y: 30, stagger: 0.065 })
-        }
-    }, [loading])
-
     return (
         <section className="cvt-drops" aria-label="Limited Drop">
-            <div className="cvt-drops-header" ref={headerRef}>
+            <div className="cvt-drops-header">
                 <div>
                     <span className="cvt-section-eyebrow">LIMITED DROP</span>
                     <h2 className="cvt-section-title">The Drop.<br /><em>Right Now.</em></h2>
@@ -349,10 +327,10 @@ function LimitedDropSection({ products, loading }) {
                     </Link>
                 </div>
             </div>
-            <div className="cvt-drops-grid" ref={gridRef}>
+            <div className="cvt-drops-grid">
                 {loading
                     ? Array(8).fill(0).map((_, i) => <div key={i} className="cvt-drop-card"><Skeleton.Card /></div>)
-                    : drops.map(p => <DropCard key={p._id} product={p} />)
+                    : drops.map(p => <DropCard key={p._id} product={p} reduced={reduced} />)
                 }
             </div>
             {!loading && drops.length > 0 && (
@@ -369,14 +347,9 @@ function LimitedDropSection({ products, loading }) {
 
 /* ─── Social Strip ─────────────────────────────────────────── */
 function SocialProof() {
-    const ref = useRef(null)
-    useEffect(() => {
-        if (!ref.current || prefersReducedMotion()) return
-        fadeUpBatch(ref.current.querySelectorAll('.cvt-stat'), { y: 20, stagger: 0.1 })
-    }, [])
     return (
         <section className="cvt-social-strip">
-            <div className="cvt-social-inner" ref={ref}>
+            <div className="cvt-social-inner">
                 {[
                     { num: '10,000+', label: 'Fans\nSuited Up' },
                     { num: '50+', label: 'Iconic\nJerseys' },
@@ -394,14 +367,15 @@ function SocialProof() {
 
 /* ─── Footer CTA ───────────────────────────────────────────── */
 function FooterCTA() {
-    const ref = useRef(null)
-    useEffect(() => {
-        if (!ref.current || prefersReducedMotion()) return
-        fadeUpOnScroll(ref.current, { y: 24, duration: 0.65 })
-    }, [])
     return (
         <section className="cvt-footer-cta">
-            <div className="cvt-footer-cta-inner" ref={ref}>
+            <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="cvt-footer-cta-inner"
+            >
                 <span className="cvt-section-eyebrow">THE IDENTITY</span>
                 <h2 className="cvt-footer-headline">
                     Not a fan.<br />
@@ -420,7 +394,7 @@ function FooterCTA() {
                         <FaWhatsapp size={20} /> Need help choosing?
                     </a>
                 </div>
-            </div>
+            </motion.div>
         </section>
     )
 }
