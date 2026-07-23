@@ -65,7 +65,7 @@ export const fixDbStock = asyncHandler(async (req, res) => {
     // Temporary public endpoint to fix the database since local machine IP is not whitelisted.
     import('../models/Product.js').then(async (ProductModule) => {
         const Product = ProductModule.default;
-        const result = await Product.updateMany({ $or: [{ stock: 0 }, { stock: null }, { stock: { $exists: false } }] }, { $set: { inStock: true, stock: 99 } });
-        res.json(ApiResponse.success(result, `Successfully updated ${result.modifiedCount} legacy products to inStock: true and stock: 99!`));
+        const result = await Product.updateMany({ $or: [{ stock: 0 }, { stock: null }, { stock: { $exists: false } }] }, { $set: { inStock: true, stock: 10 } });
+        res.json(ApiResponse.success(result, `Successfully updated ${result.modifiedCount} legacy products to inStock: true and stock: 10!`));
     });
 });
