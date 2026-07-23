@@ -227,7 +227,7 @@ function DropShopCard({ product, index, reduced }) {
                     />
 
                     {/* Stock warning TOP LEFT */}
-                    {lowStock && inStock && (
+                    {lowStock && (
                         <span className="dsc-stock-badge">
                             ⚡ ONLY {stock} LEFT
                         </span>
@@ -250,7 +250,7 @@ function DropShopCard({ product, index, reduced }) {
                         >
                             <FiHeart size={15} fill={wishlisted ? 'currentColor' : 'none'} />
                         </button>
-                        {inStock && (
+                        {isAvailable && (
                             <button
                                 className="dsc-add"
                                 onClick={e => { e.preventDefault(); addItem(product, firstSize) }}
