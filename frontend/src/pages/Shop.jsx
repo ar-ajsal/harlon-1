@@ -459,6 +459,15 @@ export default function Shop() {
                     </button>
                     {(categories || [])
                         .filter(cat => cat.image && cat.image.trim() !== '')
+                        .filter(cat => {
+                            // Only show category chip if it has at least 1 visible product
+                            const catName = cat.name.toLowerCase()
+                            return products.some(p => {
+                                const legacyMatch = p.category?.toLowerCase() === catName || p.category?.toLowerCase().includes(catName)
+                                const multiMatch = Array.isArray(p.categories) && p.categories.some(c => c.toLowerCase() === catName || c.toLowerCase().includes(catName))
+                                return legacyMatch || multiMatch
+                            })
+                        })
                         .map(cat => (
                             <button
                                 key={cat._id || cat.name}
