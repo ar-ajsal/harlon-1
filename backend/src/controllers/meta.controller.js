@@ -26,18 +26,17 @@ const escapeXML = (unsafe) => {
 /**
  * Determine correct availability string from the REAL schema fields.
  *
- * Schema has three overlapping fields:
- *   inStock  (Boolean)  — primary admin toggle
- *   soldOut  (Boolean)  — secondary "force sold-out" flag
- *   stock    (Number)   — numeric quantity
+ * Schema has two independent stock controls:
+ *   inStock  (Boolean)  — manual admin toggle (set via admin panel)
+ *   stock    (Number)   — numeric quantity decremented on each purchase
  *
  * Meta only accepts exactly two values: "in stock" | "out of stock".
- * A product is in stock ONLY when ALL three conditions pass.
+ * A product is out of stock if EITHER the admin toggled inStock off
+ * OR the numeric quantity has reached zero.
  */
 const getAvailability = (product) => {
-    // Generate Meta availability solely from stock. 
-    // Hidden products (isVisible: false) must still exist in catalog to prevent Pixel ID mismatch.
-    if (product.stock <= 0)  return 'out of stock';
+    if (product.inStock === false) return 'out of stock'; // admin toggle takes priority
+    if (product.stock <= 0)        return 'out of stock'; // quantity exhausted
     return 'in stock';
 };
 
@@ -60,18 +59,22 @@ export const getCatalogFeed = async (req, res) => {
         /**
          * FILTER — only products that SHOULD be advertised.
          *
-         * isVisible: true  — product is published and customer-facing
+         * isVisible: true  — must be published / customer-facing. Hidden products
+         *                    are excluded from the feed entirely so they never
+         *                    appear in Dynamic Ads previews or deliveries.
          *
-         * We intentionally do NOT filter on inStock/soldOut/stock here
-         * so that Meta keeps out-of-stock items in the catalog.
-         * Meta will automatically pause ads for them and reactivate
-         * when stock is restored — this is the correct Catalog Sales behaviour.
+         * We do NOT filter on inStock/stock here. Out-of-stock visible products
+         * remain in the catalog with availability="out of stock". This means:
+         *   • Meta pauses ads for them automatically.
+         *   • When restocked, ads resume without any catalog action needed.
+         *   • All catalog IDs remain intact — Pixel retargeting is preserved.
          *
          * We DO exclude mystery-box products because they have no stable
          * product URL or image meaningful to the catalog.
          */
         const products = await Product.find(
             {
+                isVisible: true,                     // published products only
                 productType: { $ne: 'mystery-box' }, // mystery boxes are not real SKUs
             },
             // Projection — only load the fields we actually use (lean query)
@@ -83,6 +86,7 @@ export const getCatalogFeed = async (req, res) => {
                 originalPrice: 1,
                 images: 1,
                 stock: 1,
+                inStock: 1,   // required by getAvailability() for the admin toggle check
                 category: 1,
             }
         ).lean();   // .lean() returns plain JS objects — ~2× faster, no Mongoose overhead
@@ -148,8 +152,10 @@ export const getCatalogFeed = async (req, res) => {
         xml += '</rss>';
 
         res.set('Content-Type', 'application/xml; charset=utf-8');
-        // Cache for 1 hour — lets Meta's crawler re-use the response and reduces DB load
-        res.set('Cache-Control', 'public, max-age=3600');
+        // Cache for 5 minutes — balances DB load vs. stock/visibility change propagation speed.
+        // Reducing from 3600s ensures that hiding a product or zeroing stock reaches Meta
+        // within one crawl cycle rather than sitting stale for up to an hour.
+        res.set('Cache-Control', 'public, max-age=300');
         return res.status(200).send(xml);
 
     } catch (error) {
