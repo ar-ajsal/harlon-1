@@ -5,7 +5,6 @@ import { authMiddleware } from '../middleware/auth.js';
 const router = Router();
 
 // Public routes
-router.get('/fix-stock', productController.fixDbStock);
 router.get('/', productController.getAll);
 router.get('/:id', productController.getById);
 
